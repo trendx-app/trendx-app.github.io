@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CaloryX — AI 칼로리 카운터 &amp; 운동 기록</title>
+<meta name="description" content="사진 한 장으로 칼로리와 영양을 분석하고, 운동까지 함께 기록하는 다이어트 앱. iOS · Android.">
+<style>
+:root{
+  --bg:#f7faf8; --card:#ffffff; --ink:#12211a; --muted:#5b6b63;
+  --brand:#16a06a; --brand-dark:#0e7a50; --line:#e2ebe6;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0e1512; --card:#152019; --ink:#e9f2ed; --muted:#9db0a6;
+         --brand:#3ddc9a; --brand-dark:#2bb37c; --line:#22302a; }
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+     background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:48px 20px 72px}
+header{text-align:center;margin-bottom:44px}
+.logo{font-size:44px;line-height:1;margin-bottom:12px}
+h1{font-size:1.9rem;margin:0 0 8px;letter-spacing:-.02em}
+.tag{color:var(--muted);font-size:1.05rem;margin:0}
+.stores{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 0}
+.btn{display:inline-block;padding:12px 20px;border-radius:12px;text-decoration:none;
+     font-weight:700;font-size:.95rem;background:var(--brand);color:#fff;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn.alt{background:transparent;color:var(--brand);border:2px solid var(--brand)}
+h2{font-size:1.15rem;margin:40px 0 14px;padding-bottom:6px;border-bottom:2px solid var(--brand)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h3{margin:0 0 4px;font-size:1rem}
+.card p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.6}
+ul{padding-left:20px;color:var(--muted)}
+li{margin:6px 0}
+footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--line);
+       color:var(--muted);font-size:.88rem;text-align:center}
+footer a{color:var(--brand);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.en{margin-top:8px}
+.en summary{cursor:pointer;color:var(--muted);font-size:.92rem}
+.en div{margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">🥗</div>
+    <h1>CaloryX</h1>
+    <p class="tag">사진 한 장이면 칼로리 기록 끝.<br>먹은 것과 움직인 것을 한곳에서.</p>
+    <div class="stores">
+      <a class="btn" href="https://apps.apple.com/app/id6791085565">App Store</a>
+      <a class="btn" href="https://play.google.com/store/apps/details?id=com.caloryx.app">Google Play</a>
+    </div>
+  </header>
+
+  <h2>주요 기능</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>📷 사진 한 장으로 분석</h3>
+      <p>음식 사진을 찍으면 칼로리와 단백질·탄수화물·지방을 추정합니다. 한 접시에 여러 음식이 담긴 한식 상차림도 항목별로 나눠 인식하고, 결과는 직접 고칠 수 있습니다.</p>
+    </div>
+    <div class="card">
+      <h3>📈 내 몸에 맞춰지는 목표</h3>
+      <p>체중 추세와 실제 섭취량을 비교해 소모 칼로리를 역산합니다. 표준 공식이 아니라 <em>내 데이터</em>로 목표가 조정됩니다.</p>
+    </div>
+    <div class="card">
+      <h3>🏃 운동도 같은 앱에서</h3>
+      <p>산책·러닝·등산·자전거를 GPS로 기록하고 지도에 경로를 남깁니다. 직접 입력한 운동도 함께 계산됩니다.</p>
+    </div>
+    <div class="card">
+      <h3>💬 AI 영양 코치</h3>
+      <p>오늘 기록을 바탕으로 무엇을 더 먹으면 좋을지 물어볼 수 있습니다.</p>
+    </div>
+    <div class="card">
+      <h3>🔥 연속 기록 &amp; 주간 리포트</h3>
+      <p>매일 기록이 이어지면 스트릭이 쌓이고, 한 주가 끝나면 요약 리포트를 받습니다.</p>
+    </div>
+    <div class="card">
+      <h3>🌍 11개 언어</h3>
+      <p>한국어·영어·일본어·중국어·스페인어 등에서 사용할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <h2>이런 분께</h2>
+  <ul>
+    <li>기록이 귀찮아 다이어트 앱을 여러 번 포기해 본 분</li>
+    <li>한식·배달 음식이 잦아 칼로리를 찾기 어려운 분</li>
+    <li>식단과 운동을 앱 두 개로 나눠 쓰기 번거로운 분</li>
+  </ul>
+
+  <h2>문의 &amp; 정책</h2>
+  <ul>
+    <li>문의·지원: <a href="https://fork-bestseller-2d1.notion.site/CaloryX-37089cfb23c08073addefb5e334956d2">지원 페이지</a></li>
+    <li>개인정보처리방침: <a href="https://fork-bestseller-2d1.notion.site/CaloryX-37089cfb23c08073addefb5e334956d2">보기</a></li>
+  </ul>
+
+  <details class="en">
+    <summary>English</summary>
+    <div>
+      <p><strong>CaloryX — AI Calorie &amp; Workout Tracker.</strong> Snap one photo to log calories and macros,
+      track walks, runs, hikes and rides on a map, and let your daily target adapt to your own weight trend.
+      Available in 11 languages on iOS and Android.</p>
+      <p>Support &amp; Privacy Policy:
+      <a href="https://fork-bestseller-2d1.notion.site/CaloryX-37089cfb23c08073addefb5e334956d2">here</a>.</p>
+    </div>
+  </details>
+
+  <footer>
+    <p>CaloryX · 문의 <a href="mailto:dys0707y@gmail.com">dys0707y@gmail.com</a></p>
+    <p>영양 정보는 참고용 추정치이며 의학적 진단·치료를 대신하지 않습니다.</p>
+  </footer>
+
+</div>
+</body>
+</html>
