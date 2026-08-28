@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LocalSale — garage &amp; yard sales near you</title>
+<meta property="og:title" content="LocalSale — every sale, one map">
+<meta property="og:description" content="Garage, yard and estate sales near you — filter by today or this weekend.">
+<meta name="apple-itunes-app" id="smart-banner" content="app-id=6792212299">
+<style>
+  :root{--orange:#F97316;--ink:#171412;--paper:#FFFBF7;--muted:#6b625b}
+  *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+  .card{max-width:420px;width:100%;text-align:center}
+  .pin{font-size:56px;line-height:1;margin-bottom:12px}
+  h1{font-size:26px;margin:0 0 8px} p{color:var(--muted);margin:0 0 22px;font-size:15px;line-height:1.45}
+  a.btn{display:block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:14px 18px;border-radius:14px;margin:10px 0;font-size:16px}
+  a.ghost{background:transparent;color:var(--orange);border:2px solid var(--orange)}
+  .small{font-size:12px;color:var(--muted);margin-top:18px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="pin">📍</div>
+  <h1 id="title">Opening LocalSale…</h1>
+  <p id="sub">Garage, yard and estate sales near you — on one map.</p>
+  <a id="open" class="btn" href="#">Open in the app</a>
+  <a id="ios" class="btn ghost" href="https://apps.apple.com/app/id6792212299">Get it on the App Store</a>
+  <a id="android" class="btn ghost" href="https://play.google.com/store/apps/details?id=com.localsale.app&amp;referrer=utm_source%3Dshare%26utm_medium%3Dlink">Get it on Google Play</a>
+  <div class="small">Free · No account needed</div>
+</div>
+<script>
+(function(){
+  // 친구가 받은 링크: 앱이 깔려 있으면 localsale:// 스킴으로 바로 열고, 1.5초 안에 못 열면(미설치)
+  // 스토어로 보낸다. 데스크톱은 두 스토어 버튼만 보여준다.
+  var q = new URLSearchParams(location.search);
+  var sale = q.get('sale');
+  var scheme = sale ? 'localsale://sale/' + encodeURIComponent(sale) : 'localsale://open';
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var play = document.getElementById('android').href;
+  var appstore = document.getElementById('ios').href;
+  var openBtn = document.getElementById('open');
+  // Android: intent:// 는 앱이 있으면 크롬이 바로 열고, 없으면 browser_fallback_url 로 보낸다(타이머 불필요).
+  var intentUrl = 'intent://' + (sale ? 'sale/' + encodeURIComponent(sale) : 'open')
+    + '#Intent;scheme=localsale;package=com.localsale.app;S.browser_fallback_url=' + encodeURIComponent(play) + ';end';
+  openBtn.href = isAndroid ? intentUrl : scheme;
+  // iOS Smart App Banner: 앱이 있으면 "열기", 없으면 "받기" — 사파리가 직접 처리(스킴 경고창 보완).
+  var banner = document.getElementById('smart-banner');
+  if (banner) banner.setAttribute('content', 'app-id=6792212299, app-argument=' + scheme);
+  if (sale) document.getElementById('sub').textContent = 'A friend shared a sale with you. Open it in LocalSale to see photos, hours and directions.';
+  if (isIOS) document.getElementById('android').style.display = 'none';
+  if (isAndroid) document.getElementById('ios').style.display = 'none';
+  if (!isIOS && !isAndroid) { document.getElementById('title').textContent = 'LocalSale'; openBtn.style.display = 'none'; return; }
+  if (isAndroid) { location.href = intentUrl; return; }
+  var start = Date.now();
+  var timer = setTimeout(function(){
+    // 앱이 열렸으면 페이지가 백그라운드로 가서 타이머가 늦게 돈다 — 2.2초 넘게 지났으면 점프한 것.
+    if (Date.now() - start < 2200) {
+      document.getElementById('title').textContent = 'Get LocalSale';
+      location.href = isIOS ? appstore : play;
+    }
+  }, 1500);
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) clearTimeout(timer); });
+  location.href = scheme;
+})();
+</script>
+</body>
+</html>

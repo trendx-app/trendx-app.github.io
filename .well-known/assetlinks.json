@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.localsale.app",
+      "sha256_cert_fingerprints": [
+        "BC:28:2C:B4:44:E1:46:41:19:18:3C:FD:1F:82:51:90:3F:4D:7B:1B:87:5A:AC:9B:5C:73:67:BC:A7:F3:CE:A0"
+      ]
+    }
+  }
+]
