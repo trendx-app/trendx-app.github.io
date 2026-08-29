@@ -1,434 +1,117 @@
-<!doctype html>
-<html lang="ko" data-theme="auto">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>다시올때 · 뷰티 주기 리마인더</title>
-  <meta name="description" content="보톡스·필러·슈링크부터 네일·속눈썹·왁싱·펌·염색까지. 마지막 받은 날짜 하나만 넣으면 다음 시기와 D-day를 대신 기억해 주는 뷰티 주기 리마인더. 모든 기록은 기기에만 저장됩니다." />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#8E3B5E" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#141014" media="(prefers-color-scheme: dark)" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrendX Apps</title>
+<meta name="description" content="일상에 필요한 작은 앱들을 만듭니다. iOS · Android">
+<style>
+  :root{--ink:#1d1a20;--mute:#6f6870;--line:#e8e3e8;--bg:#fbf9fb;--card:#fff;--accent:#8e3b5e}
+  @media (prefers-color-scheme:dark){
+    :root{--ink:#f2eef2;--mute:#a79fa8;--line:#2e2832;--bg:#141216;--card:#1c191e;--accent:#e68cb0}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",system-ui,sans-serif;
+       line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:64px 20px 80px}
+  header{margin-bottom:44px}
+  h1{font-size:30px;letter-spacing:-.02em;margin:0 0 10px}
+  .sub{color:var(--mute);margin:0;font-size:16px}
+  h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);
+     margin:40px 0 14px;font-weight:600}
+  ul{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+  li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .name{font-weight:700;font-size:17px;margin:0 0 4px}
+  .desc{color:var(--mute);font-size:14px;margin:0 0 12px}
+  .links{display:flex;gap:8px;flex-wrap:wrap}
+  .links a{font-size:13px;font-weight:600;text-decoration:none;color:var(--accent);
+           border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+  .links a:hover{border-color:var(--accent)}
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);
+         color:var(--mute);font-size:13px}
+  footer a{color:var(--mute)}
+</style>
 </head>
 <body>
-  <a class="skip-link" href="#main">본문 바로가기</a>
-
-  <!-- 데스크톱 전용 커스텀 커서 -->
-  <div class="cursor" aria-hidden="true">
-    <div class="cursor__dot"></div>
-    <div class="cursor__ring"></div>
-  </div>
-
-  <!-- 스크롤 진행 바 -->
-  <div class="scroll-progress" aria-hidden="true"><span></span></div>
-
-  <!-- 상단 내비 -->
-  <header class="nav" id="nav">
-    <div class="wrap nav__inner">
-      <a class="brand" href="#main" aria-label="다시올때 홈">
-        <span class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 36 36" width="30" height="30" role="img" aria-hidden="true">
-            <defs>
-              <linearGradient id="markGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="var(--grad-a)"/>
-                <stop offset="1" stop-color="var(--grad-b)"/>
-              </linearGradient>
-            </defs>
-            <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border)" stroke-width="3"/>
-            <circle cx="18" cy="18" r="14" fill="none" stroke="url(#markGrad)" stroke-width="3"
-                    stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="26"
-                    transform="rotate(-90 18 18)"/>
-            <circle cx="18" cy="18" r="3.2" fill="var(--gold)"/>
-          </svg>
-        </span>
-        <span class="brand__text">
-          <strong>다시올때</strong>
-          <small>뷰티 주기 리마인더</small>
-        </span>
-      </a>
-      <nav class="nav__links" aria-label="주요 섹션">
-        <a href="#how">사용법</a>
-        <a href="#presets">주기 라이브러리</a>
-        <a href="#privacy">개인정보</a>
-        <a href="#faq">자주 묻는 질문</a>
-      </nav>
-      <div class="nav__actions">
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="밝은/어두운 화면 전환" aria-pressed="false">
-          <span class="theme-toggle__icon" aria-hidden="true"></span>
-        </button>
-        <a class="btn btn--primary btn--sm magnetic" href="#waitlist" data-cta="nav">다운로드</a>
-      </div>
-    </div>
+<div class="wrap">
+  <header>
+    <h1>TrendX Apps</h1>
+    <p class="sub">일상에 필요한 작은 앱들을 만듭니다. iOS · Android</p>
   </header>
 
-  <main id="main">
-
-    <!-- ===================== 히어로 ===================== -->
-    <section class="hero" id="hero">
-      <div class="hero__bg" aria-hidden="true">
-        <span class="hero__blob hero__blob--1"></span>
-        <span class="hero__blob hero__blob--2"></span>
-        <span class="hero__blob hero__blob--3"></span>
+  <h2>Apps</h2>
+  <ul>
+    <li>
+      <p class="name">다시올때 (BeautyCycle)</p>
+      <p class="desc">시술·뷰티 관리 주기를 기억해 다음 시기를 D-day로 알려주는 리마인더.</p>
+      <div class="links">
+        <a href="/beautycycle/">소개</a>
+        <a href="https://apps.apple.com/kr/app/id6791245927">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.beautycycle.app">Google Play</a>
       </div>
-      <div class="grain" aria-hidden="true"></div>
-
-      <div class="wrap hero__inner">
-        <div class="hero__copy">
-          <p class="eyebrow reveal" data-reveal>
-            <span class="eyebrow__dot" aria-hidden="true"></span>
-            의료 시술 + 뷰티, 한 곳에서
-          </p>
-          <h1 class="hero__title">
-            <span class="line" data-stagger>다시 올 때가</span>
-            <span class="line" data-stagger>됐어요.</span>
-            <span class="line hero__title--accent" data-stagger>대신 기억해 둘게요.</span>
-          </h1>
-          <p class="hero__lead reveal" data-reveal>
-            보톡스·필러·슈링크부터 네일·속눈썹·왁싱·펌·염색까지.
-            마지막 받은 날짜 하나만 넣으면 <strong>다음 시기</strong>와 <strong>D-day</strong>를 대신 세어 드려요.
-          </p>
-          <div class="hero__cta reveal" data-reveal>
-            <a class="btn btn--primary magnetic" href="#waitlist" data-cta="hero">무료로 받기</a>
-            <a class="btn btn--ghost magnetic" href="#demo">주기 미리 계산해 보기</a>
-          </div>
-          <ul class="hero__badges reveal" data-reveal>
-            <li><span aria-hidden="true">◍</span> 기기에만 저장</li>
-            <li><span aria-hidden="true">◍</span> 회원가입 없음</li>
-            <li><span aria-hidden="true">◍</span> iOS · Android 네이티브</li>
-          </ul>
-        </div>
-
-        <!-- 시그니처: D-day 링 -->
-        <div class="hero__ring reveal" data-reveal aria-hidden="true">
-          <div class="ringcard">
-            <svg class="ring" viewBox="0 0 220 220" data-ring>
-              <defs>
-                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="var(--grad-a)"/>
-                  <stop offset="1" stop-color="var(--grad-b)"/>
-                </linearGradient>
-              </defs>
-              <circle class="ring__track" cx="110" cy="110" r="92" />
-              <circle class="ring__fill" cx="110" cy="110" r="92"
-                      transform="rotate(-90 110 110)" />
-            </svg>
-            <div class="ringcard__center">
-              <span class="ringcard__dlabel">다음 시기까지</span>
-              <!-- D-day·날짜는 JS가 오늘 기준으로 계산한다. 하드코딩하면 서로 어긋나고 언젠가 과거가 된다. -->
-              <span class="ringcard__dday" data-hero-dday>D-37</span>
-              <span class="ringcard__date" data-hero-date>계산 중…</span>
-            </div>
-            <div class="ringcard__foot">
-              <span class="chip chip--medical">보톡스(주름)</span>
-              <span class="ringcard__cycle">주기 3~4개월</span>
-            </div>
-          </div>
-        </div>
+    </li>
+    <li>
+      <p class="name">CaloryX</p>
+      <p class="desc">사진 한 장으로 칼로리·식단을 기록하는 다이어트 도우미.</p>
+      <div class="links">
+        <a href="/caloryx/">소개</a>
+        <a href="https://apps.apple.com/kr/app/id6791085565">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.caloryx.app">Google Play</a>
       </div>
-
-      <a class="hero__scroll" href="#stats" aria-label="아래로 스크롤">
-        <span class="hero__scroll-line" aria-hidden="true"></span>
-      </a>
-    </section>
-
-    <!-- ===================== 통계 ===================== -->
-    <section class="stats" id="stats" aria-label="핵심 숫자">
-      <div class="wrap stats__grid">
-        <div class="stat reveal" data-reveal>
-          <span class="stat__num" data-countup data-to="66">66</span>
-          <span class="stat__label">미리 담긴 주기 프리셋</span>
-        </div>
-        <div class="stat reveal" data-reveal>
-          <span class="stat__num" data-countup data-to="8">8</span>
-          <span class="stat__label">관리 카테고리</span>
-        </div>
-        <div class="stat reveal" data-reveal>
-          <span class="stat__num" data-countup data-to="1">1</span>
-          <span class="stat__label">입력하는 날짜의 수</span>
-        </div>
-        <div class="stat reveal" data-reveal>
-          <span class="stat__num" data-countup data-to="0">0</span>
-          <span class="stat__label">외부로 전송되는 기록</span>
-        </div>
+    </li>
+    <li>
+      <p class="name">LocalSale</p>
+      <p class="desc">주말 근처 세일을 지도 한 장으로 보는 동네 세일 지도.</p>
+      <div class="links">
+        <a href="https://apps.apple.com/kr/app/id6792212299">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.localsale.app">Google Play</a>
       </div>
-    </section>
-
-    <!-- ===================== 문제 ===================== -->
-    <section class="prob" id="why">
-      <div class="wrap prob__inner">
-        <div class="section-head reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 왜 필요할까요</p>
-          <h2>주기는 금방 지나가고,<br/>캘린더는 매번 번거로워요.</h2>
-        </div>
-        <div class="prob__cards">
-          <article class="pcard reveal" data-reveal>
-            <span class="pcard__no">01</span>
-            <h3>주기가 제각각이에요</h3>
-            <p>보톡스는 3~4개월, 필러는 1~2년, 스킨부스터는 몇 주 간격. 항목마다 달라서 외우기 어렵죠.</p>
-          </article>
-          <article class="pcard reveal" data-reveal>
-            <span class="pcard__no">02</span>
-            <h3>메모는 흩어져요</h3>
-            <p>캘린더에 적어둬도 다음 날짜를 매번 다시 계산하고 옮겨 적어야 해요.</p>
-          </article>
-          <article class="pcard reveal" data-reveal>
-            <span class="pcard__no">03</span>
-            <h3>때를 놓치기 쉬워요</h3>
-            <p>몇 달 뒤의 일이라 잊고 지내다, 문득 "언제였더라?" 싶어질 때가 많아요.</p>
-          </article>
-        </div>
+    </li>
+    <li>
+      <p class="name">Peekdo</p>
+      <p class="desc">할 일을 잠금화면에서 바로 확인하는 투두 위젯.</p>
+      <div class="links">
+        <a href="https://apps.apple.com/kr/app/id6799328929">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.peekdo.app">Google Play</a>
       </div>
-    </section>
-
-    <!-- ===================== 사용법 3스텝 ===================== -->
-    <section class="how" id="how">
-      <div class="wrap">
-        <div class="section-head section-head--center reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 어떻게 동작하나요</p>
-          <h2>세 번 탭이면 끝이에요.</h2>
-          <p class="section-sub">복잡한 설정도, 회원가입도 없어요.</p>
-        </div>
-        <ol class="steps">
-          <li class="step reveal" data-reveal>
-            <span class="step__num" aria-hidden="true">1</span>
-            <div class="step__body">
-              <h3>항목을 고르고</h3>
-              <p>66가지 프리셋에서 받은 시술·관리를 선택해요. 목록에 없으면 직접 추가할 수도 있어요.</p>
-            </div>
-          </li>
-          <li class="step reveal" data-reveal>
-            <span class="step__num" aria-hidden="true">2</span>
-            <div class="step__body">
-              <h3>마지막 날짜 하나만 입력하면</h3>
-              <p>주기는 프리셋에 이미 담겨 있어요. 언제 받았는지만 알려주면 나머지는 앱이 계산해요.</p>
-            </div>
-          </li>
-          <li class="step reveal" data-reveal>
-            <span class="step__num" aria-hidden="true">3</span>
-            <div class="step__body">
-              <h3>다음 시기가 카드로 나타나요</h3>
-              <p>다음 날짜와 D-day가 타임라인에 꽂히고, 때가 가까워지면 기기에서 알림이 울려요.</p>
-            </div>
-          </li>
-        </ol>
+    </li>
+    <li>
+      <p class="name">JoyKade</p>
+      <p class="desc">오프라인으로 즐기는 클래식 아케이드 게임 모음.</p>
+      <div class="links">
+        <a href="https://apps.apple.com/kr/app/id6799427809">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.joykade.app">Google Play</a>
       </div>
-    </section>
-
-    <!-- ===================== 인터랙티브 데모 ===================== -->
-    <section class="demo" id="demo">
-      <div class="wrap demo__inner">
-        <div class="demo__copy reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 직접 해보기</p>
-          <h2>주기를 하나 골라보세요.</h2>
-          <p class="section-sub">
-            오늘 기준으로 다음 시기와 D-day를 바로 계산해 그려드려요.
-            앱에서는 이 카드가 스프링으로 튀어나와 타임라인에 꽂혀요.
-          </p>
-          <div class="demo__chips" role="group" aria-label="시술·관리 선택">
-            <button type="button" class="dchip is-active" data-days="105" data-title="보톡스(주름)" data-cat="medical" data-cycle="3~4개월">보톡스</button>
-            <button type="button" class="dchip" data-days="450" data-title="팔자·볼 필러" data-cat="medical" data-cycle="12~18개월">필러</button>
-            <button type="button" class="dchip" data-days="135" data-title="스킨부스터" data-cat="medical" data-cycle="3~6개월">스킨부스터</button>
-            <button type="button" class="dchip" data-days="24" data-title="젤네일" data-cat="beauty" data-cycle="3~4주">젤네일</button>
-            <button type="button" class="dchip" data-days="24" data-title="속눈썹 연장" data-cat="beauty" data-cycle="3~4주">속눈썹</button>
-            <button type="button" class="dchip" data-days="135" data-title="펌" data-cat="beauty" data-cycle="3~6개월">펌</button>
-          </div>
-          <p class="disclaimer" id="demoDisclaimer">
-            <span aria-hidden="true">ⓘ</span>
-            표시되는 주기는 입력한 날짜에 기반한 단순 계산이에요. 의료 항목은 개인차가 있으며 담당 의료진과 상담이 필요합니다.
-          </p>
-        </div>
-
-        <div class="demo__ring reveal" data-reveal>
-          <div class="ringcard ringcard--lg">
-            <svg class="ring" viewBox="0 0 220 220" data-demo-ring aria-hidden="true">
-              <defs>
-                <linearGradient id="demoGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="var(--grad-a)"/>
-                  <stop offset="1" stop-color="var(--grad-b)"/>
-                </linearGradient>
-              </defs>
-              <circle class="ring__track" cx="110" cy="110" r="92" />
-              <circle class="ring__fill ring__fill--demo" cx="110" cy="110" r="92"
-                      transform="rotate(-90 110 110)" />
-            </svg>
-            <div class="ringcard__center">
-              <span class="ringcard__dlabel">다음 시기까지</span>
-              <span class="ringcard__dday" data-demo-dday aria-live="polite">D-64</span>
-              <span class="ringcard__date" data-demo-date>10월 12일</span>
-            </div>
-            <div class="ringcard__foot">
-              <span class="chip" data-demo-chip>보톡스(주름)</span>
-              <span class="ringcard__cycle" data-demo-cycle>주기 3~4개월</span>
-            </div>
-          </div>
-        </div>
+    </li>
+    <li>
+      <p class="name">GaslightGuard</p>
+      <p class="desc">가스라이팅을 배우고 점검하고 기록하는 자기 보호 도구.</p>
+      <div class="links">
+        <a href="https://apps.apple.com/kr/app/id6792681366">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=app.gaslightguard">Google Play</a>
       </div>
-    </section>
-
-    <!-- ===================== 주기 라이브러리 (실데이터 45종) ===================== -->
-    <section class="lib" id="presets">
-      <div class="wrap">
-        <div class="section-head section-head--center reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 주기 라이브러리</p>
-          <h2>66가지 주기를 미리 담았어요.</h2>
-          <p class="section-sub">"보톡스는 몇 개월?"을 검색할 필요 없이, 골라서 날짜만 넣으면 돼요. 없는 항목은 직접 만들 수 있어요.</p>
-        </div>
-
-        <div class="lib__filter reveal" data-reveal role="group" aria-label="카테고리 필터">
-          <!-- 칩은 main.js가 채웁니다 -->
-        </div>
-
-        <div class="lib__grid" id="presetGrid" aria-live="polite">
-          <!-- 카드는 main.js가 채웁니다 -->
-        </div>
-
-        <p class="disclaimer disclaimer--wide reveal" data-reveal>
-          <span aria-hidden="true">ⓘ</span>
-          <span><strong>의료</strong>로 표시된 항목의 주기는 대표값이며 개인차가 있습니다. 시술 여부와 시기는 담당 의료진과 상담이 필요합니다. 이 앱은 특정 병원·시술을 권유하지 않으며, 효과나 안전성을 보장하지 않습니다.</span>
-        </p>
+    </li>
+    <li>
+      <p class="name">NotiBox</p>
+      <p class="desc">놓친 알림을 한곳에 모아 보관·검색하는 알림 보관함.</p>
+      <div class="links">
+        <a href="https://play.google.com/store/apps/details?id=com.notibox.app">Google Play</a>
       </div>
-    </section>
+    </li>
+    <li>
+      <p class="name">Tripaint</p>
+      <p class="desc">시간표 없이 쓰는 여행 기록, 다녀온 곳은 지도에 칠해져요.</p>
+      <div class="links">
+        <a href="/tripaint/">소개</a>
+        <a href="https://play.google.com/store/apps/details?id=com.tripaint.app">Google Play</a>
+      </div>
+    </li>
+  </ul>
 
-    <!-- ===================== 개인정보 ===================== -->
-    <!-- ===================== 기능 하이라이트 ===================== -->
-    <section class="privacy" id="features" aria-label="주요 기능">
-      <div class="wrap privacy__inner">
-        <div class="privacy__copy reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 앱을 열지 않아도</p>
-          <h2>잠금화면에서<br/>D-day가 보여요.</h2>
-          <p class="section-sub">
-            주기는 몇 주에서 몇 달 — 매일 앱을 열 이유가 없죠.
-            그래서 위젯과 알림이 대신 일해요.
-          </p>
-        </div>
-        <ul class="privacy__list">
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>잠금화면·홈화면 위젯</h3><p>폰을 켤 때마다 가장 가까운 시기의 D-day가 보여요. iOS·Android 모두요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>알림 시점은 내 습관대로</h3><p>1개월 전부터 당일까지 여러 개를 고를 수 있어요. 예약이 필요한 일정일수록 미리요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>나의 실제 평균 간격</h3><p>회차 기록이 쌓이면 내가 실제로 다니는 간격을 설정 주기와 나란히 보여줘요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>기록 내보내기</h3><p>기기를 바꿀 때를 대비해 언제든 파일로 남겨둘 수 있어요.</p></div>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="privacy" id="privacy">
-      <div class="wrap privacy__inner">
-        <div class="privacy__copy reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 처음부터 기기 안에</p>
-          <h2>당신의 기록은<br/>이 기기를 떠나지 않아요.</h2>
-          <p class="section-sub">
-            시술·미용 이력은 민감한 정보예요. 그래서 주기·회차 기록은 기기 안에만 저장돼요.
-            입력한 모든 기록은 기기 안에만 저장되고, 알림도 기기 안에서 울리는 로컬 알림이에요.
-          </p>
-        </div>
-        <ul class="privacy__list">
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>회원가입이 없어요</h3><p>이름·이메일·전화번호를 요구하지 않아요. 계정 자체가 없어요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>기록은 기기 안에만</h3><p>주기·회차 기록은 서버로 전송되지 않아요. 기기 밖으로 나가는 것은 직접 켜는 선택 기능(AI 피부 노트 사진 — 분석 후 즉시 삭제, 커뮤니티에 직접 올린 글)과 무료 이용 시 표시되는 광고뿐이에요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>삭제하면 함께 지워져요</h3><p>앱을 지우면 기록도 기기에서 사라지고, 어디에도 사본이 남지 않아요.</p></div>
-          </li>
-          <li class="pitem reveal" data-reveal>
-            <span class="pitem__ic" aria-hidden="true">◍</span>
-            <div><h3>알림 권한은 나중에</h3><p>첫 항목을 저장한 뒤, 무엇을 알려줄지 분명해진 시점에만 물어봐요.</p></div>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ===================== FAQ ===================== -->
-    <section class="faq" id="faq">
-      <div class="wrap faq__inner">
-        <div class="section-head reveal" data-reveal>
-          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span> 자주 묻는 질문</p>
-          <h2>궁금한 점을 모았어요.</h2>
-        </div>
-        <div class="faq__list">
-          <details class="acc reveal" data-reveal>
-            <summary>어떤 것들을 관리할 수 있나요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>보톡스·필러·슈링크·스킨부스터 같은 의료 시술과, 네일·속눈썹·왁싱·펌·염색·피부관리 같은 뷰티까지 66가지 프리셋을 담았어요. 목록에 없으면 직접 추가할 수도 있어요.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>주기는 정확한가요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>프리셋의 주기는 일반적으로 알려진 대표값이에요. 개인차가 있어서 언제든 직접 조정할 수 있고, 의료 항목의 시기는 담당 의료진과 상담이 필요합니다.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>알림은 어떻게 오나요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>기기 안에서 예약되는 로컬 알림이에요. 다음 시기가 가까워지면 미리 알려드리고, 여러 항목이 겹쳐도 하루에 몰아서 조용히 전해요.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>제 기록이 외부로 나가나요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>주기·회차 기록은 기기 안에만 저장되며 외부 서버로 전송되지 않아요. AI 피부 노트 사진(분석 후 즉시 삭제)과 커뮤니티에 직접 올린 글처럼, 스스로 켜는 선택 기능만 네트워크를 사용해요. 자세한 내용은 개인정보처리방침을 확인하세요.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>기기를 바꾸면 기록은 어떻게 되나요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>설정에서 기록을 파일로 내보내 두면, 새 기기에서 그 파일을 가져와 그대로 되살릴 수 있어요. 가져오기는 기존 기록을 덮어쓰지 않고 없는 것만 채워 넣어요.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>병원을 연결해 주거나 예약을 대행하나요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>아니요. 이 앱은 특정 병원이나 시술을 소개·권유하지 않는, 순수한 개인 기록 도구예요. 예약은 늘 본인이 직접 하시면 돼요.</p></div>
-          </details>
-          <details class="acc reveal" data-reveal>
-            <summary>얼마인가요?<span class="acc__ic" aria-hidden="true"></span></summary>
-            <div class="acc__body"><p>모든 기능이 무료예요. 설치 후 첫 7일은 광고도 없고, 그 후에는 일부 부가 기능을 열 때만 짧은 광고를 봐요. 구독하면 광고 없이 쓸 수 있어요.</p></div>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== 사전예약 ===================== -->
-    <section class="waitlist" id="waitlist">
-      <div class="grain" aria-hidden="true"></div>
-      <div class="wrap waitlist__inner reveal" data-reveal>
-        <p class="eyebrow eyebrow--onDark"><span class="eyebrow__dot" aria-hidden="true"></span> 출시됐어요</p>
-        <h2>지금 무료로 시작하세요</h2>
-        <p class="waitlist__sub">iOS·Android 모두에서 만날 수 있어요.</p>
-        <div class="waitlist__stores" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <a class="btn btn--primary magnetic" href="https://play.google.com/store/apps/details?id=com.beautycycle.app" data-cta="store-play">Google Play에서 받기</a>
-            <a class="btn btn--primary magnetic" href="https://apps.apple.com/kr/app/id6791245927" data-cta="store-ios">App Store에서 받기</a>
-          </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===================== 푸터 ===================== -->
-  <footer class="foot">
-    <div class="wrap foot__inner">
-      <div class="foot__brand">
-        <strong>다시올때</strong>
-        <span>뷰티 주기 리마인더</span>
-      </div>
-      <p class="foot__disc">
-        이 앱은 의료 자문을 제공하지 않으며, 특정 시술을 권유하거나 그 효과·안전성을 보장하지 않습니다.
-        시술 여부와 시기는 담당 의료진과 상담하시고, 주기에는 개인차가 있습니다.
-      </p>
-      <div class="foot__meta">
-        <a href="mailto:dys0707y@gmail.com">문의</a>
-        <span aria-hidden="true">·</span>
-        <span>iOS · Android</span>
-        <span aria-hidden="true">·</span>
-        <span>© 2026 다시올때</span>
-      </div>
-    </div>
+  <footer>
+    <p>문의 <a href="mailto:dys0707y@gmail.com">dys0707y@gmail.com</a></p>
   </footer>
-
-  <script src="main.js" defer></script>
+</div>
 </body>
 </html>
