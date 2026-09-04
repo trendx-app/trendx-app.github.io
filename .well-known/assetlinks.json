@@ -1,10 +1,13 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.localsale.app",
       "sha256_cert_fingerprints": [
+        "E2:AF:31:AC:1B:7C:6C:91:04:83:E9:6E:1C:E3:62:AA:05:B1:DC:74:8B:A2:B8:96:7F:BF:7E:44:78:F0:1E:F1",
         "BC:28:2C:B4:44:E1:46:41:19:18:3C:FD:1F:82:51:90:3F:4D:7B:1B:87:5A:AC:9B:5C:73:67:BC:A7:F3:CE:A0"
       ]
     }
