@@ -1,0 +1,112 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>집잣대 개인정보처리방침</title><style>
+:root{color-scheme:light dark;--bg:#f7f8fa;--fg:#16324f;--muted:#5b6b7c;--card:#fff;--line:#dfe5ec;--accent:#ffb020}
+@media (prefers-color-scheme:dark){:root{--bg:#101720;--fg:#e8eef5;--muted:#9fb0c0;--card:#18212c;--line:#2a3644}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 72px}
+h1{font-size:28px;margin:8px 0 4px}h2{font-size:19px;margin:32px 0 8px;padding-top:16px;border-top:1px solid var(--line)}
+h3{font-size:16px;margin:20px 0 6px}
+p,li{color:var(--fg)}.note{color:var(--muted);font-size:14px}
+ul{padding-left:20px}li{margin:4px 0}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;display:block;overflow-x:auto}
+td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:13px}
+a{color:#2f6fb0}hr{border:0;border-top:1px solid var(--line);margin:24px 0}
+.brand{display:inline-block;background:var(--fg);color:#fff;border-radius:10px;padding:6px 12px;font-weight:700;letter-spacing:-.5px}
+.brand em{color:var(--accent);font-style:normal}
+footer{margin-top:48px;color:var(--muted);font-size:13px}
+</style></head><body><div class="wrap">
+<p><span class="brand">집<em>잣</em>대</span></p>
+<h1>집잣대(ZipZatDae) 개인정보처리방침</h1>
+
+<p class="note">시행일: 2026-09-10 · 버전 1.0 · 초안 작성 2026-09-10</p>
+<p class="note">구성은 개인정보보호위원회 「개인정보 처리방침 작성지침(2025.4.)」의 필수 항목 순서를 따랐습니다(<a href="https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&amp;bbscttNo=20806">https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&amp;bbscttNo=20806</a>).</p>
+<p class="note">스토어 제출 시 이 문서를 공개 URL(<code><a href="https://trendx-app.github.io/zipzatdae/privacy.html">https://trendx-app.github.io/zipzatdae/privacy.html</a></code>)로 호스팅하고, App Store 개인정보 라벨·Play 데이터 보안 답변과 내용을 일치시킵니다.</p>
+
+<hr>
+
+<p>단윤성(TrendX)(이하 &quot;개발자&quot;)는 모바일 앱 「집잣대」(이하 &quot;앱&quot;)를 제공하면서 「개인정보 보호법」 제30조에 따라 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
+
+<h2>제1조 (요약)</h2>
+<ul><li>앱은 <strong>개인정보를 수집하지 않습니다.</strong> 회원가입·로그인 기능이 없고, 연락처·사진·마이크 등 기기 권한을 요청하지 않습니다.</li>
+<li>지도 화면의 &quot;현위치&quot; 버튼을 누른 경우에만 위치 권한을 요청합니다. 받은 위치는 <strong>지도를 그 자리로 옮기는 데에만 기기 안에서 쓰이며, 저장하거나 서버로 전송하지 않습니다.</strong> 권한을 거부해도 위치를 제외한 모든 기능이 그대로 동작합니다.</li>
+<li>사용자가 앱에 입력·저장하는 정보(관심 단지, 최근 본 단지, 진단 입력값, 설정)는 <strong>사용자 기기 내부에만 저장</strong>되며 개발자 서버로 전송되지 않습니다.</li>
+<li>시세 데이터를 불러올 때 서버 통신이 발생하며, 이 과정에서 IP 주소 등 통신에 수반되는 정보가 서버 접속 기록에 일시 남을 수 있습니다. 개발자는 이를 개인 식별 목적으로 이용하지 않습니다.</li>
+</ul>
+<h2>제2조 (처리하는 개인정보 항목 및 수집 방법)</h2>
+<ul><li>개발자는 앱을 통해 이름, 연락처, 이메일, 계정 식별자, 광고 식별자(ADID/IDFA), 위치정보 등 <strong>어떠한 개인정보도 수집·저장하지 않습니다.</strong></li>
+<li>기기 내 저장 정보(개발자에게 전송되지 않음)</li>
+</ul><p>   | 항목 | 저장 위치 | 용도 | 삭제 방법 |</p>
+<p>   |---|---|---|---|</p>
+<p>   | 관심 단지·최근 본 단지 | 기기(Android DataStore / iOS UserDefaults·파일) | 편의 기능 | 앱 내 &quot;내집 &gt; 삭제&quot; 또는 앱 삭제 |</p>
+<p>   | 보증금 안전진단 입력값(보증금·선순위 채권액 등) | 기기 메모리·임시 저장 | 등급 계산(기기 내 연산) | 결과 화면 이탈·앱 삭제 |</p>
+<p>   | 설정(다크모드 등) | 기기 | 표시 설정 | 앱 삭제 |</p>
+<ul><li>서버 통신 정보</li>
+</ul><p>   - 앱은 시세·랭킹 데이터를 조회하기 위해 개발자가 운영하는 데이터 서버(Supabase)에 HTTPS 요청을 보냅니다. 요청에는 조회 대상(지역 코드·단지 코드·기간)만 포함되며 사용자 식별 정보는 포함되지 않습니다.</p>
+<p>   - 서버 및 호스팅 사업자의 표준 접속 기록(IP 주소, 요청 시각, 앱 버전, OS 종류)이 보안·장애 대응 목적으로 최대 30일 보관 후 자동 삭제됩니다.</p>
+<ul><li>(선택 조항 — 분석 도구 도입 시에만 활성화) 개발자는 서비스 개선을 위해 개인을 식별하지 않는 집계 이벤트(예: &quot;진단 실행 횟수&quot;, &quot;공유 카드 생성 횟수&quot;, 앱 버전, OS 종류)를 수집할 수 있습니다. 이 경우 기기 식별자·광고 식별자·정밀 위치는 포함하지 않으며, 사용 도구(없음)와 항목을 본 조에 명시하고 시행일을 갱신합니다. <strong>현재 버전(1.0)에서는 수집하지 않습니다.</strong></li>
+</ul>
+<h2>제3조 (개인정보의 처리 목적)</h2>
+<p>개발자는 개인정보를 수집하지 않으므로 처리 목적이 존재하지 않습니다. 제2조 제3항의 접속 기록은 서비스의 안정적 제공과 부정 이용(과도한 요청) 방지 목적으로만 이용합니다.</p>
+
+<h2>제4조 (보유 및 이용 기간)</h2>
+<ul><li>기기 내 저장 정보: 사용자가 삭제하거나 앱을 삭제할 때까지.</li>
+<li>서버 접속 기록: 생성일로부터 30일.</li>
+</ul>
+<h2>제5조 (제3자 제공)</h2>
+<p>개발자는 개인정보를 제3자에게 제공하지 않습니다.</p>
+
+<h2>제6조 (처리 위탁)</h2>
+<p>개발자는 데이터 서버 운영을 위해 클라우드 호스팅 사업자(Supabase, 소재지 대한민국 서울 리전(ap-northeast-2))의 인프라를 이용합니다. 해당 사업자는 제2조 제3항의 접속 기록을 인프라 운영 범위에서 보관할 수 있으며, 개발자는 계약을 통해 목적 외 이용을 제한합니다. (국외 사업자인 경우 「개인정보 보호법」 제28조의8에 따른 국외 이전 항목·국가·시점·방법을 여기에 기재)</p>
+
+<h2>제7조 (정보주체와 법정대리인의 권리·의무 및 행사 방법)</h2>
+<ul><li>앱은 개인정보를 보유하지 않으므로 열람·정정·삭제·처리정지 요구 대상 정보가 없습니다.</li>
+<li>기기 내 저장 정보는 사용자가 앱 내 기능 또는 앱 삭제로 직접 삭제할 수 있습니다.</li>
+<li>그럼에도 문의가 있는 경우 제12조의 연락처로 요청하시면 10일 이내 답변합니다.</li>
+</ul>
+<h2>제8조 (개인정보의 파기)</h2>
+<p>접속 기록은 보유 기간 경과 시 자동 삭제(전자 파일 영구 삭제)됩니다.</p>
+
+<h2>제9조 (안전성 확보 조치)</h2>
+<ul><li>앱-서버 통신은 TLS(HTTPS)로 암호화합니다.</li>
+<li>서버는 읽기 전용 익명 접근(행 수준 보안)으로 구성하여 앱이 사용자 데이터를 쓰거나 다른 사용자 정보를 읽을 수 없습니다.</li>
+<li>앱은 기기 외부로 진단 입력값을 전송하지 않습니다.</li>
+</ul>
+<h2>제10조 (자동 수집 장치 — 쿠키·광고 식별자·푸시)</h2>
+<ul><li>쿠키·웹 추적 도구·광고 SDK를 사용하지 않습니다.</li>
+<li>(향후 알림 기능 도입 시) 관심 단지 신규 실거래 알림은 기기 로컬 알림으로 구현하는 것을 원칙으로 하며, 푸시 토큰을 서버에 저장하게 되는 경우 본 방침을 개정하고 사전 고지합니다.</li>
+</ul>
+<h2>제11조 (공공데이터 출처 및 정보의 성격)</h2>
+<ul><li>앱이 표시하는 실거래 정보는 「국토교통부 실거래가 공개시스템」(<a href="https://rt.molit.go.kr">https://rt.molit.go.kr</a>) 및 「공공데이터포털」(<a href="https://www.data.go.kr,">https://www.data.go.kr,</a> 국토교통부_실거래가 정보)에서 제공하는 공공데이터를 개발자가 수집·가공한 것입니다.</li>
+<li>시세·전세가율·등급 등 파생 지표는 실거래 통계를 바탕으로 계산한 <strong>참고 정보</strong>이며 감정평가·은행 시세·법적 효력을 갖는 자료가 아닙니다.</li>
+<li>앱은 정부·공공기관의 공식 앱이 아니며 국토교통부·주택도시보증공사(HUG)와 무관한 민간 서비스입니다.</li>
+</ul>
+<h2>제12조 (개인정보 보호책임자 및 문의처)</h2>
+<table><tr><td>구분</td><td>내용</td></tr>
+<tr><td>개인정보 보호책임자</td><td>단윤성 (개발자)</td></tr>
+<tr><td>이메일</td><td>dys0707y@gmail.com</td></tr>
+<tr><td>문의 접수</td><td>앱 내 &quot;내집 &gt; 설정 &gt; 문의하기&quot; 또는 위 이메일</td></tr>
+</table>
+<p>기타 개인정보 침해에 대한 신고·상담: 개인정보침해신고센터(privacy.kisa.or.kr, 국번 없이 118), 개인정보분쟁조정위원회(kopico.go.kr, 1833-6972), 대검찰청 사이버수사과(spo.go.kr, 1301), 경찰청 사이버수사국(ecrm.police.go.kr, 182).</p>
+
+<h2>제13조 (처리방침의 변경)</h2>
+<p>본 방침을 변경하는 경우 시행일 7일 전(중요 변경은 30일 전)부터 앱 내 공지 및 <a href="https://trendx-app.github.io/zipzatdae/privacy.html에">https://trendx-app.github.io/zipzatdae/privacy.html에</a> 게시합니다.</p>
+<ul><li>1.0 (2026-09-10): 최초 제정.</li>
+</ul>
+<h2>제14조 (공개 위치)</h2>
+<p>본 방침은 앱 &quot;내집 &gt; 설정 &gt; 개인정보처리방침&quot;, 스토어 등록 페이지, <a href="https://trendx-app.github.io/zipzatdae/privacy.html에서">https://trendx-app.github.io/zipzatdae/privacy.html에서</a> 확인할 수 있습니다. (작성지침 2025.4. — 앱은 첫 화면 외 설정 메뉴 등 확인이 쉬운 위치에 공개 가능)</p>
+
+<hr>
+
+<h3>부록 A. 스토어 답변 대조표 (내부용, 공개본에서는 삭제)</h3>
+<table><tr><td>스토어 항목</td><td>답변</td><td>본 방침 근거</td></tr>
+<tr><td>Play 데이터 보안 — 수집</td><td>없음</td><td>제2조 1항</td></tr>
+<tr><td>Play 데이터 보안 — 공유</td><td>없음</td><td>제5조</td></tr>
+<tr><td>Play — 데이터 삭제 요청</td><td>계정 없음, 앱 삭제로 제거</td><td>제7조</td></tr>
+<tr><td>App Store 개인정보 라벨</td><td>Data Not Collected</td><td>제2조 1항</td></tr>
+<tr><td>제2조 4항 활성화 시</td><td>Play: &quot;앱 상호작용&quot; 수집·미공유·선택 / Apple: &quot;사용 데이터 — 제품 상호작용, 사용자 연결 안 됨, 추적 안 함&quot;</td><td>제2조 4항</td></tr>
+</table><ul><li>근거: Play 데이터 보안 섹션은 수집이 없어도 양식 제출·처리방침 URL 필수(<a href="https://support.google.com/googleplay/android-developer/answer/10787469">https://support.google.com/googleplay/android-developer/answer/10787469</a> ); Apple도 모든 앱에 처리방침 URL 필수, 분석 SDK 사용 중 &quot;수집 안 함&quot; 선언 시 반려 사례(<a href="https://developer.apple.com/app-store/app-privacy-details/">https://developer.apple.com/app-store/app-privacy-details/</a> , <a href="https://ultrafastutilities.com/apple-app-store-privacy-policy-requirements">https://ultrafastutilities.com/apple-app-store-privacy-policy-requirements</a> ).</li></ul>
+<footer>ZipZatDae · 국토교통부 실거래가 공개데이터 기반 · 정부 공식 앱이 아닙니다.</footer>
+</div></body></html>
