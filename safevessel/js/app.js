@@ -1669,6 +1669,7 @@ ${'─'.repeat(42)}
 
     renderInspectionRoute(P.day_plans[inspOfficer]);
     renderInspectionUrgency(P);
+    renderInspectionCapacity(P);
     renderInspectionMethod(P);
   }
 
@@ -1737,6 +1738,41 @@ ${'─'.repeat(42)}
       </div>`);
   }
 
+  function renderInspectionCapacity(P) {
+    const curve = P.capacity_curve || [];
+    if (!curve.length) { SV.html('inspCapacity', '<p class="muted">산출되지 않았습니다.</p>'); return; }
+    const max = Math.max(...curve.map((c) => c.scheduled + c.deferred)) || 1;
+    const cur = (P.summary && P.summary.officers) || 0;
+
+    SV.html('inspCapacity', `
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th style="width:80px">감독관</th><th>소화 비율</th>
+          <th class="num" style="width:72px">배정</th><th class="num" style="width:72px">이월</th>
+          <th class="num" style="width:88px">평균 가동</th><th class="num" style="width:88px">총 이동</th>
+        </tr></thead>
+        <tbody>${curve.map((c) => {
+          const w = Math.round(c.scheduled / max * 100);
+          const here = c.officers === cur;
+          return `<tr${here ? ' class="rank--top"' : ''}>
+            <td class="tnum"><b>${c.officers}명</b>${here ? ' <span class="tag">현재</span>' : ''}</td>
+            <td>
+              <div class="minibar" title="배정 ${c.scheduled} / 전체 ${c.scheduled + c.deferred}">
+                <div class="minibar__fill" style="width:${w}%"></div>
+              </div>
+              <span class="small muted tnum">${SV.pct(c.coverage, 1)}</span>
+            </td>
+            <td class="num tnum">${SV.num(c.scheduled)}</td>
+            <td class="num tnum">${SV.num(c.deferred)}</td>
+            <td class="num tnum">${SV.pct(c.utilization, 0)}</td>
+            <td class="num tnum">${SV.dec(c.travel_km, 0)}km</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+      <p class="small muted mt-1">${SV.esc(P.capacity_note || '')
+        .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')}</p>`);
+  }
+
   function renderInspectionMethod(P) {
     const m = P.method || {};
     const site = P.sites || {};
@@ -1775,6 +1811,7 @@ ${'─'.repeat(42)}
     const c = E.cases[emCase];
     const o = c.origin || {};
     const sevTone = c.severity <= 2 ? 'red' : (c.severity === 3 ? 'amber' : 'green');
+    const facs = c.facilities || [];
 
     SV.html('emSummary', `
       <div class="card__head">
@@ -1823,7 +1860,9 @@ ${'─'.repeat(42)}
 
     // 의료 이송
     const hasFac = c.transport && c.transport.length;
-    SV.el('emTransportMeta').textContent = hasFac ? '사고 지점 → 의료기관' : '의료기관 명부 미연계';
+    SV.el('emTransportMeta').textContent = hasFac
+      ? `사고 지점 → ${SV.esc((facs[0] || {}).name || '의료기관')}`
+      : '의료기관 명부 미연계';
     SV.html('emTransport', hasFac ? `
       <div class="tbl-wrap"><table>
         <thead><tr><th>수단</th><th class="num">거리</th><th class="num">합계</th><th>비고</th></tr></thead>
@@ -1850,6 +1889,33 @@ ${'─'.repeat(42)}
         <span class="tag">${SV.esc(typeof r === 'string' ? r : (r.kind || r.label || ''))}
         ${typeof r === 'object' && r.reason ? `<i title="${SV.esc(r.reason)}">ⓘ</i>` : ''}</span>`).join('')}</div>
       <p class="small muted mt-1">사고 유형 × 심각도 매트릭스(계획서 §5)로 결정됩니다.</p>`);
+
+    // 이송 대상 의료기관 — '가까운 순'이 아니라 '감당 가능한 곳 중 가까운 순'
+    SV.el('emFacMeta').textContent = facs.length
+      ? `${facs.length}곳 · 실효거리순` : '명부 미연계';
+    SV.html('emFacilities', facs.length ? `
+      <ol class="evi">${facs.map((f, i) => `
+        <li>
+          <b>${SV.esc(f.name)}</b>
+          <span class="tag${f.tier <= 2 ? ' tag--govt' : ''}">${SV.esc(f.kind || '등급 미상')}</span>
+          ${f.suitable ? '' : '<span class="tag">역량 부족</span>'}
+          <div class="small muted">
+            직선 ${SV.dec(f.distance_km, 1)}km (${SV.dec(f.distance_nm, 1)}해리)
+            ${f.effective_km !== f.distance_km
+              ? ` · 실효 ${SV.dec(f.effective_km, 1)}km` : ''}
+            ${f.phone ? ' · ' + SV.esc(f.phone) : ''}
+          </div>
+          ${f.address ? `<div class="small muted">${SV.esc(f.address)}</div>` : ''}
+        </li>`).join('')}</ol>
+      <p class="small muted mt-1">
+        <b>실효거리</b> = 직선거리 + (등급 낮을수록 가산). 중증일수록 가산이 커져
+        <b>가까운 지역기관보다 먼 권역센터</b>가 앞에 옵니다.<br>
+        출처: 국립중앙의료원 전국 응급의료기관(공공데이터포털 15000563).
+      </p>` : `
+      <div class="notice notice--warn">
+        <span class="notice__ico" aria-hidden="true">🏥</span>
+        <div><b>응급의료기관 명부가 연계되지 않았습니다.</b> 지어낸 병원을 넣지 않습니다.</div>
+      </div>`);
 
     // 최근접 구조 거점
     SV.html('emRescue', (c.rescue && c.rescue.length) ? `
