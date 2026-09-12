@@ -27,6 +27,40 @@
   let inspOfficer = 0;           // 점검계획에서 보고 있는 거점
   let emCase = 0;                // 긴급대응에서 보고 있는 사례
 
+  /**
+   * 클릭 가능한 표 행에 **키보드 조작**을 붙인다.
+   *
+   * ⚠️ 예전에는 click 리스너만 있었다. `tabindex` 가 문서 전체에 0개라
+   *    키보드·스크린리더 사용자는 선박군·실명 선박·업종을 **하나도 고를 수 없었다.**
+   *    공공 웹 접근성 기준(KWCAG 2.1 '키보드 사용 보장') 직접 위반이다.
+   */
+  /**
+   * 다음 프레임에 한 번만 실행. 슬라이더 드래그는 초당 60회 발생하는데
+   * 핸들러가 `renderSimulator + renderOverview + renderVesselPanel`(SVG 4개 재생성 +
+   * 200행 테이블 재작성)을 통째로 돌린다. 재계산 자체는 0.8ms 로 싸지만
+   * **렌더가 비싸다.** 값은 즉시 반영하고 그리기만 묶는다.
+   */
+  function raf(fn) {
+    let pending = false;
+    return (...args) => {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => { pending = false; fn(...args); });
+    };
+  }
+
+  function onRowActivate(selector, handler) {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.addEventListener('click', () => handler(el));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          handler(el);
+        }
+      });
+    });
+  }
+
   /* ================================================================ 로딩 */
 
   async function loadAll() {
@@ -333,9 +367,9 @@
     // ---- 위험 상위 선박군 ----
     const top = R.rows.slice(0, 12);
     SV.html('topRiskTable',
-      `<thead><tr><th style="width:34px"></th><th>선박군</th><th class="num">척수</th><th class="num">점수</th><th>등급</th></tr></thead>
+      `<thead><tr><th scope="col" style="width:34px"></th><th scope="col">선박군</th><th scope="col" class="num">척수</th><th scope="col" class="num">점수</th><th scope="col">등급</th></tr></thead>
        <tbody>${top.map((r, i) => `
-        <tr data-cell="${r.cell.id}" style="cursor:pointer">
+        <tr data-cell="${r.cell.id}" tabindex="0" role="button" style="cursor:pointer">
           <td><span class="rank ${i < 3 ? 'rank--top' : ''}">${i + 1}</span></td>
           <td><b>${SV.esc(r.cell.fishery)}</b>${r.cell.govt_high_risk ? ' <span class="tag tag--govt">정부지정</span>' : ''}
               <div class="small muted">${SV.esc(r.cell.band)} · ${SV.esc(r.cell.sea)} · ${SV.esc(r.cell.hull)}</div></td>
@@ -343,13 +377,11 @@
           <td class="num tnum"><b>${SV.dec(r.score, 1)}</b></td>
           <td>${SV.signalPill(r.level)}</td>
         </tr>`).join('')}</tbody>`);
-    document.querySelectorAll('#topRiskTable tbody tr').forEach((tr) => {
-      tr.addEventListener('click', () => {
-        selectedCell = tr.dataset.cell;
-        switchTab('vessel');
-        setVesselMode('cell');      // 선박군 상세를 실제로 보이게 한다
-        renderVesselPanel();
-      });
+    onRowActivate('#topRiskTable tbody tr', (tr) => {
+      selectedCell = tr.dataset.cell;
+      switchTab('vessel');
+      setVesselMode('cell');      // 선박군 상세를 실제로 보이게 한다
+      renderVesselPanel();
     });
 
     // ---- 톤급별 사고율 ----
@@ -505,11 +537,21 @@
         <div class="slider-row__desc">${SV.esc(f.desc)}</div>
       </div>`).join(''));
 
+    const repaintAll = raf(() => {
+      renderSimulator();
+      renderOverview();
+      renderVesselPanel();
+      if (RENDERED.has('vessel')) renderNamedList();
+    });
+
     D.meta.factors.forEach((f) => {
       const input = document.getElementById(`w-${f.key}`);
+      // ⚠️ 가중치 슬라이더는 renderSimulator() 만 불렀다 — 경계 슬라이더는
+      //    다른 화면까지 갱신하는데 여기만 안 해서, 슬라이더를 움직이면
+      //    종합 현황·선박 판정이 **옛 가중치 결과를 계속 보여줬다**(비대칭).
       input.addEventListener('input', () => {
         weights[f.key] = parseFloat(input.value);
-        renderSimulator();
+        repaintAll();
       });
     });
 
@@ -528,6 +570,14 @@
                aria-label="${t.label} 값">
       </div>`).join(''));
 
+    // 값은 즉시 반영하고, 그리기만 프레임 단위로 묶는다
+    const repaint = raf(() => {
+      renderSimulator();
+      renderOverview();
+      renderVesselPanel();
+      if (RENDERED.has('vessel')) renderNamedList();
+    });
+
     ['amber', 'red'].forEach((k) => {
       const input = document.getElementById(`t-${k}`);
       input.addEventListener('input', () => {
@@ -537,10 +587,8 @@
         else v = Math.max(v, thresholds.amber + 1);
         input.value = v;
         thresholds[k] = v;
-        renderSimulator();
-        renderOverview();
-        renderVesselPanel();
-        if (RENDERED.has('vessel')) renderNamedList();
+        SV.el(`tv-${k}`).textContent = `${v}점`;
+        repaint();
       });
     });
 
@@ -618,8 +666,8 @@
     ].join(''));
 
     SV.html('simRankTable',
-      `<thead><tr><th style="width:34px">순위</th><th>선박군</th><th class="num">점수</th>
-        <th class="num">기본값 대비</th><th>등급</th></tr></thead>
+      `<thead><tr><th scope="col" style="width:34px">순위</th><th scope="col">선박군</th><th scope="col" class="num">점수</th>
+        <th scope="col" class="num">기본값 대비</th><th scope="col">등급</th></tr></thead>
       <tbody>${R.rows.slice(0, 15).map((r, i) => {
         const prev = baseIndex.get(r.cell.id);
         const delta = prev === undefined ? null : prev - i;
@@ -669,10 +717,12 @@
     const rows = currentFisheryRows();
     SV.el('fisheryCount').textContent = `${rows.length}개 업종`;
     SV.html('fisheryTable',
-      `<thead><tr><th style="width:32px"></th><th>업종</th><th class="num">등록</th>
-        <th class="num">지수</th><th class="num">연 사고율</th><th class="num">1천척당 사망</th></tr></thead>
+      `<thead><tr><th scope="col" style="width:32px"></th><th scope="col">업종</th><th scope="col" class="num">등록</th>
+        <th scope="col" class="num">지수</th><th scope="col" class="num">연 사고율</th><th scope="col" class="num">1천척당 사망</th></tr></thead>
       <tbody>${rows.map((f, i) => `
-        <tr data-f="${SV.esc(f.name)}" class="${selectedFishery === f.name ? 'is-selected' : ''}" style="cursor:pointer">
+        <tr data-f="${SV.esc(f.name)}" tabindex="0" role="button"
+            aria-pressed="${selectedFishery === f.name}"
+            class="${selectedFishery === f.name ? 'is-selected' : ''}" style="cursor:pointer">
           <td><span class="rank ${i < 3 ? 'rank--top' : ''}">${i + 1}</span></td>
           <td><b>${SV.esc(f.name)}</b>${f.is_govt_high_risk ? ' <span class="tag tag--govt">정부지정</span>' : ''}
             <div class="small muted">${SV.esc(f.group)} · 중앙값 ${SV.ton(f.median_tonnage)} · ${SV.esc(f.top_sea)}</div></td>
@@ -682,12 +732,10 @@
           <td class="num tnum">${f.fatality_per_1k === null ? '<span class="muted" title="공표되지 않은 업종입니다. 0명이라는 뜻이 아닙니다.">미공표</span>' : SV.dec(f.fatality_per_1k, 1)}</td>
         </tr>`).join('')}</tbody>`);
 
-    document.querySelectorAll('#fisheryTable tbody tr').forEach((tr) => {
-      tr.addEventListener('click', () => {
-        selectedFishery = tr.dataset.f;
-        renderFisheryTable();
-        renderFisheryDetail();
-      });
+    onRowActivate('#fisheryTable tbody tr', (tr) => {
+      selectedFishery = tr.dataset.f;
+      renderFisheryTable();
+      renderFisheryDetail();
     });
     if (!selectedFishery && rows.length) {
       selectedFishery = rows[0].name;
@@ -797,7 +845,7 @@
       </div>` : ''}
 
       <div class="tbl-wrap mt-2"><table>
-        <thead><tr><th>정부 지정 업종</th><th class="num">모델 순위</th><th class="num">위험지수</th><th class="num">등록 척수</th></tr></thead>
+        <thead><tr><th scope="col">정부 지정 업종</th><th scope="col" class="num">모델 순위</th><th scope="col" class="num">위험지수</th><th scope="col" class="num">등록 척수</th></tr></thead>
         <tbody>${govt.map((f) => {
           const rank = ranked.findIndex((x) => x.name === f.name) + 1;
           return `<tr><td><b>${SV.esc(f.name)}</b></td>
@@ -974,17 +1022,20 @@
       + (rows.length > 200 ? ` (상위 200개 표시)` : '');
 
     SV.html('cellTable',
-      `<thead><tr><th>선박군</th><th class="num">척수</th><th class="num">점수</th><th>등급</th></tr></thead>
+      `<thead><tr><th scope="col">선박군</th><th scope="col" class="num">척수</th><th scope="col" class="num">점수</th><th scope="col">등급</th></tr></thead>
       <tbody>${shown.map((r) => `
-        <tr data-cell="${r.cell.id}" class="${selectedCell === r.cell.id ? 'is-selected' : ''}" style="cursor:pointer">
+        <tr data-cell="${r.cell.id}" tabindex="0" role="button"
+            aria-pressed="${selectedCell === r.cell.id}"
+            class="${selectedCell === r.cell.id ? 'is-selected' : ''}" style="cursor:pointer">
           <td><b>${SV.esc(r.cell.fishery)}</b>${r.cell.govt_high_risk ? ' <span class="tag tag--govt">지정</span>' : ''}
             <div class="small muted">${SV.esc(r.cell.band)} · ${SV.esc(r.cell.sea)} · ${SV.esc(r.cell.hull)} · ${SV.ton(r.cell.median_tonnage)}</div></td>
           <td class="num tnum">${SV.num(r.cell.count)}</td>
           <td class="num tnum"><b>${SV.dec(r.score, 1)}</b></td>
           <td>${SV.signalPill(r.level)}</td></tr>`).join('')}</tbody>`);
 
-    document.querySelectorAll('#cellTable tbody tr').forEach((tr) => {
-      tr.addEventListener('click', () => { selectedCell = tr.dataset.cell; renderVesselPanel(); });
+    onRowActivate('#cellTable tbody tr', (tr) => {
+      selectedCell = tr.dataset.cell;
+      renderVesselPanel();
     });
 
     if (!selectedCell || !shown.some((r) => r.cell.id === selectedCell)) {
@@ -1103,7 +1154,7 @@
         n: 1,
         t: '여섯 팩터를 각각 0~100점으로 채점',
         body: `<div class="tbl-wrap"><table>
-          <thead><tr><th>팩터</th><th class="num">점수</th><th>근거 요약</th></tr></thead>
+          <thead><tr><th scope="col">팩터</th><th scope="col" class="num">점수</th><th scope="col">근거 요약</th></tr></thead>
           <tbody>${factors.map((f) => {
             const firstEv = (cell.ev[f.key] || []).map((i) => EV[i]).find(Boolean);
             return `<tr>
@@ -1251,9 +1302,11 @@ ${'─'.repeat(42)}
     const shown = rows.slice(0, 300);
 
     SV.html('namedTable',
-      `<thead><tr><th>선박 · 어선번호</th><th class="num">제원</th><th class="num">점수</th><th>등급</th></tr></thead>
+      `<thead><tr><th scope="col">선박 · 어선번호</th><th scope="col" class="num">제원</th><th scope="col" class="num">점수</th><th scope="col">등급</th></tr></thead>
       <tbody>${shown.map((v) => `
-        <tr data-hull="${SV.esc(v.hull_no)}" class="${selectedHull === v.hull_no ? 'is-selected' : ''}" style="cursor:pointer">
+        <tr data-hull="${SV.esc(v.hull_no)}" tabindex="0" role="button"
+            aria-pressed="${selectedHull === v.hull_no}"
+            class="${selectedHull === v.hull_no ? 'is-selected' : ''}" style="cursor:pointer">
           <td>
             <b>${SV.esc(v.name)}</b>
             ${v.casualties ? `<span class="tag tag--govt">인명피해 ${v.casualties}명</span>` : ''}
@@ -1265,14 +1318,15 @@ ${'─'.repeat(42)}
             <span class="tnum">${SV.dec(v.gross_tonnage, 2)}톤</span>
             <div class="small muted tnum">${v.age_years == null
               ? '<span title="진수일자가 명부에 없습니다">선령 —</span>'
-              : `선령 ${SV.dec(v.age_years, 0)}년`}${v.age_years >= 21 ? ' <span class="miss-tag">노후</span>' : ''}</div>
+              : `선령 ${SV.dec(v.age_years, 1)}년`}${v.age_years >= 21 ? ' <span class="miss-tag">노후</span>' : ''}</div>
           </td>
           <td class="num tnum"><b style="font-size:15px">${SV.dec(namedScore(v).score, 1)}</b></td>
           <td>${SV.signalPill(namedScore(v).level)}</td>
         </tr>`).join('')}</tbody>`);
 
-    document.querySelectorAll('#namedTable tbody tr').forEach((tr) => {
-      tr.addEventListener('click', () => { selectedHull = tr.dataset.hull; renderNamedList(); });
+    onRowActivate('#namedTable tbody tr', (tr) => {
+      selectedHull = tr.dataset.hull;
+      renderNamedList();
     });
 
     if (!selectedHull || !shown.some((v) => v.hull_no === selectedHull)) {
@@ -1343,7 +1397,7 @@ ${'─'.repeat(42)}
               사고 이력 <span class="muted">— 중앙해양안전심판원 실제 기록 ${v.accident_count}건</span>
             </h4>
             <div class="tbl-wrap"><table>
-              <thead><tr><th>발생</th><th>사고 유형</th><th class="num">사망·실종</th><th class="num">부상</th><th>해역</th></tr></thead>
+              <thead><tr><th scope="col">발생</th><th scope="col">사고 유형</th><th scope="col" class="num">사망·실종</th><th scope="col" class="num">부상</th><th scope="col">해역</th></tr></thead>
               <tbody>${v.accident_history.map((h) => `<tr>
                 <td class="tnum">${h.year}-${String(h.month).padStart(2, '0')}</td>
                 <td>${SV.esc(h.kind)}</td>
@@ -1463,7 +1517,7 @@ ${'─'.repeat(42)}
       </div>`).join(''));
 
     SV.html('allPrograms', `<div class="tbl-wrap"><table>
-      <thead><tr><th>사업명</th><th>주관</th><th>지원 내용</th><th>신청</th><th>출처</th></tr></thead>
+      <thead><tr><th scope="col">사업명</th><th scope="col">주관</th><th scope="col">지원 내용</th><th scope="col">신청</th><th scope="col">출처</th></tr></thead>
       <tbody>${D.programs.map((p) => `<tr>
         <td><b>${SV.esc(p.name)}</b><div class="small muted">${SV.esc(p.kind)}${p.period ? ' · ' + SV.esc(p.period) : ''}</div></td>
         <td class="small">${SV.esc(p.agency)}</td>
@@ -1479,7 +1533,7 @@ ${'─'.repeat(42)}
 
   function renderMethod() {
     SV.html('sourceTable', `
-      <thead><tr><th>데이터</th><th>제공기관</th><th>규모·기간</th><th>이 도구에서의 쓰임</th><th>원본·검증</th></tr></thead>
+      <thead><tr><th scope="col">데이터</th><th scope="col">제공기관</th><th scope="col">규모·기간</th><th scope="col">이 도구에서의 쓰임</th><th scope="col">원본·검증</th></tr></thead>
       <tbody>${D.meta.sources.map((s) => `<tr>
         <td><b>${SV.esc(s.name)}</b>
           ${s.dataset_id ? `<div class="muted" style="font-size:11px">${SV.esc(s.portal)} 데이터 ${SV.esc(s.dataset_id)}</div>` : ''}</td>
@@ -1502,10 +1556,10 @@ ${'─'.repeat(42)}
         <div>${SV.esc(cmp.note)}</div>
       </div>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>톤급</th>
-          <th class="num">어선세력 (${cmp.fleet_strength.year}년, ${SV.num(cmp.fleet_strength.total)}척)</th>
-          <th class="num">검사현황 (${SV.num(cmp.inspection.total)}척)</th>
-          <th class="num">차이</th></tr></thead>
+        <thead><tr><th scope="col">톤급</th>
+          <th scope="col" class="num">어선세력 (${cmp.fleet_strength.year}년, ${SV.num(cmp.fleet_strength.total)}척)</th>
+          <th scope="col" class="num">검사현황 (${SV.num(cmp.inspection.total)}척)</th>
+          <th scope="col" class="num">차이</th></tr></thead>
         <tbody>${bands.map((b) => {
           const a = cmp.fleet_strength.shares[b];
           const i = cmp.inspection.shares[b];
@@ -1552,7 +1606,7 @@ ${'─'.repeat(42)}
 
     // ---- 인용 자료 ----
     SV.html('citationTable', `
-      <thead><tr><th>인용 내용</th><th>쓰임</th><th>출처</th></tr></thead>
+      <thead><tr><th scope="col">인용 내용</th><th scope="col">쓰임</th><th scope="col">출처</th></tr></thead>
       <tbody>${(D.meta.citations || []).map((c) => `<tr>
         <td class="small">${SV.esc(c.claim)}</td>
         <td class="small muted">${SV.esc(c.used_for)}</td>
@@ -1573,7 +1627,7 @@ ${'─'.repeat(42)}
         다르면 왜 다른지도 적었습니다 — 차이를 감추면 검수가 불가능합니다.
       </p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>항목</th><th class="num">본 도구</th><th class="num">공표치</th><th>설명</th></tr></thead>
+        <thead><tr><th scope="col">항목</th><th scope="col" class="num">본 도구</th><th scope="col" class="num">공표치</th><th scope="col">설명</th></tr></thead>
         <tbody>${(V.cross_checks || []).map((c) => `<tr>
           <td><b>${SV.esc(c.item)}</b></td>
           <td class="num tnum">${SV.esc(c.ours)}</td>
@@ -1597,8 +1651,8 @@ ${'─'.repeat(42)}
     SV.html('qcBox', `
       <p class="small" style="color:var(--ink-2);margin-bottom:10px">${SV.esc(Q.note || '')}</p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>항목</th><th class="num">물리적 가능 범위</th><th class="num">통상 범위</th>
-          <th class="num">1회 변화 허용</th><th>비고</th></tr></thead>
+        <thead><tr><th scope="col">항목</th><th scope="col" class="num">물리적 가능 범위</th><th scope="col" class="num">통상 범위</th>
+          <th scope="col" class="num">1회 변화 허용</th><th scope="col">비고</th></tr></thead>
         <tbody>${(Q.limits || []).map((r) => `<tr>
           <td><b>${SV.esc(r.name)}</b> <span class="muted">${SV.esc(r.unit)}</span></td>
           <td class="num tnum">${r.hard[0]} ~ ${r.hard[1]}</td>
@@ -1747,9 +1801,9 @@ ${'─'.repeat(42)}
       SV.html('inspRoute', `
         <div class="tbl-wrap"><table>
           <thead><tr>
-            <th style="width:58px">순서</th><th style="width:64px">도착</th>
-            <th>선박</th><th style="width:92px">긴급도</th>
-            <th class="num" style="width:64px">위험도</th><th>사유</th>
+            <th scope="col" style="width:58px">순서</th><th scope="col" style="width:64px">도착</th>
+            <th scope="col">선박</th><th scope="col" style="width:92px">긴급도</th>
+            <th scope="col" class="num" style="width:64px">위험도</th><th scope="col">사유</th>
           </tr></thead>
           <tbody>${plan.stops.map((st) => `
             <tr>
@@ -1776,7 +1830,12 @@ ${'─'.repeat(42)}
             <span class="signal signal--${URGENCY_TONE[d.urgency] || 'green'}"><i class="signal__lamp"></i>${SV.esc(d.urgency_label)}</span>
             <div class="small muted">${SV.esc(d.port)} · 위험도 ${SV.dec(d.risk_score, 1)}</div></li>`).join('')}
          </ul>${dfr.length > 12 ? `<p class="small muted">외 ${dfr.length - 12}척</p>` : ''}
-         <p class="small muted mt-1">이월 대상은 <b>버려지지 않습니다.</b> 다음 날 계획의 앞에 놓입니다.</p>`
+         <p class="small muted mt-1">
+            이월은 <b>오늘 하루 용량을 넘겨 배정하지 못한 대상</b>입니다 —
+            목록에서 사라지지 않고 여기에 남습니다. 긴급도 순으로 정렬돼 있으니
+            다음 날 계획의 앞쪽에 두십시오.
+            <b>(자동 이월·저장 기능은 아직 없습니다 — 매번 새로 계산합니다.)</b>
+          </p>`
       : '<p class="muted">이월 대상이 없습니다.</p>');
   }
 
@@ -1784,8 +1843,8 @@ ${'─'.repeat(42)}
     const by = P.summary.by_urgency || {};
     const desc = {
       'Level 1': '즉시 점검 — 설비 결함·사고 직결 신호',
-      'Level 2': '24시간 내 — 위험 등급 또는 악천후 노출',
-      'Level 3': '1주일 내 — 주의 등급·사고 다발 해역',
+      'Level 2': '24시간 내 — 위험 등급 또는 설비 결함·사고 연관',
+      'Level 3': '1주일 내 — 주의 등급 · 악천후 노출 · 사고 다발 해역',
       '정기': '주기 도래 — 위험등급별 기본 주기',
     };
     SV.html('inspUrgency', `
@@ -1808,9 +1867,9 @@ ${'─'.repeat(42)}
     SV.html('inspCapacity', `
       <div class="tbl-wrap"><table>
         <thead><tr>
-          <th style="width:80px">감독관</th><th>소화 비율</th>
-          <th class="num" style="width:72px">배정</th><th class="num" style="width:72px">이월</th>
-          <th class="num" style="width:88px">평균 가동</th><th class="num" style="width:88px">총 이동</th>
+          <th scope="col" style="width:80px">감독관</th><th scope="col">소화 비율</th>
+          <th scope="col" class="num" style="width:72px">배정</th><th scope="col" class="num" style="width:72px">이월</th>
+          <th scope="col" class="num" style="width:88px">평균 가동</th><th scope="col" class="num" style="width:88px">총 이동</th>
         </tr></thead>
         <tbody>${curve.map((c) => {
           const w = Math.round(c.scheduled / max * 100);
@@ -1903,8 +1962,8 @@ ${'─'.repeat(42)}
     // 구조 도착
     SV.html('emResponse', (c.response && c.response.length) ? `
       <div class="tbl-wrap"><table>
-        <thead><tr><th>수단</th><th class="num">준비</th><th class="num">출동</th>
-          <th class="num">합계</th><th>비고</th></tr></thead>
+        <thead><tr><th scope="col">수단</th><th scope="col" class="num">준비</th><th scope="col" class="num">출동</th>
+          <th scope="col" class="num">합계</th><th scope="col">비고</th></tr></thead>
         <tbody>${c.response.map((t) => `
           <tr class="${t.feasible ? '' : 'is-dim'}">
             <td><b>${SV.esc(t.mode)}</b>${t.feasible ? '' : ' <span class="tag">제약</span>'}</td>
@@ -1926,7 +1985,7 @@ ${'─'.repeat(42)}
       : '의료기관 명부 미연계';
     SV.html('emTransport', hasFac ? `
       <div class="tbl-wrap"><table>
-        <thead><tr><th>수단</th><th class="num">거리</th><th class="num">합계</th><th>비고</th></tr></thead>
+        <thead><tr><th scope="col">수단</th><th scope="col" class="num">거리</th><th scope="col" class="num">합계</th><th scope="col">비고</th></tr></thead>
         <tbody>${c.transport.map((t) => `
           <tr class="${t.feasible ? '' : 'is-dim'}">
             <td><b>${SV.esc(t.mode)}</b></td>
@@ -1946,9 +2005,14 @@ ${'─'.repeat(42)}
 
     // 필요 자원
     SV.html('emResources', `
-      <div class="crit__factors">${(c.resources || []).map((r) => `
-        <span class="tag">${SV.esc(typeof r === 'string' ? r : (r.kind || r.label || ''))}
-        ${typeof r === 'object' && r.reason ? `<i title="${SV.esc(r.reason)}">ⓘ</i>` : ''}</span>`).join('')}</div>
+      <div class="crit__factors">${(c.resources || []).map((r) => {
+        if (typeof r === 'string') return `<span class="tag">${SV.esc(r)}</span>`;
+        // 엔진은 note/priority 로 내보낸다. 예전에 r.reason 을 읽어 툴팁이 한 번도 안 떴다.
+        const note = r.note || r.reason || '';
+        const pri = r.priority ? `${r.priority}순위 · ` : '';
+        return `<span class="tag${r.priority === 1 ? ' tag--govt' : ''}"
+                 title="${SV.esc(pri + note)}">${SV.esc(r.kind || r.label || '')}</span>`;
+      }).join('')}</div>
       <p class="small muted mt-1">사고 유형 × 심각도 매트릭스(계획서 §5)로 결정됩니다.</p>`);
 
     // 이송 대상 의료기관 — '가까운 순'이 아니라 '감당 가능한 곳 중 가까운 순'
@@ -2022,14 +2086,30 @@ ${'─'.repeat(42)}
         console.error(err);
         const panel = document.getElementById(`panel-${name}`);
         if (panel) {
+          panel.querySelectorAll('.render-error').forEach((x) => x.remove());
           panel.insertAdjacentHTML('afterbegin',
-            `<div class="notice notice--warn"><span class="notice__ico">⚠️</span>
+            `<div class="notice notice--warn render-error"><span class="notice__ico">⚠️</span>
              <div><b>화면을 그리는 중 오류가 발생했습니다.</b><br>${SV.esc(err.message)}</div></div>`);
         }
       }
     }
-    if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
+    if (location.hash !== `#${name}`) history.pushState(null, '', `#${name}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  /**
+   * 뒤로가기. `pushState` 만 하고 `hashchange`(popstate) 를 안 들으면
+   * 탭을 몇 번 옮긴 뒤 Back 을 눌렀을 때 **사이트를 벗어난다.**
+   */
+  function initHistory() {
+    window.addEventListener('popstate', () => {
+      const TABS = ['overview', 'simulator', 'fishery', 'map', 'vessel',
+                    'inspection', 'emergency', 'support', 'method'];
+      const raw = (location.hash || '').slice(1);
+      const name = TABS.includes(raw) ? raw : 'overview';
+      const cur = document.querySelector('.tab[aria-selected="true"]');
+      if (!cur || cur.dataset.tab !== name) switchTab(name);
+    });
   }
 
   /* ================================================================ 테마 */
@@ -2086,11 +2166,31 @@ ${'─'.repeat(42)}
     document.querySelectorAll('[data-goto]').forEach((a) =>
       a.addEventListener('click', (e) => { e.preventDefault(); switchTab(a.dataset.goto); }));
 
-    renderOverview();
-    RENDERED.add('overview');
+    // ⚠️ 종합 현황만 try/catch 밖에 있었다. 여기서 던지면 로더는 이미 제거됐고
+    //    switchTab 도 실행되지 않아 **모든 패널이 hidden 인 백지**가 된다 —
+    //    데이터 재생성이 어긋났을 때 나오는 최악의 실패 모드다.
+    try {
+      renderOverview();
+      RENDERED.add('overview');
+    } catch (err) {
+      console.error(err);
+      const panel = document.getElementById('panel-overview');
+      if (panel) {
+        panel.insertAdjacentHTML('afterbegin',
+          `<div class="notice notice--warn render-error"><span class="notice__ico">⚠️</span>
+           <div><b>종합 현황을 그리는 중 오류가 발생했습니다.</b><br>${SV.esc(err.message)}
+           <br><span class="small muted">다른 탭은 정상 동작합니다.</span></div></div>`);
+      }
+    }
 
-    const initial = (location.hash || '#overview').slice(1);
-    switchTab(document.querySelector(`.tab[data-tab="${initial}"]`) ? initial : 'overview');
+    // ⚠️ 해시를 그대로 선택자에 넣으면 `#x"]{` 같은 링크 한 줄로 SyntaxError 가 나고,
+    //    그 지점은 try 블록 밖이라 로더가 사라진 뒤 **백지**가 된다. 화이트리스트로 받는다.
+    const TABS = ['overview', 'simulator', 'fishery', 'map', 'vessel',
+                  'inspection', 'emergency', 'support', 'method'];
+    const raw = (location.hash || '').slice(1);
+    const initial = TABS.includes(raw) ? raw : 'overview';
+    switchTab(initial);
+    initHistory();
   }
 
   document.addEventListener('DOMContentLoaded', boot);

@@ -1,5 +1,16 @@
 <!doctype html>
 <html lang="ko" data-theme="light">
+<script>
+  /* 다크 선호 기기에서 흰 화면이 한 프레임 번쩍이는 것을 막는다.
+     initTheme() 은 DOMContentLoaded 이후라 늦다. */
+  (function () {
+    try {
+      var t = localStorage.getItem('sv-theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { /* 시크릿 모드 등 — 기본값으로 둔다 */ }
+  })();
+</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -602,7 +613,7 @@
           숨기지 않고 적습니다 — <b>할 수 있다고 적어두면 그것이 다음 요구사항이 됩니다.</b>
         </p>
         <div class="tbl-wrap"><table>
-          <thead><tr><th style="width:38%">계획서 항목</th><th>왜 못 하는가</th></tr></thead>
+          <thead><tr><th scope="col" style="width:38%">계획서 항목</th><th scope="col">왜 못 하는가</th></tr></thead>
           <tbody>
             <tr><td><b>어선 AIS·V-Pass 실시간 위치</b></td>
                 <td>공개 오픈API가 없습니다. 업종으로 이격거리를 추정합니다.</td></tr>
@@ -635,7 +646,7 @@
           <b>확인한 것과 확인하지 못한 것을 구분해</b> 적었습니다.
         </p>
         <div class="tbl-wrap"><table>
-          <thead><tr><th style="width:44%">계획서 인용</th><th>검토 결과</th></tr></thead>
+          <thead><tr><th scope="col" style="width:44%">계획서 인용</th><th scope="col">검토 결과</th></tr></thead>
           <tbody>
             <tr>
               <td><b>산업안전보건법 제36조</b><div class="small muted">위험성 평가</div></td>

@@ -22,10 +22,17 @@ const Charts = (() => {
     return n;
   };
 
-  function svgRoot(w, h) {
+  /**
+   * 차트 SVG 루트.
+   *
+   * ⚠️ `role="img"` 만 주고 이름이 없으면 스크린리더가 **"이미지"로만 낭독**한다.
+   *    사고 지도·톤급별 사고율·월별 지수가 전부 그랬다. 이름을 반드시 붙인다.
+   */
+  function svgRoot(w, h, label) {
     const s = $('svg', {
       viewBox: `0 0 ${w} ${h}`, class: 'chart',
       preserveAspectRatio: 'xMidYMid meet', role: 'img',
+      'aria-label': label || '데이터 차트 — 같은 내용이 옆 표에 숫자로 있습니다',
     });
     s.style.width = '100%';
     s.style.height = 'auto';
@@ -89,7 +96,7 @@ const Charts = (() => {
 
     const w = 640;
     const h = rows.length * (bh + gap) + 18;
-    const svg = svgRoot(w, h);
+    const svg = svgRoot(w, h, opts.alt);
     const plotX = labelWidth + 8;
     const plotW = w - plotX - padRight;
     const max = niceMax(fixedMax ?? Math.max(...rows.map((r) => r.value), 0.0001));
@@ -160,7 +167,7 @@ const Charts = (() => {
     const padL = 34, padR = 10, padT = 14, padB = 30;
     const plotW = w - padL - padR;
     const plotH = h - padT - padB;
-    const svg = svgRoot(w, h);
+    const svg = svgRoot(w, h, opts.alt);
 
     const max = niceMax(Math.max(...rows.map((r) => r.value), baseline || 0));
     const bw = Math.min(46, (plotW / rows.length) * 0.66);
@@ -218,7 +225,7 @@ const Charts = (() => {
     const { labelWidth = 60, barH: bh = 22, gap = 9, fmt = (v) => SV.num(v) } = opts;
     const w = 640;
     const h = rows.length * (bh + gap) + 6;
-    const svg = svgRoot(w, h);
+    const svg = svgRoot(w, h, opts.alt);
     const plotX = labelWidth + 8;
     const plotW = w - plotX - 76;
 
@@ -277,7 +284,7 @@ const Charts = (() => {
     const w = 720;
     const h = height;
     const pad = 26;
-    const svg = svgRoot(w, h);
+    const svg = svgRoot(w, h, opts.alt);
 
     const [lon0, lon1] = lonRange;
     const [lat0, lat1] = latRange;
@@ -367,7 +374,7 @@ const Charts = (() => {
   /** 총점을 팩터 기여도로 쪼갠 하나의 가로 막대 */
   function contributionBar(target, factors, total, opts = {}) {
     const w = 640, h = 46;
-    const svg = svgRoot(w, h);
+    const svg = svgRoot(w, h, opts.alt);
     const plotW = w - 4;
     const scale = plotW / 100;
     let x = 2;
