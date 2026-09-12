@@ -305,14 +305,52 @@
   <!-- ================================================== 선박 판정 -->
   <section class="panel" id="panel-vessel" hidden>
     <div class="section-head">
-      <h2>선박군 판정</h2>
-      <p>
-        업종·톤급·해역·선질·선형이 같은 선박은 위험도가 같습니다. 전국 63,647척을
-        <b id="cellCountInline">—</b>개 조합으로 묶어 전수를 다룹니다.
-        조합을 고르면 왜 그 신호등이 나왔는지 팩터별로 분해해서 보여줍니다.
-      </p>
+      <h2>선박 판정</h2>
+      <p id="vesselModeDesc"></p>
     </div>
 
+    <div class="toolbar" style="margin-bottom:10px">
+      <span class="toolbar__label">보기</span>
+      <div class="seg" id="vesselMode">
+        <button class="seg__btn" data-vmode="named" aria-pressed="true">🚢 실명 선박</button>
+        <button class="seg__btn" data-vmode="cell" aria-pressed="false">📊 선박군 (전수)</button>
+      </div>
+    </div>
+
+    <!-- ── 실명 선박 ── -->
+    <div id="namedWrap">
+      <div class="toolbar">
+        <input type="search" id="namedSearch" placeholder="선박명 또는 어선번호 검색 (예: 덕성호, 9506035)" style="min-width:280px">
+        <select id="namedSea"><option value="">전체 해역</option></select>
+        <select id="namedSignal">
+          <option value="">전체 등급</option>
+          <option value="red">🔴 위험만</option>
+          <option value="amber">🟡 주의만</option>
+          <option value="green">🟢 안전만</option>
+        </select>
+        <select id="namedSort">
+          <option value="score">위험도 높은 순</option>
+          <option value="age">선령 많은 순</option>
+          <option value="tonnage">톤수 큰 순</option>
+          <option value="accident">사고 이력 많은 순</option>
+        </select>
+        <label class="row small" style="gap:5px"><input type="checkbox" id="namedOnlyAccident"> 사고 이력 있는 배만</label>
+        <span class="small muted" id="namedCount" style="margin-left:auto"></span>
+      </div>
+
+      <div class="grid grid--named">
+        <div class="card">
+          <div class="card__head"><h3>선박 목록</h3><span class="hint">어선번호로 식별 · 행을 누르면 상세가 열립니다</span></div>
+          <div class="card__body">
+            <div class="tbl-wrap scroll-y" style="max-height:600px"><table id="namedTable"></table></div>
+          </div>
+        </div>
+        <div id="namedDetail"></div>
+      </div>
+    </div>
+
+    <!-- ── 선박군 (전수) ── -->
+    <div id="cellWrap" hidden>
     <div class="toolbar">
       <input type="search" id="cellSearch" placeholder="업종·선적항 검색 (예: 안강망, 보령)" style="min-width:230px">
       <select id="cellSea"><option value="">전체 해역</option></select>
@@ -334,6 +372,7 @@
         </div>
       </div>
       <div id="cellDetail"></div>
+    </div>
     </div>
   </section>
 

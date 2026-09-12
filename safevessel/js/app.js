@@ -11,7 +11,7 @@
 (() => {
   'use strict';
 
-  const DATA_FILES = ['meta', 'cells', 'fishery', 'accidents', 'programs', 'cases', 'denominator', 'hotspots'];
+  const DATA_FILES = ['meta', 'cells', 'fishery', 'accidents', 'programs', 'cases', 'denominator', 'hotspots', 'named'];
   const D = {};                 // 불러온 원본 데이터
   let EV = [];                  // 근거 문장 풀
   let CELLS = [];               // 선박군 조합
@@ -19,6 +19,8 @@
   let thresholds = null;        // 현재 경계값
   let scenario = 'moderate';    // 현재 기상 시나리오. 실시간 연동이 있으면 부팅 시 'live' 로 바뀐다
   let selectedCell = null;
+  let selectedHull = null;
+  let vesselMode = 'named';   // 'named' = 실명 선박 · 'cell' = 선박군(전수)
   let selectedFishery = null;
   let selectedCase = 0;
 
@@ -898,7 +900,6 @@
     ['cellSea', 'cellBand', 'cellSignal'].forEach((id) =>
       SV.el(id).addEventListener('change', renderVesselPanel));
     SV.el('cellSearch').addEventListener('input', SV.debounce(renderVesselPanel, 160));
-    SV.el('cellCountInline').textContent = SV.num(D.meta.totals.cells);
   }
 
   function renderVesselPanel() {
@@ -1109,6 +1110,231 @@ ${'─'.repeat(42)}
         <div class="calc__n">${s.n}</div>
         <div class="calc__body"><b class="small">${SV.esc(s.t)}</b><div class="mt-1">${s.body}</div></div>
       </div>`).join('')}</div>`;
+  }
+
+  /* ================================================================ 실명 선박 */
+
+  /**
+   * 실명 선박 — "어느 배가 위험한가"에 직접 답하는 화면.
+   *
+   * 전수 명부(63,647척)에는 선박명이 없어 "근해안강망 49톤 · 보령시"까지만 말할 수
+   * 있었다. 어선원부에는 **어선번호 + 선박명 + 진수일자**가 있어 개별 선박을
+   * 지목할 수 있고, 선령이 실측이라 판정도 정확해진다.
+   */
+  function namedEvidence(factor) {
+    const pool = (D.named && D.named.evidence) || [];
+    return (factor.ev || []).map((i) => pool[i]).filter(Boolean);
+  }
+
+  function renderNamedControls() {
+    const seas = [...new Set(D.named.vessels.map((v) => v.sea_area))].filter(Boolean).sort();
+    SV.el('namedSea').innerHTML = '<option value="">전체 해역</option>'
+      + seas.map((s) => `<option value="${SV.esc(s)}">${SV.esc(s)}</option>`).join('');
+    ['namedSea', 'namedSignal', 'namedSort'].forEach((id) =>
+      SV.el(id).addEventListener('change', renderNamedList));
+    SV.el('namedOnlyAccident').addEventListener('change', renderNamedList);
+    SV.el('namedSearch').addEventListener('input', SV.debounce(renderNamedList, 160));
+
+    document.querySelectorAll('#vesselMode .seg__btn').forEach((b) => {
+      b.addEventListener('click', () => {
+        vesselMode = b.dataset.vmode;
+        document.querySelectorAll('#vesselMode .seg__btn')
+          .forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        SV.el('namedWrap').hidden = vesselMode !== 'named';
+        SV.el('cellWrap').hidden = vesselMode !== 'cell';
+        updateVesselModeDesc();
+        if (vesselMode === 'named') renderNamedList(); else renderVesselPanel();
+      });
+    });
+    updateVesselModeDesc();
+  }
+
+  function updateVesselModeDesc() {
+    const m = D.named.meta;
+    SV.el('vesselModeDesc').innerHTML = vesselMode === 'named'
+      ? `<b>어선번호로 식별되는 실제 선박 ${SV.num(m.total)}척</b>입니다 —
+         선박명·어선번호·제원이 공개 어선원부에 있는 배들입니다.
+         이 중 <b>${SV.num(m.with_age)}척</b>은 진수일자가 있어 <b>선령이 실측</b>이고,
+         <b>${SV.num(m.matched_with_accidents)}척</b>은 중앙해양안전심판원에 <b>실제 사고 기록</b>이 있습니다.
+         <br><span class="muted">⚠️ ${SV.esc(m.caveat)}</span>`
+      : `업종·톤급·해역·선질·선형이 같은 선박은 위험도가 같습니다.
+         전국 <b>${SV.num(D.meta.totals.registry_vessels)}척</b>을
+         <b>${SV.num(D.meta.totals.cells)}</b>개 조합으로 묶어 <b>전수</b>를 다룹니다.
+         <br><span class="muted">이 명부에는 선박명이 없습니다 — 개별 선박을 지목하려면 '실명 선박' 보기를 쓰십시오.</span>`;
+  }
+
+  function currentNamedRows() {
+    const q = SV.el('namedSearch').value.trim();
+    const sea = SV.el('namedSea').value;
+    const sig = SV.el('namedSignal').value;
+    const sort = SV.el('namedSort').value;
+    const onlyAcc = SV.el('namedOnlyAccident').checked;
+
+    let rows = D.named.vessels;
+    if (q) {
+      const digits = q.replace(/\D/g, '');
+      const numeric = digits.length >= 4 && digits.length >= q.replace(/\s/g, '').length * 0.6;
+      rows = rows.filter((v) => v.name.includes(q)
+        || (numeric && v.hull_no.includes(digits))
+        || (v.port || '').includes(q));
+    }
+    if (sea) rows = rows.filter((v) => v.sea_area === sea);
+    if (sig) rows = rows.filter((v) => v.assessment.level === sig);
+    if (onlyAcc) rows = rows.filter((v) => v.accident_count > 0);
+
+    const key = {
+      score: (v) => v.assessment.score,
+      age: (v) => v.age_years,
+      tonnage: (v) => v.gross_tonnage,
+      accident: (v) => v.accident_count * 100 + v.casualties,
+    }[sort];
+    return [...rows].sort((a, b) => {
+      const av = key(a), bv = key(b);
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;       // 값 없는 항목은 뒤로 — 0으로 보지 않는다
+      if (bv == null) return -1;
+      return bv - av;
+    });
+  }
+
+  function renderNamedList() {
+    const rows = currentNamedRows();
+    SV.el('namedCount').textContent =
+      `${SV.num(rows.length)}척` + (rows.length > 300 ? ' (상위 300척 표시)' : '');
+    const shown = rows.slice(0, 300);
+
+    SV.html('namedTable',
+      `<thead><tr><th>선박 · 어선번호</th><th class="num">제원</th><th class="num">점수</th><th>등급</th></tr></thead>
+      <tbody>${shown.map((v) => `
+        <tr data-hull="${SV.esc(v.hull_no)}" class="${selectedHull === v.hull_no ? 'is-selected' : ''}" style="cursor:pointer">
+          <td>
+            <b>${SV.esc(v.name)}</b>
+            ${v.casualties ? `<span class="tag tag--govt">인명피해 ${v.casualties}명</span>` : ''}
+            ${v.accident_count ? `<span class="tag">사고 ${v.accident_count}건</span>` : ''}
+            <div class="small muted tnum" style="white-space:nowrap">${SV.esc(v.display_no)}</div>
+            <div class="small muted">${SV.esc(v.port || v.sea_area || '—')}</div>
+          </td>
+          <td class="num" style="white-space:nowrap">
+            <span class="tnum">${SV.dec(v.gross_tonnage, 2)}톤</span>
+            <div class="small muted tnum">${v.age_years == null
+              ? '<span title="진수일자가 명부에 없습니다">선령 —</span>'
+              : `선령 ${SV.dec(v.age_years, 0)}년`}${v.age_years >= 21 ? ' <span class="miss-tag">노후</span>' : ''}</div>
+          </td>
+          <td class="num tnum"><b style="font-size:15px">${SV.dec(v.assessment.score, 1)}</b></td>
+          <td>${SV.signalPill(v.assessment.level)}</td>
+        </tr>`).join('')}</tbody>`);
+
+    document.querySelectorAll('#namedTable tbody tr').forEach((tr) => {
+      tr.addEventListener('click', () => { selectedHull = tr.dataset.hull; renderNamedList(); });
+    });
+
+    if (!selectedHull || !shown.some((v) => v.hull_no === selectedHull)) {
+      selectedHull = shown.length ? shown[0].hull_no : null;
+    }
+    renderNamedDetail();
+  }
+
+  function renderNamedDetail() {
+    const host = SV.el('namedDetail');
+    const v = D.named.vessels.find((x) => x.hull_no === selectedHull);
+    if (!v) {
+      host.innerHTML = `<div class="card"><div class="card__body">
+        <p class="muted small">조건에 맞는 선박이 없습니다. 검색어나 필터를 조정해 보십시오.</p></div></div>`;
+      return;
+    }
+    const a = v.assessment;
+    const factors = [...a.factors].sort((x, y) => y.contribution - x.contribution);
+
+    host.innerHTML = `
+      <div class="card">
+        <div class="card__head">
+          <h3>${SV.esc(v.name)}</h3>
+          <span class="hint tnum">어선번호 ${SV.esc(v.display_no)}</span>
+        </div>
+        <div class="card__body">
+          <div class="row between" style="align-items:flex-start">
+            <div>
+              <div style="font-size:38px;font-weight:760;letter-spacing:-.03em;line-height:1">
+                ${SV.dec(a.score, 1)}<span style="font-size:16px;color:var(--ink-2);font-weight:600"> / 100점</span>
+              </div>
+              <div class="mt-1">${SV.signalPill(a.level)}
+                <span class="small muted" style="margin-left:6px">${SV.esc(a.action)}</span></div>
+            </div>
+            <div class="lamp-stack" style="min-width:168px">
+              ${['red', 'amber', 'green'].map((k) => `
+                <div class="lamp lamp--${k} ${a.level === k ? 'is-on' : ''}">
+                  <span class="lamp__bulb" aria-hidden="true"></span><span>${SV.LEVELS[k].label}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <h4 class="small mt-3" style="margin-bottom:6px">선박 제원</h4>
+          <div class="tbl-wrap"><table><tbody>
+            ${[
+              ['어선번호', `<span class="tnum">${SV.esc(v.display_no)}</span>`],
+              ['선박명', `<b>${SV.esc(v.name)}</b>`],
+              ['총톤수', `${SV.dec(v.gross_tonnage, 2)}톤 <span class="muted">(${SV.esc(v.tonnage_band)})</span>`],
+              ['선령', v.age_years == null ? '<span class="muted">진수일자 미기재</span>'
+                : `${SV.dec(v.age_years, 1)}년 <span class="muted">(진수 ${SV.esc(v.launched)})</span>${v.age_years >= 21 ? ' <span class="tag tag--govt">21년 이상 노후</span>' : ''}`],
+              ['제원', [v.length_m && `길이 ${SV.dec(v.length_m, 2)}m`,
+                        v.beam_m && `너비 ${SV.dec(v.beam_m, 2)}m`,
+                        v.depth_m && `깊이 ${SV.dec(v.depth_m, 2)}m`,
+                        v.slenderness && `세장비 ${SV.dec(v.slenderness, 2)}`]
+                        .filter(Boolean).join(' · ') || '<span class="muted">—</span>'],
+              ['선적항', SV.esc(v.port || '—') + (v.sea_area ? ` <span class="tag">${SV.esc(v.sea_area)}</span>` : '')],
+              ['업종', v.fishery ? SV.esc(v.fishery) : '<span class="muted" title="어선원부에 어업방법이 없는 경우가 많습니다">미기재</span>'],
+              ['선질·기관', [v.hull_material, v.engine_hp && `${SV.num(v.engine_hp)}마력`].filter(Boolean).join(' · ') || '<span class="muted">—</span>'],
+              ['호출부호', v.call_sign ? SV.esc(v.call_sign) : '<span class="muted">—</span>'],
+              ['조선자', v.builder ? SV.esc(v.builder) : '<span class="muted">—</span>'],
+            ].map(([k, val]) => `<tr><td style="width:104px;color:var(--ink-2)">${k}</td><td>${val}</td></tr>`).join('')}
+          </tbody></table></div>
+
+          ${v.accident_count ? `
+            <h4 class="small mt-3" style="margin-bottom:6px">
+              사고 이력 <span class="muted">— 중앙해양안전심판원 실제 기록 ${v.accident_count}건</span>
+            </h4>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>발생</th><th>사고 유형</th><th class="num">사망·실종</th><th class="num">부상</th><th>해역</th></tr></thead>
+              <tbody>${v.accident_history.map((h) => `<tr>
+                <td class="tnum">${h.year}-${String(h.month).padStart(2, '0')}</td>
+                <td>${SV.esc(h.kind)}</td>
+                <td class="num tnum">${h.casualties ? `<b style="color:var(--sig-red)">${h.casualties}</b>` : 0}</td>
+                <td class="num tnum">${h.injuries || 0}</td>
+                <td>${SV.esc(h.sea)}</td></tr>`).join('')}</tbody></table></div>`
+            : `<div class="notice mt-3"><span class="notice__ico">ℹ️</span>
+               <div>중앙해양안전심판원 기록(2021~2025)에 이 선박의 사고 이력이 없습니다.
+               사고가 없었다는 뜻이며, 같은 톤급의 통계적 사고율을 사전확률로 적용했습니다.</div></div>`}
+
+          <h4 class="small mt-3" style="margin-bottom:6px">점수 구성</h4>
+          <div class="mt-1">
+            ${factors.map((f) => `
+              <div class="fbar">
+                <div class="fbar__name">
+                  <span class="legend__swatch" style="background:${SV.factorColor(f.key)}"></span>
+                  ${SV.esc(f.label)} ${(f.missing || f.unavailable)
+                    ? `<span class="miss-tag">${f.missing ? '미확인' : '추정'}</span>` : ''}
+                </div>
+                <div class="fbar__track">
+                  <div class="fbar__fill" style="width:${SV.clamp(f.score, 0, 100)}%;background:${SV.factorColor(f.key)}"></div>
+                </div>
+                <div class="fbar__num tnum"><b>${SV.dec(f.score, 0)}</b> × ${SV.dec(f.weight * 100, 0)}%</div>
+              </div>`).join('')}
+          </div>
+
+          ${a.notes.length ? `<div class="notice notice--warn mt-2"><span class="notice__ico">⚠️</span>
+            <div>${a.notes.map((n) => SV.esc(n)).join('<br>')}</div></div>` : ''}
+
+          <h4 class="small mt-3" style="margin-bottom:6px">판정 근거 (출처 포함)</h4>
+          <ul class="evi">${factors.map((f) => namedEvidence(f).map((e) =>
+            `<li class="evi__item">${SV.srcBadge(e.p, e.s || e.p)}<div>${SV.esc(e.t)}${
+              e.s ? `<span class="evi__src">출처: ${SV.esc(e.s)}</span>` : ''}</div></li>`).join('')).join('')}</ul>
+
+          <div class="row mt-2 small muted">
+            <span>출처</span>
+            ${(v.sources || []).map((s) => `<span class="tag">${SV.esc(s)}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
   }
 
   /* ================================================================ 지원사업 */
@@ -1378,7 +1604,7 @@ ${'─'.repeat(42)}
         if (name === 'simulator') { renderSimulatorControls(); renderSimulator(); }
         if (name === 'fishery') { renderFisheryControls(); renderFisheryTable(); renderGovtCompare(); }
         if (name === 'map') { renderMapControls(); renderMap(); renderMapCharts(); }
-        if (name === 'vessel') { renderVesselControls(); renderVesselPanel(); }
+        if (name === 'vessel') { renderVesselControls(); renderVesselPanel(); renderNamedControls(); renderNamedList(); }
         if (name === 'support') renderSupport();
         if (name === 'method') renderMethod();
       } catch (err) {
