@@ -576,6 +576,55 @@
 
     <div class="card mt-3">
       <div class="card__head">
+        <h3>요청 자료 대조표</h3>
+        <span class="hint">요청하신 것이 다 됐는지 한 줄씩 확인</span>
+      </div>
+      <div class="card__body">
+        <p class="small">
+          통화(2026-09-12)와 「능동형 어선원 안전보건관리시스템 개발 계획」에 적힌 요구사항을
+          <b>배포된 데이터·코드에서 기계적으로 확인</b>한 결과입니다.
+        </p>
+        <div class="grid grid--2">
+          <div class="stat">
+            <div class="stat__label">통화 요구사항</div>
+            <div class="stat__value tnum">17<span class="stat__unit">/ 17</span></div>
+            <div class="stat__foot">신호등 · 가중치 조작 · 지원사업 매칭 · 문자 문안</div>
+          </div>
+          <div class="stat">
+            <div class="stat__label">개발 계획 요구사항</div>
+            <div class="stat__value tnum">26<span class="stat__unit">/ 26</span></div>
+            <div class="stat__foot">§1~§6 · §8 (점검계획 TSP · 긴급대응 매트릭스 포함)</div>
+          </div>
+        </div>
+
+        <h4 class="small mt-3" style="margin-bottom:6px">계획서 대비 하지 못한 것</h4>
+        <p class="small muted" style="margin-bottom:8px">
+          숨기지 않고 적습니다 — <b>할 수 있다고 적어두면 그것이 다음 요구사항이 됩니다.</b>
+        </p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th style="width:38%">계획서 항목</th><th>왜 못 하는가</th></tr></thead>
+          <tbody>
+            <tr><td><b>어선 AIS·V-Pass 실시간 위치</b></td>
+                <td>공개 오픈API가 없습니다. 업종으로 이격거리를 추정합니다.</td></tr>
+            <tr><td><b>IoT 센서</b>(선내 온도·가스·진동)</td>
+                <td>설치 자체가 안 돼 있어 데이터원이 없습니다.</td></tr>
+            <tr><td><b>선원 건강 모니터링</b>(심박·체온)</td>
+                <td>같음. 개인정보보호법상 별도 동의 체계가 전제입니다.</td></tr>
+            <tr><td><b>관서별 보유 장비 대장</b></td>
+                <td>공개 데이터가 아닙니다. 위치까지만 실데이터입니다.</td></tr>
+            <tr><td><b>LSTM·XGBoost 등 학습 모델</b></td>
+                <td>학습 라벨(선박 단위 사고 이력)이 공개돼 있지 않습니다.
+                    현재는 <b>통계적 노출 보정</b>으로 대체했고, 그 편이 지금 단계에서 검증 가능합니다.</td></tr>
+          </tbody>
+        </table></div>
+        <p class="small muted mt-1">
+          이 항목들은 <b>기관 내부 데이터 연계 또는 예산 투입이 전제</b>입니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card__head">
         <h3>개발 계획 §8 조문 검토</h3>
         <span class="hint">인용된 법령을 원문과 대조했습니다</span>
       </div>
