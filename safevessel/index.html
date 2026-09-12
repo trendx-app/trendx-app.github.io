@@ -47,6 +47,8 @@
       <button class="tab" role="tab" data-tab="fishery"    aria-selected="false"><span class="tab__ico">🎣</span>업종 분석</button>
       <button class="tab" role="tab" data-tab="map"        aria-selected="false"><span class="tab__ico">🗺️</span>사고 지도</button>
       <button class="tab" role="tab" data-tab="vessel"     aria-selected="false"><span class="tab__ico">🚢</span>선박 판정</button>
+      <button class="tab" role="tab" data-tab="inspection" aria-selected="false"><span class="tab__ico">📋</span>점검계획</button>
+      <button class="tab" role="tab" data-tab="emergency"  aria-selected="false"><span class="tab__ico">🚑</span>긴급대응</button>
       <button class="tab" role="tab" data-tab="support"    aria-selected="false"><span class="tab__ico">📨</span>지원사업·알림</button>
       <button class="tab" role="tab" data-tab="method"     aria-selected="false"><span class="tab__ico">📚</span>데이터·방법론</button>
     </div>
@@ -383,6 +385,106 @@
   </section>
 
   <!-- ================================================== 지원사업·알림 -->
+  <!-- ================================================== 점검계획 (계획서 §4) -->
+  <section class="panel" id="panel-inspection" hidden>
+    <div class="section-head">
+      <h2>점검계획 자동 수립</h2>
+      <p>
+        위험도가 높은 배를 <b>누가 · 언제 · 어떤 순서로</b> 점검할지 하루 일정으로 만듭니다.
+        「능동형 어선원 안전보건관리시스템 개발 계획」 §4 의 요구사항입니다.
+      </p>
+    </div>
+
+    <div class="notice notice--warn" style="margin-bottom:16px">
+      <span class="notice__ico" aria-hidden="true">🧭</span>
+      <div id="inspBaseNote"></div>
+    </div>
+
+    <div class="grid grid--4" id="inspStats"></div>
+
+    <div class="toolbar mt-3">
+      <span class="toolbar__label">거점</span>
+      <div class="seg" id="inspOfficerBtns"></div>
+    </div>
+
+    <div class="grid grid--plan">
+      <div class="card">
+        <div class="card__head"><h3>하루 동선</h3><span class="hint" id="inspRouteMeta"></span></div>
+        <div class="card__body" id="inspRoute"></div>
+      </div>
+      <div class="grid" style="gap:14px">
+        <div class="card">
+          <div class="card__head"><h3>긴급도 구분</h3><span class="hint">계획서 §4</span></div>
+          <div class="card__body" id="inspUrgency"></div>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>오늘 못 가는 대상</h3><span class="hint" id="inspDeferMeta"></span></div>
+          <div class="card__body" id="inspDeferred"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card__head"><h3>산출 방법</h3><span class="hint">무엇을 어떻게 계산했는가</span></div>
+      <div class="card__body" id="inspMethod"></div>
+    </div>
+  </section>
+
+  <!-- ================================================== 긴급대응 (계획서 §5) -->
+  <section class="panel" id="panel-emergency" hidden>
+    <div class="section-head">
+      <h2>긴급시설장비 · 의료지원 결정</h2>
+      <p>
+        사고가 났을 때 <b>어떤 자원을 보내고, 어디로 이송하고, 몇 분이 걸리는지</b>를
+        계산합니다. 계획서 §5 의 요구사항입니다.
+      </p>
+    </div>
+
+    <div class="notice notice--warn" style="margin-bottom:16px">
+      <span class="notice__ico" aria-hidden="true">⚕️</span>
+      <div>
+        <b>이 화면은 의료 행위를 결정하지 않습니다.</b>
+        선택지를 거리·시간과 함께 정렬해 보여줄 뿐이며, 최종 판단은 의료진과 현장
+        지휘자의 몫입니다. 아래 사례는 <b>지어낸 상황이 아니라 실제로 일어난 사고</b>
+        (중앙해양안전심판원 원자료)의 지점·유형에 이 시스템을 적용한 것입니다.
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="toolbar__label">실제 사고 사례</span>
+      <div class="seg" id="emCaseBtns"></div>
+    </div>
+
+    <div class="grid grid--plan">
+      <div class="grid" style="gap:14px">
+        <div class="card" id="emSummary"></div>
+        <div class="card">
+          <div class="card__head"><h3>구조 도착까지</h3><span class="hint">준비 + 출동</span></div>
+          <div class="card__body" id="emResponse"></div>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>의료기관 이송</h3><span class="hint" id="emTransportMeta"></span></div>
+          <div class="card__body" id="emTransport"></div>
+        </div>
+      </div>
+      <div class="grid" style="gap:14px">
+        <div class="card">
+          <div class="card__head"><h3>필요 자원</h3><span class="hint">사고 유형 × 심각도</span></div>
+          <div class="card__body" id="emResources"></div>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>최근접 구조 거점</h3><span class="hint">해양경찰 관서</span></div>
+          <div class="card__body" id="emRescue"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card__head"><h3>산출 방법과 한계</h3><span class="hint">검수용</span></div>
+      <div class="card__body" id="emMethod"></div>
+    </div>
+  </section>
+
   <section class="panel" id="panel-support" hidden>
     <div class="section-head">
       <h2>지원사업 매칭과 담당자 알림</h2>

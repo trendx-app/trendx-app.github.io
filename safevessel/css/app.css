@@ -256,10 +256,12 @@ main { padding-block: 26px 72px; }
 .grid--3 { grid-template-columns: repeat(3, 1fr); }
 .grid--2 { grid-template-columns: repeat(2, 1fr); }
 .grid--sidebar { grid-template-columns: minmax(300px, 360px) 1fr; align-items: start; }
+/* 본문이 왼쪽(넓게), 보조 정보가 오른쪽(좁게) — 점검계획·긴급대응용 */
+.grid--plan { grid-template-columns: 1fr minmax(300px, 360px); align-items: start; }
 
 @media (max-width: 1000px) {
   .grid--4 { grid-template-columns: repeat(2, 1fr); }
-  .grid--3, .grid--2, .grid--sidebar { grid-template-columns: 1fr; }
+  .grid--3, .grid--2, .grid--sidebar, .grid--plan { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .grid--4 { grid-template-columns: 1fr; }
@@ -683,3 +685,30 @@ select, input[type="search"], input[type="text"] {
 }
 .icon-btn__txt { white-space: nowrap; }
 @media (max-width: 700px) { .icon-btn__txt { display: none; } .icon-btn--wide { padding: 0; width: 36px; justify-content: center; } }
+
+/* ================================================== 점검계획 · 긴급대응 */
+
+/* 큰 등급 숫자 + 옆에 항목들 */
+.bigscore { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.bigscore__v { font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+.bigscore__u { font-size: 15px; font-weight: 600; margin-left: 4px; color: var(--ink-muted); }
+.bigscore .grow { flex: 1 1 220px; min-width: 200px; }
+
+/* 이름-값 한 줄 */
+.kv { display: flex; justify-content: space-between; gap: 12px;
+      padding: 4px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+.kv:last-child { border-bottom: 0; }
+.kv > span { color: var(--ink-muted); }
+
+/* 용어-설명 표 */
+.deftable { display: grid; gap: 0; }
+.deftable__row { display: grid; grid-template-columns: 132px 1fr; gap: 12px;
+                 padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.deftable__row:last-child { border-bottom: 0; }
+.deftable__k { font-weight: 700; color: var(--ink); }
+.deftable__v { color: var(--ink-2); line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .deftable__row { grid-template-columns: 1fr; gap: 2px; }
+  .bigscore__v { font-size: 36px; }
+}

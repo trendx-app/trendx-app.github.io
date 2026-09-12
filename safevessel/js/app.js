@@ -11,7 +11,8 @@
 (() => {
   'use strict';
 
-  const DATA_FILES = ['meta', 'cells', 'fishery', 'accidents', 'programs', 'cases', 'denominator', 'hotspots', 'named'];
+  const DATA_FILES = ['meta', 'cells', 'fishery', 'accidents', 'programs', 'cases', 'denominator',
+                      'hotspots', 'named', 'inspection', 'emergency'];
   const D = {};                 // 불러온 원본 데이터
   let EV = [];                  // 근거 문장 풀
   let CELLS = [];               // 선박군 조합
@@ -23,6 +24,8 @@
   let vesselMode = 'named';   // 'named' = 실명 선박 · 'cell' = 선박군(전수)
   let selectedFishery = null;
   let selectedCase = 0;
+  let inspOfficer = 0;           // 점검계획에서 보고 있는 거점
+  let emCase = 0;                // 긴급대응에서 보고 있는 사례
 
   /* ================================================================ 로딩 */
 
@@ -1594,6 +1597,280 @@ ${'─'.repeat(42)}
 
   /* ================================================================ 탭 */
 
+  /* ======================================================= 점검계획 (§4) */
+
+  //: 엔진이 돌려주는 방법 설명의 키를 화면 용어로 옮긴다.
+  //  영문 키(severity/routing…)를 그대로 보여주면 담당자가 읽을 수 없다.
+  const METHOD_LABEL = {
+    urgency: '긴급도 구분', routing: '동선 계산', travel: '이동 시간',
+    capacity: '하루 용량', interval: '정기 주기',
+    severity: '심각도 판정', response: '구조 도착', facilities: '의료기관 선택',
+    limits: '한계',
+  };
+
+  /** 엔진 설명문의 **강조** 를 굵게 렌더한다 (이스케이프 후에 적용). */
+  function mdBold(text) {
+    return SV.esc(text || '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  }
+
+  function methodTable(m) {
+    return `<div class="deftable">${Object.entries(m || {}).map(([k, v]) => `
+      <div class="deftable__row">
+        <div class="deftable__k">${SV.esc(METHOD_LABEL[k] || k)}</div>
+        <div class="deftable__v">${mdBold(v)}</div>
+      </div>`).join('')}</div>`;
+  }
+
+
+  const URGENCY_TONE = {
+    'Level 1': 'red', 'Level 2': 'amber', 'Level 3': 'green', '정기': 'green',
+  };
+
+  function renderInspection() {
+    const P = D.inspection;
+    if (!P || !P.summary) {
+      SV.html('inspStats', '<div class="notice">점검계획 데이터가 없습니다.</div>');
+      return;
+    }
+    const s = P.summary;
+
+    SV.el('inspBaseNote').innerHTML = mdBold(P.base_note);
+
+    SV.html('inspStats', [
+      `<div class="stat">
+        <div class="stat__label">점검 대상 ${SV.srcBadge('DERIVED', '실명 선박 판정에서 특별점검 조건에 걸린 배')}</div>
+        <div class="stat__value tnum">${SV.num(s.total_targets)}<span class="stat__unit">척</span></div>
+        <div class="stat__foot">긴급도 Level 1~3</div>
+      </div>`,
+      `<div class="stat stat--amber">
+        <div class="stat__label">오늘 배정</div>
+        <div class="stat__value tnum">${SV.num(s.scheduled)}<span class="stat__unit">척</span></div>
+        <div class="stat__foot">거점 ${s.officers}곳 · 총 이동 ${SV.dec(s.total_travel_km, 0)}km</div>
+      </div>`,
+      `<div class="stat stat--red">
+        <div class="stat__label">이월</div>
+        <div class="stat__value tnum">${SV.num(s.deferred)}<span class="stat__unit">척</span></div>
+        <div class="stat__foot">하루 가용 시간을 넘겨 다음 날로</div>
+      </div>`,
+      `<div class="stat">
+        <div class="stat__label">평균 가동률</div>
+        <div class="stat__value tnum">${SV.pct(s.mean_utilization, 0)}</div>
+        <div class="stat__foot">1인 1일 ${(P.bases[0] && P.bases[0].daily_minutes) || 480}분 기준</div>
+      </div>`,
+    ].join(''));
+
+    SV.html('inspOfficerBtns', P.day_plans.map((p, i) =>
+      `<button class="seg__btn" data-insp="${i}" aria-pressed="${i === inspOfficer}">
+         ${SV.esc(p.officer)} <span class="tnum">${p.stop_count}</span>
+       </button>`).join(''));
+    document.querySelectorAll('#inspOfficerBtns .seg__btn').forEach((b) => {
+      b.addEventListener('click', () => { inspOfficer = +b.dataset.insp; renderInspection(); });
+    });
+
+    renderInspectionRoute(P.day_plans[inspOfficer]);
+    renderInspectionUrgency(P);
+    renderInspectionMethod(P);
+  }
+
+  function renderInspectionRoute(plan) {
+    if (!plan) { SV.html('inspRoute', '<p class="muted">거점을 선택하십시오.</p>'); return; }
+    SV.el('inspRouteMeta').textContent =
+      `${plan.stop_count}곳 · 이동 ${SV.dec(plan.travel_km, 1)}km · 가동 ${SV.pct(plan.utilization, 0)}`;
+
+    if (!plan.stops.length) {
+      SV.html('inspRoute',
+        `<p class="muted">이 거점에는 오늘 배정된 대상이 없습니다.
+         (근처에 특별점검 조건에 걸린 배가 없거나, 다른 거점이 더 가깝습니다.)</p>`);
+    } else {
+      SV.html('inspRoute', `
+        <div class="tbl-wrap"><table>
+          <thead><tr>
+            <th style="width:58px">순서</th><th style="width:64px">도착</th>
+            <th>선박</th><th style="width:92px">긴급도</th>
+            <th class="num" style="width:64px">위험도</th><th>사유</th>
+          </tr></thead>
+          <tbody>${plan.stops.map((st) => `
+            <tr>
+              <td class="tnum">${st.visit_order}</td>
+              <td class="tnum">${SV.esc((st.eta || '').slice(11, 16))}</td>
+              <td><b>${SV.esc(st.label)}</b><div class="small muted">${SV.esc(st.fishery)} · ${SV.esc(st.port)}</div></td>
+              <td><span class="signal signal--${URGENCY_TONE[st.urgency] || 'green'}"><i class="signal__lamp"></i>${SV.esc(st.urgency_label)}</span></td>
+              <td class="num tnum">${SV.dec(st.risk_score, 1)}</td>
+              <td class="small">${(st.trigger_labels || []).map((t) => `<span class="tag">${SV.esc(t)}</span>`).join(' ')}
+                  <div class="small muted">${(st.reasons || []).slice(0, 2).map(SV.esc).join(' · ')}</div></td>
+            </tr>`).join('')}</tbody>
+        </table></div>
+        <p class="small muted mt-1">
+          거점 <b>${SV.esc(plan.base)}</b> 출발 · 이동 시간은 직선거리×1.4 ÷ 45km/h 근사입니다.
+          정밀 경로 API 연계 시 실도로 거리로 대체됩니다.
+        </p>`);
+    }
+
+    const dfr = plan.deferred || [];
+    SV.el('inspDeferMeta').textContent = `${dfr.length}척`;
+    SV.html('inspDeferred', dfr.length
+      ? `<ul class="evi">${dfr.slice(0, 12).map((d) => `
+          <li><b>${SV.esc(d.label)}</b>
+            <span class="signal signal--${URGENCY_TONE[d.urgency] || 'green'}"><i class="signal__lamp"></i>${SV.esc(d.urgency_label)}</span>
+            <div class="small muted">${SV.esc(d.port)} · 위험도 ${SV.dec(d.risk_score, 1)}</div></li>`).join('')}
+         </ul>${dfr.length > 12 ? `<p class="small muted">외 ${dfr.length - 12}척</p>` : ''}
+         <p class="small muted mt-1">이월 대상은 <b>버려지지 않습니다.</b> 다음 날 계획의 앞에 놓입니다.</p>`
+      : '<p class="muted">이월 대상이 없습니다.</p>');
+  }
+
+  function renderInspectionUrgency(P) {
+    const by = P.summary.by_urgency || {};
+    const desc = {
+      'Level 1': '즉시 점검 — 설비 결함·사고 직결 신호',
+      'Level 2': '24시간 내 — 위험 등급 또는 악천후 노출',
+      'Level 3': '1주일 내 — 주의 등급·사고 다발 해역',
+      '정기': '주기 도래 — 위험등급별 기본 주기',
+    };
+    SV.html('inspUrgency', `
+      <div class="grid" style="gap:8px">
+        ${Object.keys(desc).map((k) => `
+          <div class="lamp lamp--${URGENCY_TONE[k]} ${(by[k] || 0) > 0 ? 'is-on' : ''}">
+            <span class="lamp__bulb" aria-hidden="true"></span>
+            <span><b>${SV.esc(k)}</b> — ${SV.esc(desc[k])}</span>
+            <span style="margin-left:auto" class="tnum small">${SV.num(by[k] || 0)}척</span>
+          </div>`).join('')}
+      </div>`);
+  }
+
+  function renderInspectionMethod(P) {
+    const m = P.method || {};
+    const site = P.sites || {};
+    SV.html('inspMethod', `
+      ${methodTable(m)}
+      <div class="notice mt-2">
+        <span class="notice__ico" aria-hidden="true">📍</span>
+        <div>
+          <b>거점·구조 자원 위치는 실제 공개 명부입니다.</b><br>
+          해양경찰 관서 ${SV.num((site.coast_guard || {}).total || 0)}개소
+          (${Object.entries((site.coast_guard || {}).by_kind || {}).map(([k, v]) => `${k} ${v}`).join(' · ')}) ·
+          국가어항 ${SV.num((site.fishing_ports || {}).total || 0)}개소.<br>
+          <span class="small muted">${SV.esc(site.note || '')}</span>
+        </div>
+      </div>`);
+  }
+
+  /* ======================================================= 긴급대응 (§5) */
+
+  function renderEmergency() {
+    const E = D.emergency;
+    if (!E || !E.cases || !E.cases.length) {
+      SV.html('emSummary', '<div class="card__body"><p class="muted">긴급대응 데이터가 없습니다.</p></div>');
+      return;
+    }
+    SV.html('emCaseBtns', E.cases.map((c, i) => {
+      const o = c.origin || {};
+      return `<button class="seg__btn" data-em="${i}" aria-pressed="${i === emCase}"
+                title="${SV.esc(o.vessel || '')} · ${SV.esc(o.year || '')}년">
+                ${SV.esc(o.kind || c.incident)}</button>`;
+    }).join(''));
+    document.querySelectorAll('#emCaseBtns .seg__btn').forEach((b) => {
+      b.addEventListener('click', () => { emCase = +b.dataset.em; renderEmergency(); });
+    });
+
+    const c = E.cases[emCase];
+    const o = c.origin || {};
+    const sevTone = c.severity <= 2 ? 'red' : (c.severity === 3 ? 'amber' : 'green');
+
+    SV.html('emSummary', `
+      <div class="card__head">
+        <h3>${SV.esc(o.vessel || '선박명 미상')} · ${SV.esc(o.kind || '')}</h3>
+        <span class="hint">${SV.esc(o.year || '')}년 ${o.month ? SV.esc(o.month) + '월' : ''} · ${SV.esc(o.sea || '')}</span>
+      </div>
+      <div class="card__body">
+        <div class="bigscore">
+          <div>
+            <div class="bigscore__v tnum" style="color:var(--sig-${sevTone})">${c.severity}<span class="bigscore__u">등급</span></div>
+            <div class="small muted">${SV.esc(c.severity_label)}</div>
+          </div>
+          <div class="grow">
+            <div class="kv"><span>사망·실종</span><b class="tnum">${SV.num(o.casualties)}명</b></div>
+            <div class="kv"><span>부상</span><b class="tnum">${SV.num(o.injured)}명</b></div>
+            <div class="kv"><span>목표 접촉</span><b class="tnum">${c.target_minutes > 0 ? c.target_minutes + '분 이내' : '즉시'}</b></div>
+            <div class="kv"><span>생존 추정</span><b class="tnum">${c.golden_minutes == null ? '—' : c.golden_minutes + '분'}</b></div>
+          </div>
+        </div>
+        <div class="mt-2 small">
+          ${(c.severity_reasons || []).map((r) => `<div>· ${SV.esc(r)}</div>`).join('')}
+        </div>
+        <p class="small muted mt-2">
+          출처: ${SV.esc(o.source || '')} · 좌표 ${SV.dec(c.lat, 3)}, ${SV.dec(c.lon, 3)}
+        </p>
+      </div>`);
+
+    // 구조 도착
+    SV.html('emResponse', (c.response && c.response.length) ? `
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>수단</th><th class="num">준비</th><th class="num">출동</th>
+          <th class="num">합계</th><th>비고</th></tr></thead>
+        <tbody>${c.response.map((t) => `
+          <tr class="${t.feasible ? '' : 'is-dim'}">
+            <td><b>${SV.esc(t.mode)}</b>${t.feasible ? '' : ' <span class="tag">제약</span>'}</td>
+            <td class="num tnum">${t.prep_min}분</td>
+            <td class="num tnum">${t.launch_min}분<div class="small muted">${SV.dec(t.launch_km, 1)}km</div></td>
+            <td class="num tnum"><b>${t.total_min}분</b></td>
+            <td class="small">${(t.caveats || []).map(SV.esc).join('<br>') || '—'}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>
+      <p class="small muted mt-1">
+        출동 거점 <b>${SV.esc((c.response[0] || {}).launch_from || '—')}</b> 기준.
+        구조정은 병원이 아니라 <b>해양경찰 관서</b>에서 출발합니다.
+      </p>` : '<p class="muted">구조 거점을 찾지 못했습니다.</p>');
+
+    // 의료 이송
+    const hasFac = c.transport && c.transport.length;
+    SV.el('emTransportMeta').textContent = hasFac ? '사고 지점 → 의료기관' : '의료기관 명부 미연계';
+    SV.html('emTransport', hasFac ? `
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>수단</th><th class="num">거리</th><th class="num">합계</th><th>비고</th></tr></thead>
+        <tbody>${c.transport.map((t) => `
+          <tr class="${t.feasible ? '' : 'is-dim'}">
+            <td><b>${SV.esc(t.mode)}</b></td>
+            <td class="num tnum">${SV.dec(t.distance_km, 1)}km</td>
+            <td class="num tnum"><b>${t.total_min}분</b></td>
+            <td class="small">${(t.caveats || []).map(SV.esc).join('<br>') || '—'}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>` : `
+      <div class="notice notice--warn">
+        <span class="notice__ico" aria-hidden="true">🏥</span>
+        <div>
+          <b>응급의료기관 좌표가 아직 연계되지 않았습니다.</b><br>
+          국립중앙의료원 전국 응급의료기관 조회 서비스(공공데이터포털 15000563) 활용신청이
+          승인되면 거리 기반 이송 추천이 켜집니다. <b>지어낸 병원을 넣지 않습니다.</b>
+        </div>
+      </div>`);
+
+    // 필요 자원
+    SV.html('emResources', `
+      <div class="crit__factors">${(c.resources || []).map((r) => `
+        <span class="tag">${SV.esc(typeof r === 'string' ? r : (r.kind || r.label || ''))}
+        ${typeof r === 'object' && r.reason ? `<i title="${SV.esc(r.reason)}">ⓘ</i>` : ''}</span>`).join('')}</div>
+      <p class="small muted mt-1">사고 유형 × 심각도 매트릭스(계획서 §5)로 결정됩니다.</p>`);
+
+    // 최근접 구조 거점
+    SV.html('emRescue', (c.rescue && c.rescue.length) ? `
+      <ul class="evi">${c.rescue.map((r) => `
+        <li><b>${SV.esc(r.name)}</b> <span class="tag">${SV.esc(r.kind)}</span>
+          <div class="small muted">${SV.dec(r.distance_km, 1)}km (${SV.dec(r.distance_nm, 1)}해리)
+          ${r.parent ? ' · ' + SV.esc(r.parent) : ''}</div></li>`).join('')}</ul>
+      <p class="small muted mt-1">출처: 해양경찰청 관서 위치 · 파출소 관할 위치(공공데이터포털).
+        관서별 보유 장비는 공개 데이터가 아닙니다.</p>`
+      : '<p class="muted">근처 관서를 찾지 못했습니다.</p>');
+
+    // 방법·한계
+    const m = E.method || {};
+    SV.html('emMethod', `
+      ${methodTable(m)}
+      <div class="notice notice--warn mt-2">
+        <span class="notice__ico" aria-hidden="true">⚠️</span>
+        <div>${(c.notes || []).map((n) => `<div>· ${SV.esc(n)}</div>`).join('')}</div>
+      </div>`);
+  }
+
   const RENDERED = new Set();
 
   function switchTab(name) {
@@ -1609,6 +1886,8 @@ ${'─'.repeat(42)}
         if (name === 'fishery') { renderFisheryControls(); renderFisheryTable(); renderGovtCompare(); }
         if (name === 'map') { renderMapControls(); renderMap(); renderMapCharts(); }
         if (name === 'vessel') { renderVesselControls(); renderVesselPanel(); renderNamedControls(); renderNamedList(); }
+        if (name === 'inspection') renderInspection();
+        if (name === 'emergency') renderEmergency();
         if (name === 'support') renderSupport();
         if (name === 'method') renderMethod();
       } catch (err) {
