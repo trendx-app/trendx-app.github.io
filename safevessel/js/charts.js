@@ -399,13 +399,18 @@ const Charts = (() => {
     }
 
     // 경계선 표시
-    [40, 70].forEach((v) => {
+    // ⚠️ 예전에는 [40, 70] 을 상수로 박아두었다. 경계값은 담당자가 화면에서
+    //    조정할 수 있고, 바로 아래 산식 설명은 조정된 값을 쓴다 — 그래서
+    //    **막대 위 점선은 40·70, 그 아래 설명은 55·85** 가 되는 모순이 생겼다.
+    //    "판정 과정을 화면에 공개한다"는 규칙을 화면이 스스로 배반한 셈이다.
+    const th = opts.thresholds || { amber: 40, red: 70 };
+    [th.amber, th.red].forEach((v) => {
       const lx = 2 + v * scale;
       svg.appendChild($('line', {
         x1: lx, y1: 0, x2: lx, y2: 34,
         stroke: SV.cssVar('--ink-muted'), 'stroke-width': 1.5, 'stroke-dasharray': '3 3',
       }));
-      svg.appendChild(text(String(v), lx, 43, 'ax-label', { 'text-anchor': 'middle' }));
+      svg.appendChild(text(String(Math.round(v)), lx, 43, 'ax-label', { 'text-anchor': 'middle' }));
     });
 
     return mount(target, svg);

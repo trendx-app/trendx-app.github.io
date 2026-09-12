@@ -109,6 +109,41 @@
     return { score: total, level, parts, floored };
   }
 
+  /**
+   * 실명 선박 1척을 **현재 가중치·경계값으로 다시 계산**한다.
+   *
+   * ⚠️ 예전에는 `named.json` 에 굳혀 넣은 `assessment.score/level` 을 그대로 읽었다.
+   *    그 값은 빌드 시점의 기본 가중치(0.30/0.20…)와 기본 경계(40/70)로 계산된 것이라,
+   *    담당자가 슬라이더를 움직이면 **같은 탭의 선박군 모드와 실명 모드가 서로 다른
+   *    등급을 주장**했다. 발주처가 통화에서 직접 요구한 기능("기상을 0.3 팩터로…
+   *    조작할 수 있잖아")을 쓰는 순간 도구가 자기모순에 빠졌다.
+   *
+   * 셀 계산(`cellScore`)과 같은 규칙을 쓴다 — 정규화, 개별 결측에만 하한.
+   */
+  function namedScore(v) {
+    const a = v.assessment;
+    const norm = normalized(weights);
+    const th = thresholds;
+
+    let total = 0;
+    const parts = {};
+    let hasMissing = false;
+    for (const f of a.factors) {
+      const sc = Number.isFinite(f.score) ? f.score : null;
+      parts[f.key] = sc;
+      total += (sc || 0) * (norm[f.key] || 0);
+      if (f.missing) hasMissing = true;
+    }
+    total = SV.clamp(total, 0, 100);
+
+    let floored = false;
+    if (hasMissing) {
+      const floor = Math.max(D.meta.defaults.uncertain_floor, th.amber);
+      if (total < floor) { total = floor; floored = true; }
+    }
+    return { score: total, level: SV.classify(total, th), parts, floored };
+  }
+
   /** 전체 셀 재계산. 척수 가중 집계까지 한 번에 낸다. */
   function recompute(w = weights, th = thresholds, scen = scenario) {
     const norm = normalized(w);
@@ -312,6 +347,7 @@
       tr.addEventListener('click', () => {
         selectedCell = tr.dataset.cell;
         switchTab('vessel');
+        setVesselMode('cell');      // 선박군 상세를 실제로 보이게 한다
         renderVesselPanel();
       });
     });
@@ -504,17 +540,26 @@
         renderSimulator();
         renderOverview();
         renderVesselPanel();
+        if (RENDERED.has('vessel')) renderNamedList();
       });
     });
 
-    SV.el('resetWeights').addEventListener('click', () => {
-      weights = { ...defaults };
-      thresholds = { ...D.meta.defaults.thresholds };
-      renderSimulatorControls();
-      renderSimulator();
-      renderOverview();
-      renderVesselPanel();
-    });
+    // ⚠️ 이 버튼은 index.html 에 **정적으로** 있다. 핸들러 안에서
+    //    renderSimulatorControls() 를 다시 부르면 여기가 또 실행돼 리스너가
+    //    2 → 4 → 8 … 로 늘어난다(10번 누르면 1024개). 그래서 한 번만 붙인다.
+    const resetBtn = SV.el('resetWeights');
+    if (resetBtn && !resetBtn.dataset.bound) {
+      resetBtn.dataset.bound = '1';
+      resetBtn.addEventListener('click', () => {
+        weights = { ...defaults };
+        thresholds = { ...D.meta.defaults.thresholds };
+        renderSimulatorControls();
+        renderSimulator();
+        renderOverview();
+        renderVesselPanel();
+        if (RENDERED.has('vessel')) renderNamedList();
+      });
+    }
 
     SV.el('weightProvenanceText').innerHTML =
       `<b>기본값의 출처</b><br>${SV.esc(D.meta.defaults.weights_note)}`;
@@ -1039,7 +1084,7 @@
         </div>
       </div>`;
 
-    Charts.contributionBar('contribBar', factors, row.score);
+    Charts.contributionBar('contribBar', factors, row.score, { thresholds });
   }
 
   /**
@@ -1144,12 +1189,7 @@ ${'─'.repeat(42)}
 
     document.querySelectorAll('#vesselMode .seg__btn').forEach((b) => {
       b.addEventListener('click', () => {
-        vesselMode = b.dataset.vmode;
-        document.querySelectorAll('#vesselMode .seg__btn')
-          .forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-        SV.el('namedWrap').hidden = vesselMode !== 'named';
-        SV.el('cellWrap').hidden = vesselMode !== 'cell';
-        updateVesselModeDesc();
+        setVesselMode(b.dataset.vmode);
         if (vesselMode === 'named') renderNamedList(); else renderVesselPanel();
       });
     });
@@ -1186,11 +1226,11 @@ ${'─'.repeat(42)}
         || (v.port || '').includes(q));
     }
     if (sea) rows = rows.filter((v) => v.sea_area === sea);
-    if (sig) rows = rows.filter((v) => v.assessment.level === sig);
+    if (sig) rows = rows.filter((v) => namedScore(v).level === sig);
     if (onlyAcc) rows = rows.filter((v) => v.accident_count > 0);
 
     const key = {
-      score: (v) => v.assessment.score,
+      score: (v) => namedScore(v).score,
       age: (v) => v.age_years,
       tonnage: (v) => v.gross_tonnage,
       accident: (v) => v.accident_count * 100 + v.casualties,
@@ -1227,8 +1267,8 @@ ${'─'.repeat(42)}
               ? '<span title="진수일자가 명부에 없습니다">선령 —</span>'
               : `선령 ${SV.dec(v.age_years, 0)}년`}${v.age_years >= 21 ? ' <span class="miss-tag">노후</span>' : ''}</div>
           </td>
-          <td class="num tnum"><b style="font-size:15px">${SV.dec(v.assessment.score, 1)}</b></td>
-          <td>${SV.signalPill(v.assessment.level)}</td>
+          <td class="num tnum"><b style="font-size:15px">${SV.dec(namedScore(v).score, 1)}</b></td>
+          <td>${SV.signalPill(namedScore(v).level)}</td>
         </tr>`).join('')}</tbody>`);
 
     document.querySelectorAll('#namedTable tbody tr').forEach((tr) => {
@@ -1250,6 +1290,8 @@ ${'─'.repeat(42)}
       return;
     }
     const a = v.assessment;
+    // 현재 슬라이더 기준으로 다시 계산한다 (굳힌 값이 아니라)
+    const now = namedScore(v);
     const factors = [...a.factors].sort((x, y) => y.contribution - x.contribution);
 
     host.innerHTML = `
@@ -1262,14 +1304,14 @@ ${'─'.repeat(42)}
           <div class="row between" style="align-items:flex-start">
             <div>
               <div style="font-size:38px;font-weight:760;letter-spacing:-.03em;line-height:1">
-                ${SV.dec(a.score, 1)}<span style="font-size:16px;color:var(--ink-2);font-weight:600"> / 100점</span>
+                ${SV.dec(now.score, 1)}<span style="font-size:16px;color:var(--ink-2);font-weight:600"> / 100점</span>
               </div>
-              <div class="mt-1">${SV.signalPill(a.level)}
+              <div class="mt-1">${SV.signalPill(now.level)}
                 <span class="small muted" style="margin-left:6px">${SV.esc(a.action)}</span></div>
             </div>
             <div class="lamp-stack" style="min-width:168px">
               ${['red', 'amber', 'green'].map((k) => `
-                <div class="lamp lamp--${k} ${a.level === k ? 'is-on' : ''}">
+                <div class="lamp lamp--${k} ${now.level === k ? 'is-on' : ''}">
                   <span class="lamp__bulb" aria-hidden="true"></span><span>${SV.LEVELS[k].label}</span>
                 </div>`).join('')}
             </div>
@@ -1596,6 +1638,25 @@ ${'─'.repeat(42)}
   }
 
   /* ================================================================ 탭 */
+
+  /**
+   * 선박 판정 탭의 보기 모드를 바꾼다.
+   *
+   * ⚠️ 예전에는 `hidden` 해제 코드가 **모드 버튼 클릭 핸들러 안에만** 있었다.
+   *    그래서 종합 현황에서 위험 상위 행을 눌러 `switchTab('vessel')` 로 오면,
+   *    선박군 상세가 **숨겨진 div 안에 그려지고** 화면에는 무관한 실명 목록이 떴다.
+   *    첫 화면의 유일한 드릴다운 경로가 조용히 죽어 있었다.
+   */
+  function setVesselMode(mode) {
+    vesselMode = mode;
+    document.querySelectorAll('#vesselMode .seg__btn').forEach((x) =>
+      x.setAttribute('aria-pressed', String(x.dataset.vmode === mode)));
+    const named = SV.el('namedWrap');
+    const cell = SV.el('cellWrap');
+    if (named) named.hidden = mode !== 'named';
+    if (cell) cell.hidden = mode !== 'cell';
+    updateVesselModeDesc();
+  }
 
   /* ======================================================= 점검계획 (§4) */
 
