@@ -712,3 +712,8 @@ select, input[type="search"], input[type="text"] {
   .deftable__row { grid-template-columns: 1fr; gap: 2px; }
   .bigscore__v { font-size: 36px; }
 }
+
+/* 그리드 자식은 기본값이 min-width:auto 라 **안쪽 내용보다 작아지지 못한다.**
+   그래서 좁은 화면에서 표 하나가 카드를 밀어내 페이지 전체에 가로 스크롤이 생겼다
+   (모바일 390px 에서 문서 폭 412px). 줄어들 수 있게 풀어 준다. */
+.grid > * { min-width: 0; }
