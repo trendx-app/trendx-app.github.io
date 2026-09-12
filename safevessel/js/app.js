@@ -234,8 +234,8 @@
       SV.el('scenarioDesc').innerHTML =
         `<b>기상청 실시간 연동</b> ${SV.srcBadge('KMA', '기상청 초단기실황·단기예보·기상특보 조회서비스 실시간 연동')}
          <div class="livegrid mt-1">${areas.map((a) => `
-           <div class="livegrid__item">
-             <b>${SV.esc(a.sea_area)}</b>
+           <div class="livegrid__item" title="${SV.esc(a.source)}">
+             <b>${SV.esc(a.sea_area === '미상' ? '해역 미상' : a.sea_area)}</b>
              <span class="tnum">${SV.dec(a.wind_speed_ms, 1)}<i>m/s</i></span>
              <span class="tnum">${SV.dec(a.wave_height_m, 1)}<i>m</i></span>
              ${a.warning ? `<span class="tag tag--govt">${SV.esc(a.warning)}</span>` : ''}
@@ -243,7 +243,11 @@
                ? `<span class="tag" title="품질검사에서 배제된 항목">QC 배제 ${a.qc_rejected.length}</span>` : ''}
            </div>`).join('')}</div>
          <div class="small muted mt-1">관측 ${SV.fmtDateTime(areas[0] && areas[0].observed_at)} ·
-           해역별 대표 지점 중 <b>가장 나쁜 값</b>을 씁니다 (평균이 아니라 최악을 봐야 안전 판단이 됩니다).</div>`;
+           해역별 대표 지점 중 <b>가장 나쁜 값</b>을 씁니다 (평균이 아니라 최악을 봐야 안전 판단이 됩니다).</div>
+         ${areas.some((a) => a.sea_area === '미상') ? `<div class="small muted">
+           <b>해역 미상</b> = 선적항이 어느 해역인지 판정되지 않은 어선.
+           어느 해역일 수도 있으므로 <b>실측 해역 중 가장 나쁜 값</b>을 적용합니다 —
+           모르는 것을 '잔잔함'으로 두지 않기 위한 규칙입니다.</div>` : ''}`;
     } else {
       SV.el('scenarioDesc').innerHTML =
         `<b>${SV.esc(sc.label)}</b> — ${SV.esc(sc.desc)} · 수온 ${sc.water_temp_c}℃ · 시정 ${sc.visibility_km}km`
