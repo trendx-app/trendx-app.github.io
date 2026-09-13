@@ -206,6 +206,25 @@ button { font: inherit; color: inherit; }
 .nav__scroll::-webkit-scrollbar { height: 5px; }
 .nav__scroll::-webkit-scrollbar-thumb { background: var(--axis); border-radius: 3px; }
 
+/* 휴대폰에서는 스크롤바가 안 보여 "탭이 3개뿐인가, 옆으로 넘어가나"를 알 수 없었다
+   (담당자 피드백 2026-09-13). 가려진 쪽에만 흐림 + 화살표를 띄운다. */
+.nav__bar { position: relative; }
+.nav__arrow {
+  position: absolute; top: 0; bottom: 0; z-index: 1;
+  width: 52px; padding: 0 4px; border: 0; cursor: pointer;
+  display: flex; align-items: center;
+}
+.nav__arrow--prev { left: 0;  justify-content: flex-start;
+  background: linear-gradient(to right, var(--plane) 45%, transparent); }
+.nav__arrow--next { right: 0; justify-content: flex-end;
+  background: linear-gradient(to left, var(--plane) 45%, transparent); }
+.nav__arrow > span {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 19px; font-weight: 700; line-height: 1; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--border-strong); box-shadow: var(--shadow);
+}
+
 .tab {
   flex: none; display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 14px; border-radius: 9px; border: 1px solid transparent;

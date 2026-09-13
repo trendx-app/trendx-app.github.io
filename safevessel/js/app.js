@@ -2064,9 +2064,48 @@ ${'─'.repeat(42)}
 
   const RENDERED = new Set();
 
+  /* 탭 줄이 화면보다 넓을 때(휴대폰) 가려진 쪽 화살표만 켠다. */
+  function updateNavArrows() {
+    const sc = document.querySelector('.nav__scroll');
+    if (!sc) return;
+    const max = sc.scrollWidth - sc.clientWidth;
+    document.querySelector('.nav__arrow--prev').hidden = sc.scrollLeft <= 2;
+    document.querySelector('.nav__arrow--next').hidden = sc.scrollLeft >= max - 2;
+  }
+
+  /* 선택한 탭이 화면 밖이면 끌어온다 — `#method` 링크로 들어오면 휴대폰에서
+     선택된 탭이 오른쪽 밖에 있어 지금 어느 화면인지 보이지 않았다. */
+  function revealTab(name) {
+    const sc = document.querySelector('.nav__scroll');
+    const tab = [...document.querySelectorAll('.tab')].find((t) => t.dataset.tab === name);
+    if (!sc || !tab) return;
+    const s = sc.getBoundingClientRect(), r = tab.getBoundingClientRect();
+    const edge = 56;   // 화살표 폭만큼 안쪽까지 들여야 가려지지 않는다
+    if (r.left < s.left + edge) sc.scrollLeft += r.left - s.left - edge;
+    else if (r.right > s.right - edge) sc.scrollLeft += r.right - s.right + edge;
+    updateNavArrows();
+  }
+
+  function initNavArrows() {
+    const sc = document.querySelector('.nav__scroll');
+    if (!sc) return;
+    const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+    document.querySelector('.nav__arrow--prev').addEventListener('click', () =>
+      sc.scrollBy({ left: -Math.round(sc.clientWidth * 0.6), behavior: smooth() }));
+    document.querySelector('.nav__arrow--next').addEventListener('click', () =>
+      sc.scrollBy({ left: Math.round(sc.clientWidth * 0.6), behavior: smooth() }));
+    sc.addEventListener('scroll', updateNavArrows, { passive: true });
+    window.addEventListener('resize', updateNavArrows);
+    // 이모지·웹폰트가 늦게 그려지면 탭 폭이 바뀐다
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateNavArrows);
+    window.addEventListener('load', updateNavArrows);
+    updateNavArrows();
+  }
+
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach((t) =>
       t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    revealTab(name);
     document.querySelectorAll('.panel').forEach((p) =>
       p.hidden = (p.id !== `panel-${name}`));
 
@@ -2139,6 +2178,7 @@ ${'─'.repeat(42)}
   async function boot() {
     SV.tipInit();
     initTheme();
+    initNavArrows();
 
     try {
       await loadAll();

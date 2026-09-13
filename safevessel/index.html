@@ -51,7 +51,11 @@
 
 <!-- ====================================================== nav -->
 <nav class="nav" aria-label="주요 화면">
-  <div class="wrap">
+  <div class="wrap nav__bar">
+    <!-- 휴대폰에서는 탭 9개 중 3개만 보인다 — 옆으로 더 있다는 것을 화살표로 알린다.
+         탭 자체는 키보드로 모두 닿으므로 화살표는 포커스·낭독 대상에서 뺀다. -->
+    <button class="nav__arrow nav__arrow--prev" type="button" tabindex="-1" aria-hidden="true" hidden><span>‹</span></button>
+    <button class="nav__arrow nav__arrow--next" type="button" tabindex="-1" aria-hidden="true" hidden><span>›</span></button>
     <div class="nav__scroll" role="tablist">
       <button class="tab" role="tab" data-tab="overview"   aria-selected="true"><span class="tab__ico">🚦</span>종합 현황</button>
       <button class="tab" role="tab" data-tab="simulator"  aria-selected="false"><span class="tab__ico">🎚️</span>위험도 시뮬레이터</button>
