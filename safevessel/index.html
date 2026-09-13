@@ -40,7 +40,7 @@
     <a class="icon-btn icon-btn--wide" id="manualBtn"
        href="manual/SafeVessel_%EC%82%AC%EC%9A%A9%EC%84%A4%EB%AA%85%EC%84%9C.pdf"
        target="_blank" rel="noopener"
-       title="사용 설명서 (PDF, 33쪽) — 화면에 보이는 것과 버튼 설명">
+       title="사용 설명서 (PDF) — 화면에 보이는 것과 버튼 설명">
       <span aria-hidden="true">📘</span><span class="icon-btn__txt">사용 설명서</span>
     </a>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="밝은/어두운 화면 전환" title="밝은/어두운 화면 전환">
@@ -273,7 +273,7 @@
     <div class="card mt-3">
       <div class="card__head">
         <h3>정부 지정 고위험 업종과의 대조</h3>
-        <span class="hint">모델이 정부 판단을 독립적으로 재현하는가</span>
+        <span class="hint">위험지수와 정부 지정 업종 비교</span>
       </div>
       <div class="card__body" id="govtCompare"></div>
     </div>
@@ -440,7 +440,7 @@
     </div>
 
     <div class="card mt-3">
-      <div class="card__head"><h3>몇 명이면 다 갈 수 있는가</h3>
+      <div class="card__head"><h3>감독관 수에 따른 배치 변화</h3>
         <span class="hint">감독관 수를 늘려 가며 같은 대상을 다시 배치한 결과</span></div>
       <div class="card__body" id="inspCapacity"></div>
     </div>
@@ -596,12 +596,12 @@
       </div>
       <div class="card__body">
         <p class="small">
-          통화(2026-09-12)와 「능동형 어선원 안전보건관리시스템 개발 계획」에 적힌 요구사항을
+          담당자 요구사항과 「능동형 어선원 안전보건관리시스템 개발 계획」에 적힌 요구사항을
           <b>배포된 데이터·코드에서 기계적으로 확인</b>한 결과입니다.
         </p>
         <div class="grid grid--2">
           <div class="stat">
-            <div class="stat__label">통화 요구사항</div>
+            <div class="stat__label">담당자 요구사항</div>
             <div class="stat__value tnum">17<span class="stat__unit">/ 17</span></div>
             <div class="stat__foot">신호등 · 가중치 조작 · 지원사업 매칭 · 문자 문안</div>
           </div>
@@ -640,64 +640,6 @@
 
     <div class="card mt-3">
       <div class="card__head">
-        <h3>개발 계획 §8 조문 검토</h3>
-        <span class="hint">인용된 법령을 원문과 대조했습니다</span>
-      </div>
-      <div class="card__body">
-        <p class="small">
-          「능동형 어선원 안전보건관리시스템 개발 계획」 §8 이 인용한 법령·조문을
-          국가법령정보센터 원문과 대조했습니다.
-          <b>확인한 것과 확인하지 못한 것을 구분해</b> 적었습니다.
-        </p>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th scope="col" style="width:44%">계획서 인용</th><th scope="col">검토 결과</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><b>산업안전보건법 제36조</b><div class="small muted">위험성 평가</div></td>
-              <td><span class="tag tag--govt">정확</span> 제36조 = 위험성평가의 실시.</td>
-            </tr>
-            <tr>
-              <td><b>산업안전보건법 제41조</b><div class="small muted">사업주의 안전보건조치 의무</div></td>
-              <td><span class="tag">조문 상이</span>
-                제41조는 <b>고객응대근로자</b>(감정노동자) 보호 조항입니다.
-                의도하신 내용은 <b>제38조(안전조치)·제39조(보건조치)</b>입니다.</td>
-            </tr>
-            <tr>
-              <td><b>어선안전법 제12조·제20조</b></td>
-              <td><span class="tag">확인 불가</span>
-                해당 제명의 법률을 확인하지 못했습니다. 어선 <b>검사</b>는 「어선법」,
-                어선원 <b>안전·보건</b>은 「어선안전조업 및 어선원의 안전ㆍ보건 증진 등에
-                관한 법률」입니다.</td>
-            </tr>
-          </tbody>
-        </table></div>
-
-        <div class="notice notice--warn mt-2">
-          <span class="notice__ico" aria-hidden="true">⚖️</span>
-          <div>
-            <b>근거 법률이 바뀌었습니다.</b>
-            「어선안전조업법」의 제명이 <b>「어선안전조업 및 어선원의 안전ㆍ보건 증진 등에
-            관한 법률」</b>로 변경됐고, 개정 이유는 이 사업의 취지와 그대로 겹칩니다 —
-            <span class="small">“「선원법」과 「산업안전보건법」에서 규정하고 있는 어선원의
-            안전·보건 증진 및 재해예방에 관한 사항을 이 법에 일률적으로 규정하여 …
-            관리·감독 체계를 일원화”</span>.
-            즉 어선원 안전·보건의 1차 근거는 이제 산업안전보건법이 아닙니다.
-            그리고 이 법이 요구하는 <b>“어선 안전 위해요소 발굴을 위한 위험성평가 기준”</b>이
-            바로 이 화면의 위험도 엔진이 하는 일입니다.
-          </div>
-        </div>
-
-        <p class="small muted mt-2">
-          ⚠️ 이 검토는 공개 검색 결과에 기초한 것이며 <b>법률 자문이 아닙니다.</b>
-          원문을 직접 대조해 단정한 것은 산업안전보건법 제41조 하나이고, 나머지는
-          “확인하지 못했다”로 적었습니다. 시행일·경과규정은 법제처 원문 부칙을
-          확인하십시오. 출처: 국가법령정보센터(law.go.kr).
-        </p>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
         <h3>인용한 공표 자료</h3>
         <span class="hint">통계 외에 제도·사업·사고 사례로 인용한 원문 — 전부 링크를 겁니다</span>
       </div>
@@ -728,7 +670,7 @@
 <footer class="foot">
   <div class="wrap">
     <p>
-      <b>SafeVessel</b> — 어선 위험도 신호등. 정부 공개 데이터 12종을 조합해
+      <b>SafeVessel</b> — 어선 위험도 신호등. 정부 공개 데이터를 조합해
       전국 등록 어선 63,647척의 위험도를 산출하고, 점검 순서와 긴급대응 자원까지 제시합니다.
     </p>
     <p class="mt-1" id="footMeta"></p>

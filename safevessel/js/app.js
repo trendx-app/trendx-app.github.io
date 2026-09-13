@@ -149,8 +149,7 @@
    * ⚠️ 예전에는 `named.json` 에 굳혀 넣은 `assessment.score/level` 을 그대로 읽었다.
    *    그 값은 빌드 시점의 기본 가중치(0.30/0.20…)와 기본 경계(40/70)로 계산된 것이라,
    *    담당자가 슬라이더를 움직이면 **같은 탭의 선박군 모드와 실명 모드가 서로 다른
-   *    등급을 주장**했다. 발주처가 통화에서 직접 요구한 기능("기상을 0.3 팩터로…
-   *    조작할 수 있잖아")을 쓰는 순간 도구가 자기모순에 빠졌다.
+   *    등급을 주장**했다. 담당자가 가중치를 조정하는 순간 도구가 자기모순에 빠졌다.
    *
    * 셀 계산(`cellScore`)과 같은 규칙을 쓴다 — 정규화, 개별 결측에만 하한.
    */
@@ -437,7 +436,7 @@
             <p class="small muted mt-1">
               각 팩터의 점수는 정부 공개 데이터에서 계산합니다.
               업종·톤급 위험도는 <b>사고 건수 ÷ 등록 척수</b>(실측 사고율)에서,
-              계절·시간대는 사고 원자료 17,036건의 실제 분포에서 나옵니다.
+              계절·시간대는 어선 사고 원자료 ${SV.num(D.meta.totals.accident_fishing_rows)}건의 실제 분포에서 나옵니다.
             </p>
           </div>
         </div>
@@ -447,7 +446,7 @@
           <div>
             <b class="small">가중치를 곱해 합산 — 가중치는 담당자가 조정합니다</b>
             <p class="small muted mt-1">
-              기본값은 발주기관이 제시한 <b>기상 0.30 · 사고이력 0.20</b>이며 나머지는 초기 배분안입니다.
+              기본값(<b>기상 0.30 · 사고이력 0.20</b> 등)은 초기 배분안이며 담당자가 조정할 수 있습니다.
               합이 1이 아니어도 자동으로 정규화되므로 슬라이더를 전부 올려도 모두 빨간불이 되지 않습니다.
               <a href="#" data-goto="simulator">시뮬레이터에서 직접 조정</a>해 보십시오.
             </p>
@@ -812,24 +811,24 @@
 
     SV.html('govtCompare', `
       <div class="grid grid--3" style="gap:10px;margin-bottom:14px">
-        <div class="stat"><div class="stat__label">정부 지정 업종 중 모델 상위 1/3 재현</div>
+        <div class="stat"><div class="stat__label">정부 지정 업종 중 위험지수 상위 1/3</div>
           <div class="stat__value tnum">${hits.length}<span class="stat__unit">/ ${govt.length}</span></div>
           <div class="stat__foot">무작위 기대치 ${SV.dec(expected, 1)}개 대비 ${SV.dec(hits.length / expected, 1)}배</div></div>
         <div class="stat"><div class="stat__label">전체 분석 업종</div>
           <div class="stat__value tnum">${ranked.length}</div>
           <div class="stat__foot">등록 20척 이상 업종만</div></div>
-        <div class="stat"><div class="stat__label">모델이 새로 지목한 고위험</div>
+        <div class="stat"><div class="stat__label">상위 15위 중 미지정 업종</div>
           <div class="stat__value tnum">${notDesignated.length}</div>
-          <div class="stat__foot">상위 15위 중 정부 미지정</div></div>
+          <div class="stat__foot">톤급 대리지표 — 지정 판단 근거 아님</div></div>
       </div>
 
       <div class="notice">
         <span class="notice__ico">🔍</span>
         <div>
-          <b>모델이 정부 판단을 데이터만으로 재현했습니다.</b>
-          정부가 사고발생률을 근거로 지정한 고위험 업종 ${govt.length}개 중 ${hits.length}개가,
-          본 모델의 독립적 계산(공개 데이터만 사용)에서도 상위 1/3에 들었습니다.
-          이는 모델의 타당성을 뒷받침합니다.
+          <b>톤급 구성으로 본 위험지수가 정부 지정 고위험 업종과 상당 부분 겹칩니다.</b>
+          지정 업종 ${govt.length}개 중 ${hits.length}개가 공개 데이터로 계산한 위험지수 상위 1/3에 들었습니다.
+          다만 사고 원자료에 업종 항목이 없어 이 지수는 <b>업종의 톤급 구성만으로 계산한 대리지표</b>이며,
+          어법 고유의 위험은 반영하지 못합니다.
         </div>
       </div>
 
@@ -837,15 +836,16 @@
       <div class="notice notice--warn mt-2">
         <span class="notice__ico">📌</span>
         <div>
-          <b>검토가 필요한 지점</b> — 아래 업종은 모델 위험지수가 상위 15위 안에 들지만
-          현재 정부 고위험 지정 목록에는 없습니다. 지정 확대 검토 대상으로 제안드립니다.
+          <b>해석에 주의</b> — 아래 업종은 위험지수 상위 15위 안에 들지만 지정 목록에는 없습니다.
+          대부분 톤수가 큰 업종으로 <b>톤급 구성이 반영된 결과</b>입니다.
+          지정 판단의 근거로 쓸 수 없으며, 업종별 사고 원자료를 연계한 뒤 다시 볼 대상입니다.
           <div class="mt-1">${notDesignated.map((f) =>
             `<span class="tag">${SV.esc(f.name)} <b>${SV.dec(f.risk_index, 2)}배</b></span>`).join('')}</div>
         </div>
       </div>` : ''}
 
       <div class="tbl-wrap mt-2"><table>
-        <thead><tr><th scope="col">정부 지정 업종</th><th scope="col" class="num">모델 순위</th><th scope="col" class="num">위험지수</th><th scope="col" class="num">등록 척수</th></tr></thead>
+        <thead><tr><th scope="col">정부 지정 업종</th><th scope="col" class="num">위험지수 순위</th><th scope="col" class="num">위험지수</th><th scope="col" class="num">등록 척수</th></tr></thead>
         <tbody>${govt.map((f) => {
           const rank = ranked.findIndex((x) => x.name === f.name) + 1;
           return `<tr><td><b>${SV.esc(f.name)}</b></td>
@@ -1458,7 +1458,7 @@ ${'─'.repeat(42)}
 
     SV.html('caseSummary', `
       <div class="card__head"><h3>${SV.esc(c.vessel.fishery)}</h3>
-        <span class="hint">${SV.ton(c.vessel.tonnage)} · ${SV.esc(c.vessel.port)}</span></div>
+        <span class="hint">${SV.ton(c.vessel.tonnage)} · ${SV.esc(c.vessel.port)} · <b>기상은 ${SV.esc(c.scenario || '풍랑주의보')} 가정 시나리오</b></span></div>
       <div class="card__body">
         <div class="row between">
           <div>
@@ -1466,7 +1466,7 @@ ${'─'.repeat(42)}
             <div class="mt-1">${SV.signalPill(a.level)}</div>
           </div>
           <div class="small muted" style="text-align:right;max-width:56%">
-            승선원 ${c.vessel.crew ?? '—'}명${c.vessel.foreign_crew ? ` (외국인 ${c.vessel.foreign_crew}명)` : ''}<br>
+            승선원 ${c.vessel.crew != null ? `${c.vessel.crew}명` : '미확인 (공개 명부에 없음)'}${c.vessel.foreign_crew ? ` (외국인 ${c.vessel.foreign_crew}명)` : ''}<br>
             ${SV.esc(c.vessel.hull)} · 길이 ${SV.dec(c.vessel.length, 1)}m<br>
             판정 신뢰도 ${SV.pct(a.confidence, 0)}
           </div>
@@ -1483,9 +1483,9 @@ ${'─'.repeat(42)}
     const msg = c.sms;
     const bytes = [...msg].reduce((s, ch) => s + (ch.codePointAt(0) > 0x7f ? 2 : 1), 0);
     SV.el('smsBody').textContent = msg;
-    SV.el('smsMeta').textContent = `${bytes <= 90 ? 'SMS' : 'LMS'} · ${bytes}바이트`;
+    SV.el('smsMeta').textContent = `${bytes <= 90 ? 'SMS' : 'LMS'} · ${bytes}바이트 · 기상은 ${c.scenario || '풍랑주의보'} 가정`;
     SV.html('smsFoot', `
-      <span class="tag">수신: 담당 주무관 010-****-0000</span>
+      <span class="tag">수신: 담당자 (기관 연계 후 지정)</span>
       <span class="tag">상태: 발송대기 (실제 발송 안 함)</span>
       <span class="tag">재발송 억제: ${a.level === 'red' ? '1일' : '7일'}</span>
       <span class="tag">심야(22~07시) ${a.level === 'red' ? '즉시 발송' : '발송 보류'}</span>`);
@@ -1679,7 +1679,7 @@ ${'─'.repeat(42)}
           { t: 'V-Pass 위치 연계', d: '실제 조업 위치. 공개 API가 없어 업무협약이 전제입니다.', who: '어선안전조업본부' },
           { t: '기상청 서비스 키', d: '단기예보·해양기상 실시간 연동. 개발계정은 자동승인·1만건/일입니다.', who: '공공데이터포털 신청' },
           { t: 'MTIS 인증키', d: 'KOMSA 해양교통안전정보 연계. 회원가입 후 개발키 무승인 발급.', who: 'mtisopenapi.komsa.or.kr' },
-          { t: '기관 SMS 게이트웨이', d: '담당자 알림 실제 발송. 현재는 대기열·CSV 내보내기까지만 동작합니다.', who: '기관 행정망' },
+          { t: '기관 SMS 게이트웨이', d: '담당자 알림 실제 발송. 현재는 발송 대상·문안 생성까지만 동작합니다.', who: '기관 행정망' },
         ].map((s) => `
           <div class="card" style="box-shadow:none">
             <div class="card__body" style="padding:13px 15px">
@@ -1765,7 +1765,7 @@ ${'─'.repeat(42)}
       `<div class="stat stat--red">
         <div class="stat__label">이월</div>
         <div class="stat__value tnum">${SV.num(s.deferred)}<span class="stat__unit">척</span></div>
-        <div class="stat__foot">하루 가용 시간을 넘겨 다음 날로</div>
+        <div class="stat__foot">하루 가용 시간을 넘긴 대상</div>
       </div>`,
       `<div class="stat">
         <div class="stat__label">평균 가동률</div>
@@ -1976,6 +1976,7 @@ ${'─'.repeat(42)}
       <p class="small muted mt-1">
         출동 거점 <b>${SV.esc((c.response[0] || {}).launch_from || '—')}</b> 기준.
         구조정은 병원이 아니라 <b>해양경찰 관서</b>에서 출발합니다.
+        헬기·함정의 실제 소속 기지는 반영하지 않고, <b>모든 수단이 가장 가까운 관서에서 출발한다고 가정</b>했습니다.
       </p>` : '<p class="muted">구조 거점을 찾지 못했습니다.</p>');
 
     // 의료 이송
