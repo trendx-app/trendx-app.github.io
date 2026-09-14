@@ -1,693 +1,370 @@
 <!doctype html>
 <html lang="ko" data-theme="light">
 <script>
-  /* 다크 선호 기기에서 흰 화면이 한 프레임 번쩍이는 것을 막는다.
-     initTheme() 은 DOMContentLoaded 이후라 늦다. */
+  /* 앱과 같은 테마 결정 — 로그인 전후로 색이 번쩍 바뀌지 않게 */
   (function () {
     try {
       var t = localStorage.getItem('sv-theme');
       if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', t);
-    } catch (e) { /* 시크릿 모드 등 — 기본값으로 둔다 */ }
+    } catch (e) { /* 사생활 보호 모드 — 기본값 */ }
   })();
 </script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SafeVessel — 어선 위험도 신호등</title>
-<meta name="description" content="공개 데이터 기반 어선 안전 위험도 신호등. 중앙해양안전심판원 해양사고 원자료와 해양수산부 어선세력 통계로 산정한 업종·톤급·해역별 위험도.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
-<link rel="stylesheet" href="css/app.css">
+<title>SafeVessel — 담당자 로그인</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚦</text></svg>">
+<style id="lockStyle">
+  /* 토큰은 web/css/app.css 와 같은 값 — 로그인 전에는 앱 CSS 가 암호화돼 있어 여기 따로 둔다 */
+  :root {
+    color-scheme: light;
+    --plane: #f4f5f3; --surface: #ffffff; --surface-sunk: #f0f1ee;
+    --ink: #0b0b0b; --ink-2: #52514e; --ink-muted: #7c7b75;
+    --border: rgba(11,11,11,.10); --border-strong: rgba(11,11,11,.16);
+    --accent: #184f95; --accent-ink: #ffffff;
+    --danger: #b3261e; --danger-soft: #fbe9e9;
+    --radius: 14px; --radius-sm: 9px;
+    --shadow-lg: 0 2px 6px rgba(11,11,11,.07), 0 20px 50px rgba(11,11,11,.10);
+    --sans: system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Segoe UI", sans-serif;
+    --dur: 180ms; --ease: cubic-bezier(.2, .7, .3, 1);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane: #0d0d0d; --surface: #1a1a19; --surface-sunk: #131312;
+    --ink: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+    --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+    --accent: #3987e5; --accent-ink: #08111d;
+    --danger: #ff8a80; --danger-soft: #2d1414;
+    --shadow-lg: 0 2px 6px rgba(0,0,0,.5), 0 20px 50px rgba(0,0,0,.45);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--plane); color: var(--ink); font-family: var(--sans); }
+  .lock { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
+  .lock__card {
+    width: 100%; max-width: 384px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+    padding: 32px 28px 24px;
+    animation: lock-in 240ms var(--ease) both;
+  }
+  @keyframes lock-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .lock__card { animation: none; } }
+
+  .lock__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .lock__mark {
+    width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--surface-sunk); border: 1px solid var(--border); font-size: 24px;
+  }
+  .lock__name { font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .lock__sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .lock h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
+  .lock__lead { font-size: 14px; line-height: 1.5; color: var(--ink-2); margin: 0 0 20px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 650; margin-bottom: 6px; }
+  .field__row { position: relative; }
+  .field input {
+    width: 100%; height: 48px; padding: 0 14px; font: inherit; font-size: 16px;
+    color: var(--ink); background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .field input.has-toggle { padding-right: 72px; }
+  .field input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .field input[aria-invalid="true"] { border-color: var(--danger); }
+  .pw-toggle {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    min-width: 60px; height: 40px; padding: 0 10px; border: 0; border-radius: 7px;
+    background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .pw-toggle:hover { background: var(--surface-sunk); }
+  .pw-toggle:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 1px; }
+
+  .lock__error {
+    display: none; margin: 0 0 16px; padding: 10px 12px; border-radius: var(--radius-sm);
+    background: var(--danger-soft); color: var(--danger); font-size: 14px; line-height: 1.45; font-weight: 600;
+  }
+  .lock__error.is-on { display: block; }
+
+  .lock__btn {
+    width: 100%; height: 48px; border: 0; border-radius: var(--radius-sm); cursor: pointer;
+    background: var(--accent); color: var(--accent-ink); font: inherit; font-size: 16px; font-weight: 750;
+    transition: filter var(--dur) var(--ease), transform 90ms var(--ease);
+  }
+  .lock__btn:hover { filter: brightness(1.08); }
+  .lock__btn:active { transform: scale(.985); }
+  .lock__btn:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+  .lock__btn[disabled] { cursor: progress; filter: saturate(.6) brightness(.95); }
+  @media (prefers-reduced-motion: reduce) { .lock__btn, .field input { transition: none; } .lock__btn:active { transform: none; } }
+
+  .lock__foot { margin: 20px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); text-align: center; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
 </head>
 <body>
-
-<!-- ====================================================== header -->
-<header class="topbar">
-  <div class="wrap topbar__inner">
-    <a class="brand" href="#" data-goto="overview">
-      <span class="brand__mark" aria-hidden="true">🚦</span>
+<main class="lock">
+  <section class="lock__card" aria-labelledby="lockTitle">
+    <div class="lock__brand">
+      <span class="lock__mark" aria-hidden="true">🚦</span>
       <span>
-        <span class="brand__name">SafeVessel</span>
-        <span class="brand__sub">어선 위험도 신호등 · 공개데이터 기반 시범</span>
+        <span class="lock__name">SafeVessel</span>
+        <span class="lock__sub" style="display:block">어선 위험도 신호등</span>
       </span>
-    </a>
-    <span class="topbar__spacer"></span>
-    <span class="chip chip--live" id="chipData" title="데이터 기준 시점">
-      <span class="chip__dot" aria-hidden="true"></span>
-      <span id="chipDataText">데이터 로딩 중…</span>
-    </span>
-    <a class="icon-btn icon-btn--wide" id="manualBtn"
-       href="manual/SafeVessel_%EC%82%AC%EC%9A%A9%EC%84%A4%EB%AA%85%EC%84%9C.pdf"
-       target="_blank" rel="noopener"
-       title="사용 설명서 (PDF) — 화면에 보이는 것과 버튼 설명">
-      <span aria-hidden="true">📘</span><span class="icon-btn__txt">사용 설명서</span>
-    </a>
-    <button class="icon-btn" id="themeBtn" type="button" aria-label="밝은/어두운 화면 전환" title="밝은/어두운 화면 전환">
-      <span id="themeIco" aria-hidden="true">🌙</span>
-    </button>
-  </div>
-</header>
-
-<!-- ====================================================== nav -->
-<nav class="nav" aria-label="주요 화면">
-  <div class="wrap nav__bar">
-    <!-- 휴대폰에서는 탭 9개 중 3개만 보인다 — 옆으로 더 있다는 것을 화살표로 알린다.
-         탭 자체는 키보드로 모두 닿으므로 화살표는 포커스·낭독 대상에서 뺀다. -->
-    <button class="nav__arrow nav__arrow--prev" type="button" tabindex="-1" aria-hidden="true" hidden><span>‹</span></button>
-    <button class="nav__arrow nav__arrow--next" type="button" tabindex="-1" aria-hidden="true" hidden><span>›</span></button>
-    <div class="nav__scroll" role="tablist">
-      <button class="tab" role="tab" data-tab="overview"   aria-selected="true"><span class="tab__ico">🚦</span>종합 현황</button>
-      <button class="tab" role="tab" data-tab="simulator"  aria-selected="false"><span class="tab__ico">🎚️</span>위험도 시뮬레이터</button>
-      <button class="tab" role="tab" data-tab="fishery"    aria-selected="false"><span class="tab__ico">🎣</span>업종 분석</button>
-      <button class="tab" role="tab" data-tab="map"        aria-selected="false"><span class="tab__ico">🗺️</span>사고 지도</button>
-      <button class="tab" role="tab" data-tab="vessel"     aria-selected="false"><span class="tab__ico">🚢</span>선박 판정</button>
-      <button class="tab" role="tab" data-tab="inspection" aria-selected="false"><span class="tab__ico">📋</span>점검계획</button>
-      <button class="tab" role="tab" data-tab="emergency"  aria-selected="false"><span class="tab__ico">🚑</span>긴급대응</button>
-      <button class="tab" role="tab" data-tab="support"    aria-selected="false"><span class="tab__ico">📨</span>지원사업·알림</button>
-      <button class="tab" role="tab" data-tab="method"     aria-selected="false"><span class="tab__ico">📚</span>데이터·방법론</button>
     </div>
-  </div>
-</nav>
 
-<main class="wrap">
+    <h1 id="lockTitle">담당자 로그인</h1>
+    <p class="lock__lead">권한을 받은 담당자만 이용할 수 있습니다.</p>
 
-  <div id="loader" class="loader">
-    <div class="loader__bar"><i></i></div>
-    <p class="small muted">공개 데이터를 불러오는 중입니다…</p>
-  </div>
+    <form id="loginForm" novalidate>
+      <p class="lock__error" id="loginError" role="alert" aria-live="assertive"></p>
 
-  <!-- ================================================== 종합 현황 -->
-  <section class="panel" id="panel-overview" hidden>
-
-    <div class="notice mt-1" style="margin-bottom:16px">
-      <span class="notice__ico" aria-hidden="true">ℹ️</span>
-      <div>
-        <b>이 화면의 모든 수치는 정부 공개 데이터에서 직접 계산한 값입니다.</b>
-        가상 데이터를 쓰지 않았습니다. 각 숫자 옆의 회색 뱃지가 그 수치의 출처이며,
-        뱃지에 마우스를 올리면 원본과 산출 방법이 나옵니다.
-        판정 근거·한계는 <a href="#" data-goto="method">데이터·방법론</a> 화면에 전부 공개했습니다.
+      <div class="field">
+        <label for="loginId">아이디</label>
+        <input id="loginId" name="username" type="text" autocomplete="username"
+               autocapitalize="none" autocorrect="off" spellcheck="false" required>
       </div>
-    </div>
 
-    <div class="grid grid--4" id="heroStats"></div>
-
-    <div class="card mt-3" id="criteriaCard">
-      <div class="card__head">
-        <h3>신호등은 어떻게 정해지는가</h3>
-        <span class="hint">판정 과정과 기준을 먼저 밝힙니다 — 개별 선박의 실제 계산은 <a href="#" data-goto="vessel">선박 판정</a>에서 숫자 그대로 확인하실 수 있습니다</span>
-      </div>
-      <div class="card__body" id="criteriaBody"></div>
-    </div>
-
-    <div class="grid grid--sidebar mt-3">
-      <div class="card">
-        <div class="card__head">
-          <h3>기상 시나리오</h3>
-          <span class="hint">고르면 전국 신호등이 즉시 다시 계산됩니다</span>
-        </div>
-        <div class="card__body">
-          <div id="scenarioBtns" class="seg" style="flex-wrap:wrap"></div>
-          <p class="small muted mt-2" id="scenarioDesc"></p>
-
-          <div class="mt-3">
-            <div class="row between" style="margin-bottom:7px">
-              <b class="small">전국 신호등 분포</b>
-              <span class="small muted tnum" id="distTotal"></span>
-            </div>
-            <div class="dist" id="distBar" role="img" aria-label="신호등 등급별 어선 비율"></div>
-            <div class="legend" id="distLegend"></div>
-          </div>
-
-          <div class="lamp-stack mt-3" id="lampStack"></div>
+      <div class="field">
+        <label for="loginPw">비밀번호</label>
+        <div class="field__row">
+          <input id="loginPw" name="password" type="password" class="has-toggle"
+                 autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" id="pwToggle" aria-controls="loginPw" aria-pressed="false">보기</button>
         </div>
       </div>
 
-      <div class="grid" style="gap:14px">
-        <div class="card">
-          <div class="card__head">
-            <h3>해역별 위험 구성</h3>
-            <span class="hint">선적항 기준 · 등록 척수 가중</span>
-          </div>
-          <div class="card__body"><div id="seaChart"></div></div>
-        </div>
-        <div class="card">
-          <div class="card__head">
-            <h3>위험도 상위 선박군</h3>
-            <span class="hint">업종 · 톤급 · 해역 조합 기준 상위 12</span>
-          </div>
-          <div class="card__body">
-            <div class="tbl-wrap scroll-y"><table id="topRiskTable"></table></div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <button type="submit" class="lock__btn" id="loginBtn">로그인</button>
+    </form>
 
-    <div class="card mt-3" id="sourceStripCard">
-      <div class="card__head">
-        <h3>이 화면이 쓴 공공데이터</h3>
-        <span class="hint">전부 정부 공개 데이터입니다 — 클릭하면 원본으로 갑니다 · <a href="#" data-goto="method">검수 방법 보기</a></span>
-      </div>
-      <div class="card__body"><div id="sourceStrip"></div></div>
-    </div>
-
-    <div class="grid grid--2 mt-3">
-      <div class="card">
-        <div class="card__head">
-          <h3>톤급별 실제 사고율</h3>
-          <span class="hint">사고 건수 ÷ 등록 척수 — 건수만 보면 놓치는 사실</span>
-        </div>
-        <div class="card__body"><div id="bandRateChart"></div></div>
-      </div>
-      <div class="card">
-        <div class="card__head">
-          <h3>월별 사고 지수</h3>
-          <span class="hint">연평균 1.00 기준 · 실측</span>
-        </div>
-        <div class="card__body"><div id="monthChart"></div></div>
-      </div>
-    </div>
+    <p class="lock__foot">공개 데이터 기반 시범 서비스</p>
   </section>
-
-  <!-- ================================================== 시뮬레이터 -->
-  <section class="panel" id="panel-simulator" hidden>
-    <div class="section-head">
-      <h2>위험도 시뮬레이터</h2>
-      <p>
-        팩터별 가중치와 신호등 경계값을 담당자가 직접 조정합니다. 슬라이더를 움직이면
-        전국 63,647척의 판정이 <b>즉시</b> 다시 계산됩니다. 가중치 합은 자동으로 1.0으로 정규화되므로
-        전부 올려도 모든 배가 빨간불이 되지 않습니다.
-      </p>
-    </div>
-
-    <div class="grid grid--sidebar">
-      <div class="card">
-        <div class="card__head">
-          <h3>가중치</h3>
-          <button class="btn" id="resetWeights" type="button" style="margin-left:auto;padding:4px 10px;font-size:12px">초기화</button>
-        </div>
-        <div class="card__body">
-          <div id="weightSliders"></div>
-
-          <div class="notice mt-2" id="weightProvenance">
-            <span class="notice__ico" aria-hidden="true">📌</span>
-            <div id="weightProvenanceText"></div>
-          </div>
-
-          <h4 class="small mt-3" style="margin-bottom:4px">신호등 경계값</h4>
-          <p class="small muted" style="margin-bottom:6px">
-            빨간불이 너무 많으면 담당자가 전부 무시하게 됩니다. 하루에 연락 가능한 척수에 맞춰 조정하십시오.
-          </p>
-          <div id="thresholdSliders"></div>
-        </div>
-      </div>
-
-      <div class="grid" style="gap:14px">
-        <div class="card">
-          <div class="card__head">
-            <h3>조정 결과</h3>
-            <span class="hint" id="simScenarioHint"></span>
-          </div>
-          <div class="card__body">
-            <div class="dist" id="simDist" role="img" aria-label="조정 후 신호등 분포"></div>
-            <div class="legend" id="simLegend"></div>
-            <div class="grid grid--3 mt-3" id="simStats"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card__head">
-            <h3>가중치 조정에 따른 순위 변화</h3>
-            <span class="hint">기본값 대비 · 상위 15개 선박군</span>
-          </div>
-          <div class="card__body">
-            <div class="tbl-wrap scroll-y"><table id="simRankTable"></table></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================== 업종 분석 -->
-  <section class="panel" id="panel-fishery" hidden>
-    <div class="section-head">
-      <h2>업종별 위험도</h2>
-      <p>
-        업종 위험지수 = <b>Σ(그 업종의 톤급 구성비 × 톤급별 실측 사고율)</b> ÷ 전체 평균.
-        분자는 중앙해양안전심판원 사고 원자료, 분모는 해양수산부 어선세력 공표 통계입니다.
-        지수 1.00 = 전국 평균.
-      </p>
-    </div>
-
-    <div class="toolbar">
-      <span class="toolbar__label">분류</span>
-      <div class="seg" id="groupFilter"></div>
-      <span class="toolbar__label" style="margin-left:8px">정렬</span>
-      <select id="fisherySort">
-        <option value="risk_index">위험지수 높은 순</option>
-        <option value="annual_rate_pct">연 사고율 높은 순</option>
-        <option value="fatality_per_1k">1,000척당 사망률 높은 순</option>
-        <option value="vessel_count">등록 척수 많은 순</option>
-        <option value="median_tonnage">톤수 큰 순</option>
-      </select>
-      <label class="row small" style="gap:5px;margin-left:8px">
-        <input type="checkbox" id="onlyGovt"> 정부 지정 고위험 업종만
-      </label>
-    </div>
-
-    <div class="grid grid--2">
-      <div class="card">
-        <div class="card__head"><h3>위험지수 순위</h3><span class="hint" id="fisheryCount"></span></div>
-        <div class="card__body">
-          <div class="tbl-wrap scroll-y" style="max-height:520px"><table id="fisheryTable"></table></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card__head"><h3 id="fdName">업종을 선택하십시오</h3><span class="hint" id="fdGroup"></span></div>
-        <div class="card__body" id="fisheryDetail">
-          <p class="muted small">왼쪽 표에서 업종을 고르면 상세 근거가 나옵니다.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>정부 지정 고위험 업종과의 대조</h3>
-        <span class="hint">위험지수와 정부 지정 업종 비교</span>
-      </div>
-      <div class="card__body" id="govtCompare"></div>
-    </div>
-  </section>
-
-  <!-- ================================================== 지도 -->
-  <section class="panel" id="panel-map" hidden>
-    <div class="section-head">
-      <h2>실제 어선 사고 발생 지점</h2>
-      <p>
-        중앙해양안전심판원 원자료에 기록된 어선 사고의 <b>실제 위·경도</b>입니다.
-        인명피해가 있었던 사고를 우선해 2,500건을 표시합니다.
-      </p>
-    </div>
-
-    <div class="toolbar">
-      <span class="toolbar__label">표시</span>
-      <div class="seg" id="mapMode">
-        <button class="seg__btn" data-mode="casualty" aria-pressed="true">인명피해</button>
-        <button class="seg__btn" data-mode="kind" aria-pressed="false">사고 유형</button>
-      </div>
-      <span class="toolbar__label" style="margin-left:8px">사고 유형</span>
-      <select id="mapKind"><option value="">전체</option></select>
-      <span class="toolbar__label" style="margin-left:8px">연도</span>
-      <select id="mapYear"><option value="">전체</option></select>
-      <label class="row small" style="gap:5px;margin-left:8px">
-        <input type="checkbox" id="showHotspots" checked>
-        <span id="hotspotLabel">사고 다발지점 겹쳐보기</span>
-      </label>
-      <span class="small muted" id="mapCount" style="margin-left:auto"></span>
-    </div>
-
-    <div class="card">
-      <div class="card__body">
-        <div class="map-shell"><div id="mapChart"></div></div>
-        <div class="legend" id="mapLegend"></div>
-      </div>
-    </div>
-
-    <div class="grid grid--2 mt-3">
-      <div class="card">
-        <div class="card__head"><h3>사고 유형별 치명률</h3><span class="hint">사고 1건당 사망·실종자 수 · 실측</span></div>
-        <div class="card__body"><div id="lethalChart"></div></div>
-      </div>
-      <div class="card">
-        <div class="card__head"><h3>시간대별 사고 지수</h3><span class="hint">구간 평균 1.00 · 실측</span></div>
-        <div class="card__body"><div id="timeChart"></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================== 선박 판정 -->
-  <section class="panel" id="panel-vessel" hidden>
-    <div class="section-head">
-      <h2>선박 판정</h2>
-      <p id="vesselModeDesc"></p>
-    </div>
-
-    <div class="toolbar" style="margin-bottom:10px">
-      <span class="toolbar__label">보기</span>
-      <div class="seg" id="vesselMode">
-        <button class="seg__btn" data-vmode="named" aria-pressed="true">🚢 실명 선박</button>
-        <button class="seg__btn" data-vmode="cell" aria-pressed="false">📊 선박군 (전수)</button>
-      </div>
-    </div>
-
-    <!-- ── 실명 선박 ── -->
-    <div id="namedWrap">
-      <div class="toolbar">
-        <input type="search" id="namedSearch" placeholder="선박명 또는 어선번호 검색 (예: 덕성호, 9506035)" style="min-width:280px">
-        <select id="namedSea"><option value="">전체 해역</option></select>
-        <select id="namedSignal">
-          <option value="">전체 등급</option>
-          <option value="red">🔴 위험만</option>
-          <option value="amber">🟡 주의만</option>
-          <option value="green">🟢 안전만</option>
-        </select>
-        <select id="namedSort">
-          <option value="score">위험도 높은 순</option>
-          <option value="age">선령 많은 순</option>
-          <option value="tonnage">톤수 큰 순</option>
-          <option value="accident">사고 이력 많은 순</option>
-        </select>
-        <label class="row small" style="gap:5px"><input type="checkbox" id="namedOnlyAccident"> 사고 이력 있는 배만</label>
-        <span class="small muted" id="namedCount" style="margin-left:auto"></span>
-      </div>
-
-      <div class="grid grid--named">
-        <div class="card">
-          <div class="card__head"><h3>선박 목록</h3><span class="hint">어선번호로 식별 · 행을 누르면 상세가 열립니다</span></div>
-          <div class="card__body">
-            <div class="tbl-wrap scroll-y" style="max-height:600px"><table id="namedTable"></table></div>
-          </div>
-        </div>
-        <div id="namedDetail"></div>
-      </div>
-    </div>
-
-    <!-- ── 선박군 (전수) ── -->
-    <div id="cellWrap" hidden>
-    <div class="toolbar">
-      <input type="search" id="cellSearch" placeholder="업종·선적항 검색 (예: 안강망, 보령)" style="min-width:230px">
-      <select id="cellSea"><option value="">전체 해역</option></select>
-      <select id="cellBand"><option value="">전체 톤급</option></select>
-      <select id="cellSignal">
-        <option value="">전체 등급</option>
-        <option value="red">🔴 위험만</option>
-        <option value="amber">🟡 주의만</option>
-        <option value="green">🟢 안전만</option>
-      </select>
-      <span class="small muted" id="cellCount" style="margin-left:auto"></span>
-    </div>
-
-    <div class="grid grid--sidebar">
-      <div class="card">
-        <div class="card__head"><h3>선박군 목록</h3><span class="hint">위험한 순</span></div>
-        <div class="card__body">
-          <div class="tbl-wrap scroll-y" style="max-height:560px"><table id="cellTable"></table></div>
-        </div>
-      </div>
-      <div id="cellDetail"></div>
-    </div>
-    </div>
-  </section>
-
-  <!-- ================================================== 지원사업·알림 -->
-  <!-- ================================================== 점검계획 (계획서 §4) -->
-  <section class="panel" id="panel-inspection" hidden>
-    <div class="section-head">
-      <h2>점검계획 자동 수립</h2>
-      <p>
-        위험도가 높은 배를 <b>누가 · 언제 · 어떤 순서로</b> 점검할지 하루 일정으로 만듭니다.
-        「능동형 어선원 안전보건관리시스템 개발 계획」 §4 의 요구사항입니다.
-      </p>
-    </div>
-
-    <div class="notice notice--warn" style="margin-bottom:16px">
-      <span class="notice__ico" aria-hidden="true">🧭</span>
-      <div id="inspBaseNote"></div>
-    </div>
-
-    <div class="grid grid--4" id="inspStats"></div>
-
-    <div class="toolbar mt-3">
-      <span class="toolbar__label">거점</span>
-      <div class="seg" id="inspOfficerBtns"></div>
-    </div>
-
-    <div class="grid grid--plan">
-      <div class="card">
-        <div class="card__head"><h3>하루 동선</h3><span class="hint" id="inspRouteMeta"></span></div>
-        <div class="card__body" id="inspRoute"></div>
-      </div>
-      <div class="grid" style="gap:14px">
-        <div class="card">
-          <div class="card__head"><h3>긴급도 구분</h3><span class="hint">계획서 §4</span></div>
-          <div class="card__body" id="inspUrgency"></div>
-        </div>
-        <div class="card">
-          <div class="card__head"><h3>오늘 못 가는 대상</h3><span class="hint" id="inspDeferMeta"></span></div>
-          <div class="card__body" id="inspDeferred"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>감독관 수에 따른 배치 변화</h3>
-        <span class="hint">감독관 수를 늘려 가며 같은 대상을 다시 배치한 결과</span></div>
-      <div class="card__body" id="inspCapacity"></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>산출 방법</h3><span class="hint">무엇을 어떻게 계산했는가</span></div>
-      <div class="card__body" id="inspMethod"></div>
-    </div>
-  </section>
-
-  <!-- ================================================== 긴급대응 (계획서 §5) -->
-  <section class="panel" id="panel-emergency" hidden>
-    <div class="section-head">
-      <h2>긴급시설장비 · 의료지원 결정</h2>
-      <p>
-        사고가 났을 때 <b>어떤 자원을 보내고, 어디로 이송하고, 몇 분이 걸리는지</b>를
-        계산합니다. 계획서 §5 의 요구사항입니다.
-      </p>
-    </div>
-
-    <div class="notice notice--warn" style="margin-bottom:16px">
-      <span class="notice__ico" aria-hidden="true">⚕️</span>
-      <div>
-        <b>이 화면은 의료 행위를 결정하지 않습니다.</b>
-        선택지를 거리·시간과 함께 정렬해 보여줄 뿐이며, 최종 판단은 의료진과 현장
-        지휘자의 몫입니다. 아래 사례는 <b>지어낸 상황이 아니라 실제로 일어난 사고</b>
-        (중앙해양안전심판원 원자료)의 지점·유형에 이 시스템을 적용한 것입니다.
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <span class="toolbar__label">실제 사고 사례</span>
-      <div class="seg" id="emCaseBtns"></div>
-    </div>
-
-    <div class="grid grid--plan">
-      <div class="grid" style="gap:14px">
-        <div class="card" id="emSummary"></div>
-        <div class="card">
-          <div class="card__head"><h3>구조 도착까지</h3><span class="hint">준비 + 출동</span></div>
-          <div class="card__body" id="emResponse"></div>
-        </div>
-        <div class="card">
-          <div class="card__head"><h3>의료기관 이송</h3><span class="hint" id="emTransportMeta"></span></div>
-          <div class="card__body" id="emTransport"></div>
-        </div>
-      </div>
-      <div class="grid" style="gap:14px">
-        <div class="card">
-          <div class="card__head"><h3>필요 자원</h3><span class="hint">사고 유형 × 심각도</span></div>
-          <div class="card__body" id="emResources"></div>
-        </div>
-        <div class="card">
-          <div class="card__head"><h3>이송 대상 의료기관</h3><span class="hint" id="emFacMeta"></span></div>
-          <div class="card__body" id="emFacilities"></div>
-        </div>
-        <div class="card">
-          <div class="card__head"><h3>최근접 구조 거점</h3><span class="hint">해양경찰 관서</span></div>
-          <div class="card__body" id="emRescue"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>산출 방법과 한계</h3><span class="hint">검수용</span></div>
-      <div class="card__body" id="emMethod"></div>
-    </div>
-  </section>
-
-  <section class="panel" id="panel-support" hidden>
-    <div class="section-head">
-      <h2>지원사업 매칭과 담당자 알림</h2>
-      <p>
-        신호등이 '진단'이라면 이 화면은 '처방'입니다. 위험 등급과 선박 상태에 따라
-        해당되는 정부 지원사업을 찾아 담당 공무원에게 보낼 문자 문안까지 만듭니다.
-      </p>
-    </div>
-
-    <div class="notice notice--warn" style="margin-bottom:16px">
-      <span class="notice__ico" aria-hidden="true">🛡️</span>
-      <div>
-        <b>이 화면은 실제로 문자를 발송하지 않습니다.</b>
-        발송 대상과 문안을 만들어 대기열에 넣을 뿐이며, 실제 발송은 기관 SMS 게이트웨이 연계 후
-        담당자 승인으로만 이뤄집니다. 시연 중 오발송을 구조적으로 막기 위한 설계입니다.
-        담당자 연락처는 화면에 마스킹되어 표시됩니다.
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <span class="toolbar__label">예시 선박</span>
-      <div class="seg" id="caseBtns"></div>
-    </div>
-
-    <div class="grid grid--sidebar">
-      <div class="grid" style="gap:14px">
-        <div class="card" id="caseSummary"></div>
-        <div class="card">
-          <div class="card__head"><h3>발송 문안 미리보기</h3><span class="hint" id="smsMeta"></span></div>
-          <div class="card__body"><div class="sms" id="smsBody"></div>
-            <div class="sms__meta" id="smsFoot"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card__head"><h3>매칭된 지원사업</h3><span class="hint" id="progCount"></span></div>
-        <div class="card__body" id="programList"></div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>지원사업 전체 목록</h3><span class="hint">근거 법령·주관기관·신청 방법 포함</span></div>
-      <div class="card__body" id="allPrograms"></div>
-    </div>
-  </section>
-
-  <!-- ================================================== 방법론 -->
-  <section class="panel" id="panel-method" hidden>
-    <div class="section-head">
-      <h2>데이터 출처와 산출 방법</h2>
-      <p>이 도구가 쓴 데이터, 계산식, 그리고 <b>한계</b>를 전부 공개합니다. 검증하실 수 있어야 정책에 쓸 수 있습니다.</p>
-    </div>
-
-    <div class="card">
-      <div class="card__head"><h3>사용한 공개 데이터</h3></div>
-      <div class="card__body"><div class="tbl-wrap"><table id="sourceTable"></table></div></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>모집단(분모) 선택 — 가장 틀리기 쉬운 부분</h3>
-        <span class="hint">두 공개 데이터의 톤급 분포가 다릅니다</span>
-      </div>
-      <div class="card__body" id="denomCompare"></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>산출식</h3></div>
-      <div class="card__body" id="formulaBox"></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>관측값 품질관리(QC)</h3>
-        <span class="hint">"값이 왔다"와 "쓸 수 있는 값이다"는 다릅니다</span>
-      </div>
-      <div class="card__body" id="qcBox"></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>요청 자료 대조표</h3>
-        <span class="hint">요청하신 것이 다 됐는지 한 줄씩 확인</span>
-      </div>
-      <div class="card__body">
-        <p class="small">
-          담당자 요구사항과 「능동형 어선원 안전보건관리시스템 개발 계획」에 적힌 요구사항을
-          <b>배포된 데이터·코드에서 기계적으로 확인</b>한 결과입니다.
-        </p>
-        <div class="grid grid--2">
-          <div class="stat">
-            <div class="stat__label">담당자 요구사항</div>
-            <div class="stat__value tnum">17<span class="stat__unit">/ 17</span></div>
-            <div class="stat__foot">신호등 · 가중치 조작 · 지원사업 매칭 · 문자 문안</div>
-          </div>
-          <div class="stat">
-            <div class="stat__label">개발 계획 요구사항</div>
-            <div class="stat__value tnum">26<span class="stat__unit">/ 26</span></div>
-            <div class="stat__foot">§1~§6 · §8 (점검계획 TSP · 긴급대응 매트릭스 포함)</div>
-          </div>
-        </div>
-
-        <h4 class="small mt-3" style="margin-bottom:6px">계획서 대비 하지 못한 것</h4>
-        <p class="small muted" style="margin-bottom:8px">
-          숨기지 않고 적습니다 — <b>할 수 있다고 적어두면 그것이 다음 요구사항이 됩니다.</b>
-        </p>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th scope="col" style="width:38%">계획서 항목</th><th scope="col">왜 못 하는가</th></tr></thead>
-          <tbody>
-            <tr><td><b>어선 AIS·V-Pass 실시간 위치</b></td>
-                <td>공개 오픈API가 없습니다. 업종으로 이격거리를 추정합니다.</td></tr>
-            <tr><td><b>IoT 센서</b>(선내 온도·가스·진동)</td>
-                <td>설치 자체가 안 돼 있어 데이터원이 없습니다.</td></tr>
-            <tr><td><b>선원 건강 모니터링</b>(심박·체온)</td>
-                <td>같음. 개인정보보호법상 별도 동의 체계가 전제입니다.</td></tr>
-            <tr><td><b>관서별 보유 장비 대장</b></td>
-                <td>공개 데이터가 아닙니다. 위치까지만 실데이터입니다.</td></tr>
-            <tr><td><b>LSTM·XGBoost 등 학습 모델</b></td>
-                <td>학습 라벨(선박 단위 사고 이력)이 공개돼 있지 않습니다.
-                    현재는 <b>통계적 노출 보정</b>으로 대체했고, 그 편이 지금 단계에서 검증 가능합니다.</td></tr>
-          </tbody>
-        </table></div>
-        <p class="small muted mt-1">
-          이 항목들은 <b>기관 내부 데이터 연계 또는 예산 투입이 전제</b>입니다.
-        </p>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>인용한 공표 자료</h3>
-        <span class="hint">통계 외에 제도·사업·사고 사례로 인용한 원문 — 전부 링크를 겁니다</span>
-      </div>
-      <div class="card__body"><div class="tbl-wrap"><table id="citationTable"></table></div></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head">
-        <h3>검수 방법 — 직접 확인하십시오</h3>
-        <span class="hint">"믿어달라"가 아니라 "확인해보시라"</span>
-      </div>
-      <div class="card__body" id="verifyBox"></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>한계와 전제</h3><span class="hint">감추지 않습니다</span></div>
-      <div class="card__body"><ul class="evi" id="limitList"></ul></div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card__head"><h3>다음 단계에 필요한 연계</h3></div>
-      <div class="card__body" id="nextSteps"></div>
-    </div>
-  </section>
-
 </main>
+<noscript>
+  <p style="text-align:center;padding:16px;font-family:system-ui">이 화면은 자바스크립트를 켜야 열립니다.</p>
+</noscript>
 
-<footer class="foot">
-  <div class="wrap">
-    <p>
-      <b>SafeVessel</b> — 어선 위험도 신호등. 정부 공개 데이터를 조합해
-      전국 등록 어선 63,647척의 위험도를 산출하고, 점검 순서와 긴급대응 자원까지 제시합니다.
-    </p>
-    <p class="mt-1" id="footMeta"></p>
-    <p class="mt-1">
-      <b>모든 수치는 출처와 계산 과정을 함께 공개합니다.</b>
-      어느 기관의 어떤 데이터에서 어떤 식으로 나온 값인지 화면에서 그대로 확인하고
-      검산할 수 있습니다.
-      선박은 <b>선박명·어선번호</b>로 식별되어 현장 조치가 가능하며,
-      소유자 성명·연락처는 공개 데이터에 없어 <b>기관 내부 연계 시 담당자 화면에서</b> 제공됩니다.
-    </p>
-  </div>
-</footer>
+<script>
+(function () {
+  'use strict';
 
-<div class="tooltip" id="tip" role="status" aria-live="polite"></div>
+  /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
+  const SALT_B64 = 'upSuZ/V6Vozo2OWYsRRNCA==';
+  const ITER = 600000;
+  const BUILD = '7d3f7b3b736b';
+  const KEY_STORE = 'sv-lock-key';
 
-<script src="js/format.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/app.js"></script>
+  const $ = (id) => document.getElementById(id);
+  const te = new TextEncoder();
+  const nativeFetch = window.fetch.bind(window);
+  let KEY = null;
+
+  const b64d = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  function b64e(u8) {
+    let s = '';
+    for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+
+  function showError(msg) {
+    const el = $('loginError');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.toggle('is-on', !!msg);
+  }
+
+  function setBusy(on, label) {
+    const btn = $('loginBtn');
+    if (!btn) return;
+    btn.disabled = on;
+    btn.textContent = on ? label : '로그인';
+    $('loginForm').setAttribute('aria-busy', on ? 'true' : 'false');
+    $('loginId').readOnly = on;
+    $('loginPw').readOnly = on;
+  }
+
+  async function deriveKey(id, pw) {
+    const base = await crypto.subtle.importKey('raw', te.encode(id + String.fromCharCode(0) + pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: b64d(SALT_B64), iterations: ITER },
+      base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+  }
+
+  async function openSealed(buf) {
+    const u8 = new Uint8Array(buf);
+    if (u8.length < 32 || String.fromCharCode(u8[0], u8[1], u8[2], u8[3]) !== 'SVL1') throw new Error('형식이 맞지 않습니다');
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8.subarray(4, 16) }, KEY, u8.subarray(16));
+  }
+
+  async function loadBundle() {
+    const res = await nativeFetch('app.bundle.enc', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    let plain;
+    try { plain = await openSealed(buf); } catch (e) { const err = new Error('자격 불일치'); err.bad = true; throw err; }
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  /* 앱은 fetch('data/이름.json') 으로 자료를 부른다 — 암호문(.enc)을 받아 풀어서 같은 모양으로 돌려준다. */
+  function installFetch() {
+    const re = /(^|\/)data\/([A-Za-z0-9_-]+)\.json(?:[?#].*)?$/;
+    window.fetch = async function (input, init) {
+      const url = typeof input === 'string' ? input : (input && input.url) || '';
+      const m = url.match(re);
+      if (!m) return nativeFetch(input, init);
+      const encUrl = url.replace(re, (all, pre, name) => pre + 'data/' + name + '.enc');
+      const res = await nativeFetch(encUrl, { cache: 'no-cache' });
+      if (!res.ok) return new Response('', { status: res.status, statusText: res.statusText });
+      const plain = await openSealed(await res.arrayBuffer());
+      return new Response(plain, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    };
+  }
+
+  function addLogout() {
+    const bar = document.querySelector('.topbar__inner');
+    if (!bar) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'svLogout';
+    btn.className = 'icon-btn icon-btn--wide';
+    btn.title = '로그아웃';
+    btn.innerHTML = '<span aria-hidden="true">🔒</span><span class="icon-btn__txt">로그아웃</span>';
+    btn.setAttribute('aria-label', '로그아웃');
+    btn.addEventListener('click', () => {
+      try { sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
+      location.reload();   // 창 전역의 리스너가 쌓이지 않도록 반드시 전체 새로고침
+    });
+    bar.appendChild(btn);
+  }
+
+  /* 설명서: 비동기 복호화 뒤에 window.open 하면 팝업 차단에 걸린다 → 클릭 순간 빈 탭을 먼저 연다. */
+  function wireManual() {
+    document.addEventListener('click', async (e) => {
+      const a = e.target && e.target.closest ? e.target.closest('[data-locked-manual]') : null;
+      if (!a) return;
+      e.preventDefault();
+      const w = window.open('', '_blank');
+      try {
+        if (w) w.document.write('<p style="font-family:system-ui;padding:24px">사용 설명서를 여는 중…</p>');
+        const res = await nativeFetch('manual/manual.enc', { cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const plain = await openSealed(await res.arrayBuffer());
+        const url = URL.createObjectURL(new Blob([plain], { type: 'application/pdf' }));
+        if (w && !w.closed) {
+          w.location.href = url;
+        } else {
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'SafeVessel_사용설명서.pdf';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }
+        setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+      } catch (err) {
+        if (w && !w.closed) w.close();
+        alert('사용 설명서를 열지 못했습니다. 잠시 뒤 다시 시도하세요.');
+      }
+    });
+  }
+
+  function mount(bundle) {
+    installFetch();
+    document.title = bundle.title;
+    const style = document.createElement('style');
+    style.textContent = bundle.css;
+    document.head.appendChild(style);
+    const lockStyle = $('lockStyle');
+    if (lockStyle) lockStyle.remove();
+    document.body.innerHTML = bundle.body;
+    addLogout();
+    wireManual();
+    for (const s of bundle.scripts) {
+      const el = document.createElement('script');
+      el.textContent = s.code + '\n//# sourceURL=' + s.name;
+      document.body.appendChild(el);
+    }
+  }
+
+  async function tryResume() {
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(KEY_STORE) || 'null'); } catch (e) { saved = null; }
+    if (!saved || saved.build !== BUILD || !saved.k) {
+      try { sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
+      return false;
+    }
+    setBusy(true, '화면을 여는 중…');
+    try {
+      KEY = await crypto.subtle.importKey('raw', b64d(saved.k), { name: 'AES-GCM' }, false, ['decrypt']);
+      mount(await loadBundle());
+      return true;
+    } catch (e) {
+      KEY = null;
+      try { sessionStorage.removeItem(KEY_STORE); } catch (e2) { /* 무시 */ }
+      setBusy(false);
+      return false;
+    }
+  }
+
+  $('pwToggle').addEventListener('click', () => {
+    const pw = $('loginPw');
+    const show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    $('pwToggle').textContent = show ? '숨기기' : '보기';
+    $('pwToggle').setAttribute('aria-pressed', show ? 'true' : 'false');
+    pw.focus();
+  });
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const idEl = $('loginId');
+    const pwEl = $('loginPw');
+    const id = idEl.value.trim();
+    const pw = pwEl.value;
+    idEl.removeAttribute('aria-invalid');
+    pwEl.removeAttribute('aria-invalid');
+    if (!id || !pw) {
+      const target = !id ? idEl : pwEl;
+      target.setAttribute('aria-invalid', 'true');
+      showError(!id ? '아이디를 입력하세요.' : '비밀번호를 입력하세요.');
+      target.focus();
+      return;
+    }
+    showError('');
+    setBusy(true, '확인 중…');
+    try {
+      KEY = await deriveKey(id, pw);
+      const bundle = await loadBundle();
+      const raw = new Uint8Array(await crypto.subtle.exportKey('raw', KEY));
+      try { sessionStorage.setItem(KEY_STORE, JSON.stringify({ build: BUILD, k: b64e(raw) })); } catch (e2) { /* 저장 불가 — 이번 탭에서만 */ }
+      KEY = await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['decrypt']);
+      raw.fill(0);
+      mount(bundle);
+    } catch (err) {
+      KEY = null;
+      setBusy(false);
+      if (err && err.bad) {
+        pwEl.setAttribute('aria-invalid', 'true');
+        showError('아이디 또는 비밀번호가 올바르지 않습니다.');
+        pwEl.select();
+        pwEl.focus();
+      } else {
+        showError('화면을 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 시도하세요.');
+      }
+    }
+  });
+
+  (async function start() {
+    if (!window.crypto || !crypto.subtle) {
+      showError('이 브라우저에서는 열 수 없습니다. 최신 크롬·엣지·사파리·파이어폭스로 https 주소에 접속하세요.');
+      setBusy(true, '사용할 수 없음');
+      return;
+    }
+    if (await tryResume()) return;
+    $('loginId').focus();
+  })();
+})();
+</script>
 </body>
 </html>
