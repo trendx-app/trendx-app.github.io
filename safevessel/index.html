@@ -150,9 +150,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'gn6gE2vQLq1zp9hpp+YXwA==';
+  const SALT_B64 = 'lMIzcwOJ93WgekWTqtnLmw==';
   const ITER = 600000;
-  const BUILD = '6b2f7b2a66f9';
+  const BUILD = '6c26d1ba2374';
   const KEY_STORE = 'sv-lock-key';
 
   const $ = (id) => document.getElementById(id);
@@ -184,6 +184,28 @@
     $('loginPw').readOnly = on;
   }
 
+  /* 캐시 어긋남 방지 (2026-09-18 실제 사고: 배포 직후 브라우저가 옛 로그인 화면(옛 salt)을 캐시에서 쓰고
+     새 암호문을 받아 '자격 불일치'가 났고, 다른 탭에선 옛 화면+옛 암호문 짝으로 열려 새 이름이 안 보였다).
+     GitHub Pages 는 파일을 10분 캐시한다. 그래서 열릴 때마다 서버의 build.json(캐시 금지)을 읽어
+     이 화면의 BUILD 와 다르면 화면 자체를 서버에서 다시 받아 새로고침한다. 무한 반복은 세션 표시로 막는다. */
+  const RELOAD_MARK = 'sv.reloaded.for';
+  async function ensureFresh(reason) {
+    let server = null;
+    try {
+      const r = await nativeFetch('build.json?t=' + Date.now(), { cache: 'no-store' });
+      if (r.ok) server = (await r.json()).build || null;
+    } catch (e) { return false; }          // 오프라인·차단 — 판단 보류, 지금 화면으로 진행
+    if (!server || server === BUILD) return false;
+    let already = null;
+    try { already = sessionStorage.getItem(RELOAD_MARK); } catch (e) { /* 무시 */ }
+    if (already === server) return false;  // 이미 한 번 새로고침했는데도 다르면 반복하지 않는다
+    try { sessionStorage.setItem(RELOAD_MARK, server); sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
+    setBusy(true, '새 버전을 받는 중…');
+    try { await nativeFetch(location.pathname, { cache: 'reload' }); } catch (e) { /* 실패해도 새로고침은 한다 */ }
+    location.reload();
+    return true;
+  }
+
   async function deriveKey(id, pw) {
     const base = await crypto.subtle.importKey('raw', te.encode(id + String.fromCharCode(0) + pw), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey(
@@ -198,7 +220,7 @@
   }
 
   async function loadBundle() {
-    const res = await nativeFetch('app.bundle.enc', { cache: 'no-cache' });
+    const res = await nativeFetch('app.bundle.enc?b=' + BUILD, { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     let plain;
@@ -214,7 +236,7 @@
       const m = url.match(re);
       if (!m) return nativeFetch(input, init);
       const encUrl = url.replace(re, (all, pre, name) => pre + 'data/' + name + '.enc');
-      const res = await nativeFetch(encUrl, { cache: 'no-cache' });
+      const res = await nativeFetch(encUrl + '?b=' + BUILD, { cache: 'no-cache' });
       if (!res.ok) return new Response('', { status: res.status, statusText: res.statusText });
       const plain = await openSealed(await res.arrayBuffer());
       return new Response(plain, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
@@ -247,7 +269,7 @@
       const w = window.open('', '_blank');
       try {
         if (w) w.document.write('<p style="font-family:system-ui;padding:24px">사용 설명서를 여는 중…</p>');
-        const res = await nativeFetch('manual/manual.enc', { cache: 'no-cache' });
+        const res = await nativeFetch('manual/manual.enc?b=' + BUILD, { cache: 'no-cache' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const plain = await openSealed(await res.arrayBuffer());
         const url = URL.createObjectURL(new Blob([plain], { type: 'application/pdf' }));
@@ -343,6 +365,7 @@
       mount(bundle);
     } catch (err) {
       KEY = null;
+      if (err && err.bad && await ensureFresh('login')) return;   // 새 버전 → 새로고침 중
       setBusy(false);
       if (err && err.bad) {
         pwEl.setAttribute('aria-invalid', 'true');
@@ -361,6 +384,7 @@
       setBusy(true, '사용할 수 없음');
       return;
     }
+    if (await ensureFresh('start')) return;   // 옛 화면이 캐시에서 열렸으면 여기서 새로고침
     if (await tryResume()) return;
     $('loginId').focus();
   })();
