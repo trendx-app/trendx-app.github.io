@@ -41,7 +41,7 @@ a{color:var(--brand)}
   <header>
     <div class="logo">🏠</div>
     <h1>집운 개인정보처리방침</h1>
-    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 4일(광고·설치 성과 측정 항목 추가)</p>
+    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 19일(AI 풀이·지비 상담, 실행 화면 앱 소개 항목 추가 · 영문 요약 갱신)</p>
   </header>
 
   <p>집운(Jibwoon, 이하 “앱”)은 이용자의 개인정보를 소중히 여기며, 필요한 최소한의 정보만 다룹니다.
@@ -55,13 +55,19 @@ a{color:var(--brand)}
     <tr><th>보관 기간</th><td>이용자가 앱에서 삭제하거나 앱을 삭제하면 즉시 함께 삭제됩니다.</td></tr>
   </table>
 
-  <h2>2. AI 터 분석 이용 시</h2>
-  <p>이용자가 ‘AI 터 분석’ 기능을 <strong>직접 실행할 때에 한해</strong>, 입력한 주소와 사주 요약(일간 오행·필요 오행·본명괘·길방)이
-     분석 목적으로 Google의 Gemini API에 전송됩니다. 이름·연락처 등 이용자를 식별할 수 있는 정보는 전송되지 않으며,
-     개발사는 이 내용을 별도로 저장하지 않습니다.</p>
+  <h2>2. AI 기능 이용 시</h2>
+  <p>다음 세 기능은 Google의 <strong>Gemini API</strong>로 글을 만듭니다. 이용자가 <strong>그 기능을 쓸 때에 한해</strong> 아래 정보가 전송됩니다.</p>
   <ul>
+    <li><strong>AI 터 분석</strong> — 이용자가 입력한 주소</li>
+    <li><strong>운세 풀이</strong>(결과를 열 때 문장을 다듬음) — 그 풀이의 제목과 문장</li>
+    <li><strong>지비에게 물어보기</strong> — 이용자가 쓴 질문</li>
+  </ul>
+  <p>세 기능 모두 위 내용과 함께 <strong>사주 요약</strong>(생년월일로 계산한 사주 네 기둥, 일간, 오행 비율, 필요한 오행, 본명괘·길방, 오늘의 일진)이 함께 전송됩니다.
+     <strong>생년월일 원본·이름·연락처</strong>처럼 이용자를 식별할 수 있는 정보는 보내지 않습니다.</p>
+  <ul>
+    <li>전송 경로: 앱 → 개발사의 중계 함수(Supabase Edge Function) → Google Gemini API. 중계 함수는 내용을 <strong>기록·저장하지 않습니다.</strong></li>
     <li>처리 위탁: Google LLC (Gemini API) — <a href="https://policies.google.com/privacy">Google 개인정보처리방침</a></li>
-    <li>이 기능을 사용하지 않으면 어떠한 정보도 외부로 전송되지 않습니다.</li>
+    <li>이 세 기능을 쓰지 않으면 이 항목의 정보는 외부로 전송되지 않습니다.</li>
   </ul>
 
   <h2>3. 광고</h2>
@@ -88,6 +94,11 @@ a{color:var(--brand)}
     <li>사주·생년월일·가족 정보 등 앱에 입력한 내용은 <strong>전송되지 않습니다.</strong></li>
   </ul>
 
+  <h2>3-2. 실행 화면의 앱 소개</h2>
+  <p>앱을 열면 같은 개발자가 만든 다른 앱을 소개하는 창이 뜰 수 있습니다(닫기·오늘 하루 안 보기 가능).
+     <strong>이미 설치된 앱은 목록에서 빼기 위해</strong> 기기 안에서만 설치 여부를 확인하며, 그 결과는 <strong>어디로도 전송되지 않습니다.</strong>
+     그래서 사용자마다 보이는 목록이 다를 수 있습니다. 스토어 페이지는 이용자가 직접 탭할 때만 열립니다.</p>
+
   <h2>4. 제휴 링크(쿠팡 파트너스)</h2>
   <p>‘개운 아이템’ 화면의 상품 링크는 쿠팡 파트너스 제휴 링크입니다. 이용자가 <strong>직접 탭할 때만</strong> 외부 브라우저로 이동하며,
      이동 이후의 개인정보 처리는 쿠팡의 정책을 따릅니다. 앱은 자동으로 외부 페이지를 열지 않습니다.</p>
@@ -96,12 +107,13 @@ a{color:var(--brand)}
   <h2>5. 제3자 제공</h2>
   <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음 셋뿐입니다.</p>
   <ul>
-    <li>2항의 <strong>AI 터 분석</strong> 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만</li>
+    <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함</li>
     <li>3항의 <strong>광고 게재</strong>(Google AdMob) — 광고 식별자 및 기기·앱 정보</li>
     <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 설치·실행 이벤트 및 광고 식별자</li>
   </ul>
-  <p>생년월일·성별·가족 및 친구 정보·체크리스트·연속 기록 등 앱에 입력한 내용은
-     <strong>어느 경우에도 외부로 전송되지 않으며</strong> 이용자의 기기 안에만 저장됩니다.</p>
+  <p>생년월일 원본·성별·가족 및 친구 정보·체크리스트·연속 기록 등 앱에 입력한 내용은
+     <strong>외부로 전송되지 않으며</strong> 이용자의 기기 안에만 저장됩니다.
+     (2항의 AI 기능을 쓸 때 보내는 것은 생년월일로 계산한 사주 요약뿐입니다.)</p>
 
   <h2>6. 이용자의 권리</h2>
   <ul>
@@ -126,12 +138,14 @@ a{color:var(--brand)}
   <details class="en">
     <summary>English summary</summary>
     <div>
-      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-04)</p>
+      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-19)</p>
       <ul>
         <li>No account is required. Your birth date, birth time, gender, and the family/friend entries you add are stored <strong>only on your device</strong> and are never sent to our servers.</li>
-        <li>When you explicitly run “AI Site Reading”, the address you type and a summary of your chart are sent to Google’s Gemini API for that analysis only. No identifying personal data is included, and we do not store the result.</li>
-        <li>This version shows no ads. If advertising (Google AdMob) is added later, this policy will be updated and you will be notified in the app.</li>
-        <li>Product links are Coupang Partners affiliate links and open only when you tap them. We may earn a commission from qualifying purchases.</li>
+        <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result) and Ask Jibi (your question). Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them.</li>
+        <li><strong>Ads:</strong> the app shows <strong>rewarded ads</strong> via Google AdMob, only when you choose “Watch ad”. No banner or interstitial ads. AdMob processes the advertising ID, device/app information, approximate (country-level) location and ad interactions. Users in the EEA, UK and Switzerland are asked for consent first.</li>
+        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using device information and the advertising ID. Nothing you enter in the app is sent.</li>
+        <li><strong>Launch screen app introductions:</strong> the app may introduce other apps by the same developer when it opens. To leave out apps you already have, it checks on your device whether they are installed; this result is never sent anywhere, so the list can differ per user.</li>
+        <li>Product links are Coupang Partners affiliate links (Korean only) and open only when you tap them. We may earn a commission from qualifying purchases.</li>
         <li>You can delete your data anytime via Settings → Reset profile, or by uninstalling the app.</li>
         <li>Content is traditional East Asian lore offered for reference and entertainment, not scientific or professional advice.</li>
         <li>Contact: <a href="mailto:dys0707y@gmail.com">dys0707y@gmail.com</a></li>
