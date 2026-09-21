@@ -21,7 +21,7 @@ footer{margin-top:48px;color:var(--muted);font-size:13px}
 <p><span class="brand">집<em>잣</em>대</span></p>
 <h1>집잣대(ZipZatDae) 개인정보처리방침</h1>
 
-<p class="note">시행일: 2026-09-10 · 버전 1.0 · 초안 작성 2026-09-10</p>
+<p class="note">시행일 2026-09-22 · 버전 1.0 · 초안 작성 2026-09-10</p>
 <p class="note">구성은 개인정보보호위원회 「개인정보 처리방침 작성지침(2025.4.)」의 필수 항목 순서를 따랐습니다(<a href="https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&amp;bbscttNo=20806">https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&amp;bbscttNo=20806</a>).</p>
 <p class="note">스토어 제출 시 이 문서를 공개 URL(<code><a href="https://trendx-app.github.io/zipzatdae/privacy.html">https://trendx-app.github.io/zipzatdae/privacy.html</a></code>)로 호스팅하고, App Store 개인정보 라벨·Play 데이터 보안 답변과 내용을 일치시킵니다.</p>
 
@@ -30,13 +30,14 @@ footer{margin-top:48px;color:var(--muted);font-size:13px}
 <p>단윤성(TrendX)(이하 &quot;개발자&quot;)는 모바일 앱 「집잣대」(이하 &quot;앱&quot;)를 제공하면서 「개인정보 보호법」 제30조에 따라 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
 
 <h2>제1조 (요약)</h2>
-<ul><li>앱은 <strong>개인정보를 수집하지 않습니다.</strong> 회원가입·로그인 기능이 없고, 연락처·사진·마이크 등 기기 권한을 요청하지 않습니다.</li>
+<ul><li>앱은 <strong>이름·연락처·이메일·계정 식별자·광고 식별자를 수집하지 않습니다.</strong> 회원가입·로그인 기능이 없고, 연락처·사진·마이크 등 기기 권한을 요청하지 않습니다.</li>
+<li>다만 <strong>무료 이용 기간(7일)을 기기당 한 번만</strong> 적용하기 위해, 되돌릴 수 없이 변환한 <strong>기기 식별 해시 1건</strong>과 그 최초 등록 시각을 서버에 저장합니다. 원래 값은 전송하지 않으며, 이 해시만으로는 개인을 알아볼 수 없습니다.</li>
 <li>지도 화면의 &quot;현위치&quot; 버튼을 누른 경우에만 위치 권한을 요청합니다. 받은 위치는 <strong>지도를 그 자리로 옮기는 데에만 기기 안에서 쓰이며, 저장하거나 서버로 전송하지 않습니다.</strong> 권한을 거부해도 위치를 제외한 모든 기능이 그대로 동작합니다.</li>
 <li>사용자가 앱에 입력·저장하는 정보(관심 단지, 최근 본 단지, 진단 입력값, 설정)는 <strong>사용자 기기 내부에만 저장</strong>되며 개발자 서버로 전송되지 않습니다.</li>
 <li>시세 데이터를 불러올 때 서버 통신이 발생하며, 이 과정에서 IP 주소 등 통신에 수반되는 정보가 서버 접속 기록에 일시 남을 수 있습니다. 개발자는 이를 개인 식별 목적으로 이용하지 않습니다.</li>
 </ul>
 <h2>제2조 (처리하는 개인정보 항목 및 수집 방법)</h2>
-<ul><li>개발자는 앱을 통해 이름, 연락처, 이메일, 계정 식별자, 광고 식별자(ADID/IDFA), 위치정보 등 <strong>어떠한 개인정보도 수집·저장하지 않습니다.</strong></li>
+<ul><li>개발자는 앱을 통해 이름, 연락처, 이메일, 계정 식별자, 광고 식별자(ADID/IDFA), 위치정보를 <strong>수집·저장하지 않습니다.</strong> 서버에 저장하는 것은 <strong>기기 식별 해시 1건과 그 최초 등록 시각</strong>뿐입니다 — Android 는 기기 식별자(SSAID), iOS 는 앱이 만든 무작위 값에 앱 고유 값을 더해 <strong>SHA-256 으로 되돌릴 수 없게</strong> 변환한 64자 문자열이며 원래 값은 전송하지 않습니다. 목적은 <strong>무료 7일을 기기당 한 번만 적용</strong>하는 것(앱을 지우고 다시 설치해 무료 기간을 반복하는 것을 막기 위함)이며 다른 목적으로 쓰지 않습니다. 보유 기간은 서비스 종료 시까지이고, 요청하시면 해당 행을 삭제합니다(dys.trendx@gmail.com). 제3자 제공·국외 이전은 없으며 저장 위치는 개발자가 사용하는 클라우드 데이터베이스(Supabase, 서울 리전)입니다.</li>
 <li>기기 내 저장 정보(개발자에게 전송되지 않음)</li>
 </ul><p>   | 항목 | 저장 위치 | 용도 | 삭제 방법 |</p>
 <p>   |---|---|---|---|</p>
