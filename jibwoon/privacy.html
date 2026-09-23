@@ -41,7 +41,7 @@ a{color:var(--brand)}
   <header>
     <div class="logo">🏠</div>
     <h1>집운 개인정보처리방침</h1>
-    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 19일(AI 풀이·지비 상담, 실행 화면 앱 소개 항목 추가 · 영문 요약 갱신)</p>
+    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 23일(광고 제거·구독 결제, 무료 이용 기간 확인값, 앱 이용 통계 항목 추가 · 영문 요약 갱신)</p>
   </header>
 
   <p>집운(Jibwoon, 이하 “앱”)은 이용자의 개인정보를 소중히 여기며, 필요한 최소한의 정보만 다룹니다.
@@ -71,25 +71,16 @@ a{color:var(--brand)}
   </ul>
 
   <h2>3. 광고</h2>
-  <p>앱은 <strong>Google AdMob</strong>을 통해 <strong>보상형 광고</strong>를 제공합니다. 보상형 광고는
-     <strong>이용자가 직접 «광고 보기»를 선택할 때만</strong> 재생되며, 예고 없이 재생되지 않습니다.
-     배너 광고와 전면 광고는 사용하지 않습니다.</p>
-  <ul>
-    <li>수집·처리 주체: <strong>Google LLC (AdMob)</strong> —
-        <a href="https://policies.google.com/technologies/partner-sites">Google의 데이터 처리 안내</a></li>
-    <li>처리되는 정보: 광고 식별자(광고 ID/IDFA), 기기·앱 정보, 대략적 위치(국가 수준), 광고 노출·클릭 기록</li>
-    <li>목적: 광고 게재 및 성과 측정</li>
-    <li>유럽경제지역(EEA)·영국·스위스 이용자에게는 광고 게재 전 <strong>동의 요청 화면</strong>을 표시하며,
-        앱 설정에서 동의를 언제든 변경할 수 있습니다.</li>
-  </ul>
-  <p class="note">광고 시청으로 얻은 이용 권한은 이용자의 <strong>기기 안에만</strong> 저장되며 서버로 전송되지 않습니다.</p>
+  <p>앱은 <strong>1.8.0(2026년 9월)부터 광고를 싣지 않습니다.</strong> 이전 버전(1.7.x 이하)에서는 이용자가 직접 «광고 보기»를 고를 때만
+     Google AdMob 보상형 광고가 재생되었으며(광고 식별자·기기·앱 정보·대략적 위치·광고 노출 기록 처리), 앱을 업데이트하면 광고 SDK 는 함께 제거됩니다.</p>
 
   <h2>3-1. 앱 설치 성과 측정</h2>
   <p>앱 홍보 광고의 성과를 측정하기 위해 <strong>Meta(Facebook)</strong>의 소프트웨어 개발 도구(SDK)를 사용합니다.</p>
   <ul>
     <li>수집·처리 주체: <strong>Meta Platforms, Inc.</strong> —
         <a href="https://www.facebook.com/privacy/policy/">Meta 개인정보처리방침</a></li>
-    <li>처리되는 정보: 앱 설치·실행 이벤트, 기기 정보, 광고 식별자</li>
+    <li>처리되는 정보: 앱 설치·실행 등 앱 이용 이벤트(앱 내 결제 발생 여부가 포함될 수 있음), 기기 정보(모델·OS·언어 등), IP 주소</li>
+    <li>광고 식별자(광고 ID/IDFA)는 <strong>수집하지 않도록 설정</strong>되어 있습니다(Android 1.7.x 이하에서는 광고 동의 후 광고 ID 를 쓸 수 있었습니다).</li>
     <li>목적: 광고를 통한 앱 설치 여부 확인(기여 측정)</li>
     <li>사주·생년월일·가족 정보 등 앱에 입력한 내용은 <strong>전송되지 않습니다.</strong></li>
   </ul>
@@ -99,17 +90,45 @@ a{color:var(--brand)}
      <strong>이미 설치된 앱은 목록에서 빼기 위해</strong> 기기 안에서만 설치 여부를 확인하며, 그 결과는 <strong>어디로도 전송되지 않습니다.</strong>
      그래서 사용자마다 보이는 목록이 다를 수 있습니다. 스토어 페이지는 이용자가 직접 탭할 때만 열리며, 스토어로 이동한 뒤에는 해당 스토어(Google Play·App Store)의 개인정보처리방침이 적용됩니다.</p>
 
+  <h2>3-3. 구독·평생 이용권 결제</h2>
+  <p>유료 이용권(월간·연간 구독, 평생 이용권)은 <strong>App Store·Google Play 결제</strong>로만 판매합니다.
+     카드 번호 등 결제 정보는 각 스토어가 처리하며 <strong>앱과 개발사는 받지 않습니다.</strong>
+     앱은 이용 권한을 확인하기 위해 기기에서 스토어의 구매 내역(상품·만료일)을 조회합니다.
+     구독 해지·환불은 각 스토어의 구독 관리 화면에서 할 수 있습니다.</p>
+
+  <h2>3-4. 무료 이용 기간 확인</h2>
+  <p>설치 후 7일 무료 기간이 삭제 후 재설치로 반복되지 않도록, 기기 식별값(Android 는 기기의 앱별 ID, iOS 는 앱이 기기에 만들어 둔 무작위 값)을 앱 전용 값과 섞어 <strong>되돌릴 수 없게 변환한 값</strong>(SHA-256)과
+     그 값을 처음 등록한 시각을 개발사 서버(Supabase)에 저장합니다.</p>
+  <ul>
+    <li>저장 항목: 변환된 기기 값, 최초 등록 시각 — 이름·생년월일 등 이용자가 입력한 정보는 포함하지 않습니다.</li>
+    <li>목적: 무료 이용 기간 계산(재설치 악용 방지)</li>
+    <li>처리 위탁: Supabase, Inc.(서버 호스팅)</li>
+    <li>보관 기간: 서비스 제공 기간. 삭제를 원하시면 아래 문의처로 요청해 주세요.</li>
+  </ul>
+
+  <h2>3-5. 앱 이용 통계</h2>
+  <p>어떤 화면·기능이 쓰이고 어디서 불편을 겪는지 파악해 앱을 고치기 위해 <strong>Google Analytics for Firebase</strong>를 사용합니다.</p>
+  <ul>
+    <li>수집·처리 주체: <strong>Google LLC</strong> — <a href="https://policies.google.com/privacy">Google 개인정보처리방침</a></li>
+    <li>처리되는 정보: 화면 이동·기능 사용·오류 같은 앱 이용 기록, 앱 설치마다 무작위로 만들어지는 식별값(앱 인스턴스 ID),
+        기기·앱 정보(모델·OS 버전·언어), IP 주소에서 추정한 대략적 위치(국가·도시 수준), 앱 내 결제 발생 여부(상품·금액)</li>
+    <li><strong>광고 식별자는 수집하지 않으며</strong>, 광고 개인화에 쓰지 않습니다.</li>
+    <li>생년월일·이름·주소·질문 등 <strong>앱에 입력한 내용은 보내지 않습니다.</strong></li>
+    <li>보관 기간: 14개월</li>
+  </ul>
+
   <h2>4. 제휴 링크(쿠팡 파트너스)</h2>
   <p>‘개운 아이템’ 화면의 상품 링크는 쿠팡 파트너스 제휴 링크입니다. 이용자가 <strong>직접 탭할 때만</strong> 외부 브라우저로 이동하며,
      이동 이후의 개인정보 처리는 쿠팡의 정책을 따릅니다. 앱은 자동으로 외부 페이지를 열지 않습니다.</p>
   <p class="note">이 추천은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
 
   <h2>5. 제3자 제공</h2>
-  <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음 셋뿐입니다.</p>
+  <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음뿐입니다.</p>
   <ul>
     <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함</li>
-    <li>3항의 <strong>광고 게재</strong>(Google AdMob) — 광고 식별자 및 기기·앱 정보</li>
-    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 설치·실행 이벤트 및 광고 식별자</li>
+    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 앱 이용 이벤트 및 기기 정보(광고 식별자 제외)</li>
+    <li>3-4항의 <strong>무료 이용 기간 확인</strong>(Supabase 서버) — 변환된 기기 값과 최초 등록 시각</li>
+    <li>3-5항의 <strong>앱 이용 통계</strong>(Google Analytics for Firebase) — 앱 이용 기록과 앱 인스턴스 ID</li>
   </ul>
   <p>생년월일 원본·성별·가족 및 친구 정보·체크리스트·연속 기록 등 앱에 입력한 내용은
      <strong>외부로 전송되지 않으며</strong> 이용자의 기기 안에만 저장됩니다.
@@ -138,12 +157,15 @@ a{color:var(--brand)}
   <details class="en">
     <summary>English summary</summary>
     <div>
-      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-19)</p>
+      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-23)</p>
       <ul>
         <li>No account is required. Your birth date, birth time, gender, and the family/friend entries you add are stored <strong>only on your device</strong> and are never sent to our servers.</li>
         <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result) and Ask Jibi (your question). Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them.</li>
-        <li><strong>Ads:</strong> the app shows <strong>rewarded ads</strong> via Google AdMob, only when you choose “Watch ad”. No banner or interstitial ads. AdMob processes the advertising ID, device/app information, approximate (country-level) location and ad interactions. Users in the EEA, UK and Switzerland are asked for consent first.</li>
-        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using device information and the advertising ID. Nothing you enter in the app is sent.</li>
+        <li><strong>No ads</strong> from version 1.8.0 (September 2026). Earlier versions (1.7.x and below) showed Google AdMob rewarded ads only when you chose “Watch ad”; updating removes the ad SDK.</li>
+        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. Advertising ID collection is turned off (Android 1.7.x and below could use it after ad consent). Nothing you enter in the app is sent.</li>
+        <li><strong>Subscriptions and lifetime purchase</strong> are sold only through App Store / Google Play billing. Payment details are handled by the store; we never receive them.</li>
+        <li><strong>Free-trial check:</strong> to stop the 7-day free period from repeating after reinstalling, we store a one-way hashed device value (SHA-256 of the Android per-app ID, or of a random value the app keeps on the iPhone, with an app-specific salt) and its first registration time on our server (Supabase). It contains nothing you entered.</li>
+        <li><strong>Usage statistics:</strong> Google Analytics for Firebase records screen views, feature use and errors, a random app-instance ID, device/app information, approximate location derived from IP (country/city level) and in-app purchase events, to improve the app. No advertising ID is collected and nothing you enter (birth date, names, addresses, questions) is sent. Retention: 14 months.</li>
         <li><strong>Launch screen app introductions:</strong> the app may introduce other apps by the same developer when it opens. To leave out apps you already have, it checks on your device whether they are installed; this result is never sent anywhere, so the list can differ per user. Store pages open only when you tap, and the store’s own privacy policy applies from there.</li>
         <li>Product links are Coupang Partners affiliate links (Korean only) and open only when you tap them. We may earn a commission from qualifying purchases.</li>
         <li>You can delete your data anytime via Settings → Reset profile, or by uninstalling the app.</li>
