@@ -41,7 +41,7 @@ a{color:var(--brand)}
   <header>
     <div class="logo">🏠</div>
     <h1>집운 개인정보처리방침</h1>
-    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 23일(광고 제거·구독 결제, 무료 이용 기간 확인값, 앱 이용 통계 항목 추가 · 영문 요약 갱신)</p>
+    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 24일(3-1항 광고 식별자 — iOS 추적 허용 시 IDFA·Android 광고 ID 를 Meta 에 전달, 5항·영문 요약 갱신)</p>
   </header>
 
   <p>집운(Jibwoon, 이하 “앱”)은 이용자의 개인정보를 소중히 여기며, 필요한 최소한의 정보만 다룹니다.
@@ -80,7 +80,9 @@ a{color:var(--brand)}
     <li>수집·처리 주체: <strong>Meta Platforms, Inc.</strong> —
         <a href="https://www.facebook.com/privacy/policy/">Meta 개인정보처리방침</a></li>
     <li>처리되는 정보: 앱 설치·실행 등 앱 이용 이벤트(앱 내 결제 발생 여부가 포함될 수 있음), 기기 정보(모델·OS·언어 등), IP 주소</li>
-    <li>광고 식별자(광고 ID/IDFA)는 <strong>수집하지 않도록 설정</strong>되어 있습니다(Android 1.7.x 이하에서는 광고 동의 후 광고 ID 를 쓸 수 있었습니다).</li>
+    <li><strong>광고 식별자</strong>(Android 광고 ID / iOS IDFA): <strong>1.8.5부터</strong> 광고 성과 측정을 위해 Meta 에 전달합니다.
+        iOS 에서는 앱이 <strong>«추적 허용»을 한 번 묻고, 허용한 경우에만</strong> IDFA 를 씁니다(허용하지 않아도 모든 기능을 그대로 쓸 수 있고, 설정 › 개인정보 보호 › 추적에서 언제든 바꿀 수 있습니다).
+        Android 에서는 광고 ID 를 쓰며, 설정 › Google › 광고에서 광고 ID 를 재설정하거나 삭제할 수 있습니다. 1.8.4 이하에서는 광고 식별자를 수집하지 않았습니다.</li>
     <li>목적: 광고를 통한 앱 설치 여부 확인(기여 측정)</li>
     <li>사주·생년월일·가족 정보 등 앱에 입력한 내용은 <strong>전송되지 않습니다.</strong></li>
   </ul>
@@ -126,7 +128,7 @@ a{color:var(--brand)}
   <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음뿐입니다.</p>
   <ul>
     <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함</li>
-    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 앱 이용 이벤트 및 기기 정보(광고 식별자 제외)</li>
+    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 앱 이용 이벤트 및 기기 정보, 그리고 광고 식별자(iOS 는 추적 허용 시에만). Meta 는 이를 다른 앱·사이트의 데이터와 결합해 광고 성과를 측정할 수 있습니다(App Store 기준 «추적»에 해당)</li>
     <li>3-4항의 <strong>무료 이용 기간 확인</strong>(Supabase 서버) — 변환된 기기 값과 최초 등록 시각</li>
     <li>3-5항의 <strong>앱 이용 통계</strong>(Google Analytics for Firebase) — 앱 이용 기록과 앱 인스턴스 ID</li>
   </ul>
@@ -157,12 +159,12 @@ a{color:var(--brand)}
   <details class="en">
     <summary>English summary</summary>
     <div>
-      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-23)</p>
+      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-24)</p>
       <ul>
         <li>No account is required. Your birth date, birth time, gender, and the family/friend entries you add are stored <strong>only on your device</strong> and are never sent to our servers.</li>
         <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result) and Ask Jibi (your question). Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them.</li>
         <li><strong>No ads</strong> from version 1.8.0 (September 2026). Earlier versions (1.7.x and below) showed Google AdMob rewarded ads only when you chose “Watch ad”; updating removes the ad SDK.</li>
-        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. Advertising ID collection is turned off (Android 1.7.x and below could use it after ad consent). Nothing you enter in the app is sent.</li>
+        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. From version 1.8.5 the advertising identifier is also shared with Meta for ad measurement: on iOS only after you tap “Allow” in the one-time tracking prompt (you can change it any time in Settings › Privacy › Tracking; every feature works the same either way), on Android the advertising ID (resettable in Settings › Google › Ads). Meta may combine it with data from other apps and sites, which Apple classifies as tracking. Versions 1.8.4 and below did not collect it. Nothing you enter in the app is sent.</li>
         <li><strong>Subscriptions and lifetime purchase</strong> are sold only through App Store / Google Play billing. Payment details are handled by the store; we never receive them.</li>
         <li><strong>Free-trial check:</strong> to stop the 7-day free period from repeating after reinstalling, we store a one-way hashed device value (SHA-256 of the Android per-app ID, or of a random value the app keeps on the iPhone, with an app-specific salt) and its first registration time on our server (Supabase). It contains nothing you entered.</li>
         <li><strong>Usage statistics:</strong> Google Analytics for Firebase records screen views, feature use and errors, a random app-instance ID, device/app information, approximate location derived from IP (country/city level) and in-app purchase events, to improve the app. No advertising ID is collected and nothing you enter (birth date, names, addresses, questions) is sent. Retention: 14 months.</li>
