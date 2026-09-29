@@ -17,7 +17,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
 <title>SafeVessel — 담당자 로그인</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><path d='M100,28 A58,58 0 0 1 100,144 A29,29 0 0 1 100,86 A29,29 0 0 0 100,28 Z' fill='%23CD2E3A'/><path d='M100,144 A58,58 0 0 1 100,28 A29,29 0 0 1 100,86 A29,29 0 0 0 100,144 Z' fill='%230047A0'/><path d='M41,162 q29,-12 58,0 q29,12 58,0' fill='none' stroke='%23184F95' stroke-width='11' stroke-linecap='round'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23184F95'/><text x='50' y='72' font-size='62' font-family='system-ui,sans-serif' font-weight='700' fill='white' text-anchor='middle'>S</text></svg>">
 <style id="lockStyle">
   /* 토큰은 web/css/app.css 와 같은 값 — 로그인 전에는 앱 CSS 가 암호화돼 있어 여기 따로 둔다 */
   :root {
@@ -99,7 +99,16 @@
   .lock__btn[disabled] { cursor: progress; filter: saturate(.6) brightness(.95); }
   @media (prefers-reduced-motion: reduce) { .lock__btn, .field input { transition: none; } .lock__btn:active { transform: none; } }
 
-  .lock__foot { margin: 20px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); text-align: center; }
+  .lock__open { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line, #e5e5e5); }
+.lock__openbtn { display: flex; align-items: center; gap: 10px; text-decoration: none;
+  padding: 12px 14px; border-radius: 10px; border: 1px solid #cfd8e3; background: #f4f8fd;
+  color: inherit; transition: background .15s, border-color .15s; }
+.lock__openbtn:hover { background: #e8f1fb; border-color: #9fbfe0; }
+.lock__openbtn b { display: block; font-size: 14px; }
+.lock__openbtn small { display: block; font-size: 11.5px; color: #5b6675; margin-top: 2px; }
+.lock__openbtn > span:nth-child(1) { font-size: 20px; }
+.lock__arrow { margin-left: auto; font-size: 20px; color: #7a8796; }
+.lock__foot { margin: 20px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); text-align: center; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 </head>
@@ -107,7 +116,6 @@
 <main class="lock">
   <section class="lock__card" aria-labelledby="lockTitle">
     <div class="lock__brand">
-      <span class="lock__mark"><svg viewBox="0 0 200 200" width="24" height="24" aria-hidden="true"><path d="M100,28 A58,58 0 0 1 100,144 A29,29 0 0 1 100,86 A29,29 0 0 0 100,28 Z" fill="#CD2E3A"/><path d="M100,144 A58,58 0 0 1 100,28 A29,29 0 0 1 100,86 A29,29 0 0 0 100,144 Z" fill="#0047A0"/><path d="M41,162 q29,-12 58,0 q29,12 58,0" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity=".92"/></svg></span>
       <span>
         <span class="lock__name">SafeVessel</span>
         <span class="lock__sub" style="display:block">어선·어선원 안전ON</span>
@@ -138,6 +146,17 @@
       <button type="submit" class="lock__btn" id="loginBtn">로그인</button>
     </form>
 
+    <div class="lock__open">
+      <a class="lock__openbtn" href="open/">
+        <span aria-hidden="true">🌊</span>
+        <span>
+          <b>로그인 없이 해상위험정보 보기</b>
+          <small>어선·어선원용 — 출항 전 기상·사고 확인</small>
+        </span>
+        <span class="lock__arrow" aria-hidden="true">›</span>
+      </a>
+    </div>
+
     <p class="lock__foot">공개 데이터 기반 시범 서비스</p>
   </section>
 </main>
@@ -150,9 +169,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = '4uVbymRzthI3mtpk+PHQUA==';
+  const SALT_B64 = 'RPQfqrqjimMsKp6CqxYn3Q==';
   const ITER = 600000;
-  const BUILD = '949c41108f5e';
+  const BUILD = '8292c2d04396';
   const KEY_STORE = 'sv-lock-key';
 
   const $ = (id) => document.getElementById(id);
