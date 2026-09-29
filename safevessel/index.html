@@ -17,7 +17,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
 <title>SafeVessel — 담당자 로그인</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚦</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><path d='M100,28 A58,58 0 0 1 100,144 A29,29 0 0 1 100,86 A29,29 0 0 0 100,28 Z' fill='%23CD2E3A'/><path d='M100,144 A58,58 0 0 1 100,28 A29,29 0 0 1 100,86 A29,29 0 0 0 100,144 Z' fill='%230047A0'/><path d='M41,162 q29,-12 58,0 q29,12 58,0' fill='none' stroke='%23184F95' stroke-width='11' stroke-linecap='round'/></svg>">
 <style id="lockStyle">
   /* 토큰은 web/css/app.css 와 같은 값 — 로그인 전에는 앱 CSS 가 암호화돼 있어 여기 따로 둔다 */
   :root {
@@ -107,10 +107,10 @@
 <main class="lock">
   <section class="lock__card" aria-labelledby="lockTitle">
     <div class="lock__brand">
-      <span class="lock__mark" aria-hidden="true">🚦</span>
+      <span class="lock__mark"><svg viewBox="0 0 200 200" width="24" height="24" aria-hidden="true"><path d="M100,28 A58,58 0 0 1 100,144 A29,29 0 0 1 100,86 A29,29 0 0 0 100,28 Z" fill="#CD2E3A"/><path d="M100,144 A58,58 0 0 1 100,28 A29,29 0 0 1 100,86 A29,29 0 0 0 100,144 Z" fill="#0047A0"/><path d="M41,162 q29,-12 58,0 q29,12 58,0" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity=".92"/></svg></span>
       <span>
         <span class="lock__name">SafeVessel</span>
-        <span class="lock__sub" style="display:block">어선원 안전ON</span>
+        <span class="lock__sub" style="display:block">어선·어선원 안전ON</span>
       </span>
     </div>
 
@@ -150,9 +150,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'CppeR/q/EGKVK6OmBCWb4A==';
+  const SALT_B64 = '4uVbymRzthI3mtpk+PHQUA==';
   const ITER = 600000;
-  const BUILD = 'e247f07ec9f0';
+  const BUILD = '949c41108f5e';
   const KEY_STORE = 'sv-lock-key';
 
   const $ = (id) => document.getElementById(id);

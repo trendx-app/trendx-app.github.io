@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko" data-theme="light" data-mode="open" data-datadir="data">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('sv-theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { /* 시크릿 모드 등 */ }
+  })();
+</script>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>어선·어선원 안전ON — 출항 전 해상위험 확인</title>
+<meta name="description" content="출항 전에 내 조업 해역의 기상 실측과 그 바다의 어선 사고 기록을 확인합니다. 기상청 해양기상부이·중앙해양안전심판원 공개 데이터.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="css/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar__inner">
+    <a class="brand" href="#" data-goto="overview">
+      <span class="brand__mark"><svg viewBox="0 0 200 200" width="24" height="24" aria-hidden="true"><path d="M100,28 A58,58 0 0 1 100,144 A29,29 0 0 1 100,86 A29,29 0 0 0 100,28 Z" fill="#CD2E3A"/><path d="M100,144 A58,58 0 0 1 100,28 A29,29 0 0 1 100,86 A29,29 0 0 0 100,144 Z" fill="#0047A0"/><path d="M41,162 q29,-12 58,0 q29,12 58,0" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity=".92"/></svg></span>
+      <span>
+        <span class="brand__name">SafeVessel</span>
+        <span class="brand__sub">어선·어선원 안전ON · 출항 전 해상위험 확인</span>
+      </span>
+    </a>
+    <span class="topbar__spacer"></span>
+    <span class="chip chip--live" id="chipData" title="데이터 기준 시점">
+      <span class="chip__dot" aria-hidden="true"></span>
+      <span id="chipDataText">데이터 로딩 중…</span>
+    </span>
+    
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="밝은/어두운 화면 전환" title="밝은/어두운 화면 전환">
+      <span id="themeIco" aria-hidden="true">🌙</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="loader" class="loader">
+    <div class="loader__bar"><i></i></div>
+    <p class="small muted">공개 데이터를 불러오는 중입니다…</p>
+  </div>
+
+<section class="panel" id="panel-marine">
+    <div class="section-head">
+      <h2>어선 해상위험정보</h2>
+      <p>
+        지도에서 <b>바다의 한 지점</b>을 고르면, 그 자리에서 가장 가까운 기상청 부이의
+        <b>실측 파고·풍속·돌풍</b>과 그 바다에서 지금까지 신고된 <b>어선 사고 기록</b>을
+        함께 보여 줍니다. 배의 톤수를 넣으면 소형선 가중까지 반영합니다.
+      </p>
+    </div>
+
+    <!-- 관측 신선도 — 이 화면에서 가장 중요한 경고다 -->
+    <div id="marineFresh"></div>
+
+    <div class="toolbar">
+      <label class="toolbar__label" for="marineTon">어선 톤수</label>
+      <input type="number" id="marineTon" value="4.5" min="0" max="10000" step="0.1"
+             style="width:92px" inputmode="decimal">
+      <span class="toolbar__label">톤</span>
+      <button class="btn" type="button" id="marineGeo">📍 내 위치</button>
+      <input type="search" id="marineSearch" list="marinePlaces"
+             placeholder="지명 검색 (예: 주문진, 거문도, 여수)" style="min-width:220px">
+      <datalist id="marinePlaces"></datalist>
+      <label class="row small" style="gap:5px">
+        <input type="checkbox" id="marineShowCells" checked>
+        <span>사고 격자</span>
+      </label>
+      <label class="row small" style="gap:5px">
+        <input type="checkbox" id="marineShowSpots">
+        <span id="marineSpotsLabel">다발지점</span>
+      </label>
+      <label class="row small" style="gap:5px">
+        <input type="checkbox" id="marineShowBuoys" checked>
+        <span id="marineBuoysLabel">관측 부이</span>
+      </label>
+      <label class="row small" style="gap:5px">
+        <input type="checkbox" id="marineShowHeat">
+        <span>🔥 사고 히트맵</span>
+      </label>
+      <label class="row small" style="gap:5px">
+        <input type="checkbox" id="marineShowLabels" checked>
+        <span>지명</span>
+      </label>
+      <span class="zoombar" style="margin-left:auto">
+        <button class="icon-btn" type="button" id="marineZoomOut" title="축소" aria-label="지도 축소">−</button>
+        <b class="tnum small" id="marineZoomLabel">1.0배</b>
+        <button class="icon-btn" type="button" id="marineZoomIn" title="확대" aria-label="지도 확대">+</button>
+        <button class="btn" type="button" id="marineZoomReset">전체 보기</button>
+      </span>
+    </div>
+
+    <div class="grid grid--map mt-2">
+      <div class="card">
+        <div class="card__body">
+          <div class="map-shell"><div id="marineMap"></div></div>
+          <div class="legend" id="marineLegend"></div>
+          <p class="small muted mt-1" id="marineMapHint"></p>
+        </div>
+      </div>
+
+      <div id="marineSide">
+        <div class="card">
+          <div class="card__head"><h3>종합 위험도</h3><span class="hint" id="marineMixHint"></span></div>
+          <div class="card__body">
+            <div id="marineDial" class="dial-wrap"></div>
+            <div id="marineVerdict"></div>
+          </div>
+        </div>
+
+        <div class="card mt-2">
+          <div class="card__head"><h3>현재 해상기상</h3><span class="hint">기상청 부이 실측</span></div>
+          <div class="card__body">
+            <div id="marineWeather"></div>
+            <div id="marineStation"></div>
+          </div>
+        </div>
+
+        <div class="card mt-2">
+          <div class="card__head"><h3>이 바다의 사고 기록</h3><span class="hint">0.5° 격자 · 원시 집계</span></div>
+          <div class="card__body"><div id="marineCell"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card__head"><h3>이 화면을 읽는 법 · 한계</h3></div>
+      <div class="card__body"><div id="marineMethod"></div></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>
+      <b>출항 전에 한 번 보고 나가십시오.</b>
+      지도에서 나갈 바다를 누르면 그 자리의 <b>파고·풍속·돌풍</b>과
+      그 바다에서 지금까지 신고된 <b>어선 사고 기록</b>을 함께 보여 드립니다.
+    </p>
+    <p class="mt-1" id="footMeta"></p>
+    <p class="mt-1">
+      이 화면은 <b>참고 자료</b>입니다. 출항 여부는 기상특보와 어선안전조업국 안내를 함께 확인하고
+      선장이 판단하십시오. 개인·선박을 식별하는 정보는 이 화면에 없습니다.
+    </p>
+    <p class="foot__credit">
+      화면·분석 엔진 제작 <b>TrendX</b> ·
+      데이터는 각 기관의 공개 데이터이며 출처는 화면에 표기했습니다 ·
+      화면 구성과 분석 로직에 대한 권리는 제작자에게 있습니다.
+    </p>
+  </div>
+</footer>
+
+<div class="tooltip" id="tip" role="status" aria-live="polite"></div>
+
+<script src="js/format.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
