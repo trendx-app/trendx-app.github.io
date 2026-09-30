@@ -177,10 +177,18 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'yhj2luUxElD6p2/DuwwIdg==';
+  const SALT_B64 = '0TA5oRUHzQZcHLdT4PiN/w==';
   const ITER = 600000;
-  const BUILD = 'bb215fe221ee';
+  const BUILD = '87031d399d1d';
   const KEY_STORE = 'sv-lock-key';
+
+  /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
+     새 암호문과 짝이 안 맞는다. 예전에는 그때 화면을 통째로 새로고침했는데, 폰에서
+     그 새로고침이 **올라온 키보드를 닫아** 버렸다(2026-09-30 회장님 보고).
+     그래서 값만 갈아끼울 수 있게 변수로 둔다 — 화면은 그대로, 사용자는 모른다. */
+  let salt = SALT_B64;
+  let iters = ITER;
+  let build = BUILD;
 
   const $ = (id) => document.getElementById(id);
   const te = new TextEncoder();
@@ -218,27 +226,63 @@
      GitHub Pages 는 파일을 10분 캐시한다. 그래서 열릴 때마다 서버의 build.json(캐시 금지)을 읽어
      이 화면의 BUILD 와 다르면 화면 자체를 서버에서 다시 받아 새로고침한다. 무한 반복은 세션 표시로 막는다. */
   const RELOAD_MARK = 'sv.reloaded.for';
+
+  /** 이 화면의 열쇠 재료(salt·반복횟수·빌드)를 새 것으로 갈아끼운다.
+      새로고침 없이 해내는 것이 요점이다 — 새로고침은 폰에서 키보드를 닫는다. */
+  function swapBuildFrom(html, server) {
+    const s = (html.match(/const SALT_B64 = '([^']+)'/) || [])[1];
+    const i = Number((html.match(/const ITER = (\d+)/) || [])[1]);
+    const b = (html.match(/const BUILD = '([^']+)'/) || [])[1];
+    if (!s || !i || !b || b !== server) return false;   // 하나라도 못 읽으면 갈아끼우지 않는다
+    salt = s; iters = i; build = b;
+    return true;
+  }
+
   async function ensureFresh(reason) {
     let server = null;
     try {
       const r = await nativeFetch('build.json?t=' + Date.now(), { cache: 'no-store' });
       if (r.ok) server = (await r.json()).build || null;
     } catch (e) { return false; }          // 오프라인·차단 — 판단 보류, 지금 화면으로 진행
-    if (!server || server === BUILD) return false;
+    if (!server || server === build) return false;
+
+    /* ① 새로고침하지 않고 값만 갈아끼워 본다. 성공하면 사용자는 아무것도 못 느낀다.
+          (입력 중이던 글자도, 올라온 키보드도 그대로 남는다.) */
+    try {
+      const r2 = await nativeFetch(location.pathname + '?t=' + Date.now(), { cache: 'reload' });
+      if (r2.ok && swapBuildFrom(await r2.text(), server)) {
+        try { sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
+        return false;                      // 새 재료로 이 화면에서 그대로 진행한다
+      }
+    } catch (e) { /* 아래 새로고침으로 내려간다 */ }
+
+    /* ② 갈아끼우지 못했을 때만 새로고침한다. 사용자가 입력 중이면 **그 순간에는 하지 않고**
+          로그인 시도 때로 미룬다 — 타이핑 중 화면이 날아가는 것이 가장 나쁘다. */
+    if (reason === 'start' && isUserBusyTyping()) { pendingBuild = server; return false; }
+
     let already = null;
     try { already = sessionStorage.getItem(RELOAD_MARK); } catch (e) { /* 무시 */ }
     if (already === server) return false;  // 이미 한 번 새로고침했는데도 다르면 반복하지 않는다
     try { sessionStorage.setItem(RELOAD_MARK, server); sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
     setBusy(true, '새 버전을 받는 중…');
-    try { await nativeFetch(location.pathname, { cache: 'reload' }); } catch (e) { /* 실패해도 새로고침은 한다 */ }
     location.reload();
     return true;
+  }
+
+  /** 지금 사용자가 입력칸에서 무언가 하고 있는가 (포커스 중이거나 이미 뭔가 쳤거나). */
+  let pendingBuild = null;
+  function isUserBusyTyping() {
+    const id = $('loginId');
+    const pw = $('loginPw');
+    if (!id || !pw) return false;
+    const a = document.activeElement;
+    return a === id || a === pw || !!id.value || !!pw.value;
   }
 
   async function deriveKey(id, pw) {
     const base = await crypto.subtle.importKey('raw', te.encode(id + String.fromCharCode(0) + pw), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey(
-      { name: 'PBKDF2', hash: 'SHA-256', salt: b64d(SALT_B64), iterations: ITER },
+      { name: 'PBKDF2', hash: 'SHA-256', salt: b64d(salt), iterations: iters },
       base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
   }
 
@@ -249,7 +293,7 @@
   }
 
   async function loadBundle() {
-    const res = await nativeFetch('app.bundle.enc?b=' + BUILD, { cache: 'no-cache' });
+    const res = await nativeFetch('app.bundle.enc?b=' + build, { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     let plain;
@@ -265,7 +309,7 @@
       const m = url.match(re);
       if (!m) return nativeFetch(input, init);
       const encUrl = url.replace(re, (all, pre, name) => pre + 'data/' + name + '.enc');
-      const res = await nativeFetch(encUrl + '?b=' + BUILD, { cache: 'no-cache' });
+      const res = await nativeFetch(encUrl + '?b=' + build, { cache: 'no-cache' });
       if (!res.ok) return new Response('', { status: res.status, statusText: res.statusText });
       const plain = await openSealed(await res.arrayBuffer());
       return new Response(plain, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
@@ -298,7 +342,7 @@
       const w = window.open('', '_blank');
       try {
         if (w) w.document.write('<p style="font-family:system-ui;padding:24px">사용 설명서를 여는 중…</p>');
-        const res = await nativeFetch('manual/manual.enc?b=' + BUILD, { cache: 'no-cache' });
+        const res = await nativeFetch('manual/manual.enc?b=' + build, { cache: 'no-cache' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const plain = await openSealed(await res.arrayBuffer());
         const url = URL.createObjectURL(new Blob([plain], { type: 'application/pdf' }));
@@ -341,7 +385,7 @@
   async function tryResume() {
     let saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY_STORE) || 'null'); } catch (e) { saved = null; }
-    if (!saved || saved.build !== BUILD || !saved.k) {
+    if (!saved || saved.build !== build || !saved.k) {
       try { sessionStorage.removeItem(KEY_STORE); } catch (e) { /* 무시 */ }
       return false;
     }
@@ -388,7 +432,7 @@
       KEY = await deriveKey(id, pw);
       const bundle = await loadBundle();
       const raw = new Uint8Array(await crypto.subtle.exportKey('raw', KEY));
-      try { sessionStorage.setItem(KEY_STORE, JSON.stringify({ build: BUILD, k: b64e(raw) })); } catch (e2) { /* 저장 불가 — 이번 탭에서만 */ }
+      try { sessionStorage.setItem(KEY_STORE, JSON.stringify({ build: build, k: b64e(raw) })); } catch (e2) { /* 저장 불가 — 이번 탭에서만 */ }
       KEY = await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['decrypt']);
       raw.fill(0);
       mount(bundle);
@@ -423,7 +467,45 @@
     if (el && document.activeElement !== el) el.focus();
   }
 
+  /* 진단 모드 — 주소 끝에 ?diag=1 을 붙였을 때만 켜진다.
+     휴대폰에서 "키보드가 왜 내려가는지" 는 헤드리스 브라우저로 재현되지 않는다(키보드가 없다).
+     그래서 폰이 직접 겪은 일을 화면에 적게 한다. 창 높이(innerHeight)가 키보드의 대리 지표다 —
+     키보드가 올라오면 줄고, 내려가면 늘어난다.
+     ⚠️ 친 글자는 절대 적지 않는다. 길이만 센다. */
+  function startDiag() {
+    if (!/[?&]diag=1/.test(location.search)) return;
+    const box = document.createElement('div');
+    box.setAttribute('style', 'position:fixed;left:0;right:0;bottom:0;max-height:46vh;overflow:auto;'
+      + 'background:#0b0b0b;color:#b7f7c0;font:11px/1.45 ui-monospace,monospace;padding:8px;z-index:99999;'
+      + 'white-space:pre-wrap;word-break:break-all');
+    const lines = [];
+    let h0 = window.innerHeight;
+    const t0 = Date.now();
+    function put(what) {
+      lines.push(String(Date.now() - t0).padStart(5, ' ') + 'ms  h=' + window.innerHeight + '  ' + what);
+      if (lines.length > 60) lines.shift();
+      box.textContent = lines.join('\n');
+      box.scrollTop = box.scrollHeight;
+    }
+    const who = (t) => (t && (t.id || t.tagName)) || '?';
+    for (const ev of ['focusin', 'focusout']) {
+      document.addEventListener(ev, (e) => put(ev + ' ' + who(e.target)), true);
+    }
+    document.addEventListener('input', (e) => put('input ' + who(e.target) + ' 글자수=' + (e.target.value || '').length), true);
+    document.addEventListener('keydown', (e) => put('keydown ' + (e.key === ' ' ? 'Space' : e.key.length === 1 ? '글자' : e.key)), true);
+    for (const ev of ['pointerdown', 'touchstart']) {
+      document.addEventListener(ev, (e) => put(ev + ' ' + who(e.target)), true);
+    }
+    window.addEventListener('resize', () => put('창높이 바뀜 (처음 ' + h0 + ' → 지금 ' + window.innerHeight + ')'));
+    document.addEventListener('visibilitychange', () => put('visibilitychange ' + document.visibilityState));
+    window.addEventListener('pagehide', () => put('pagehide — 화면이 떠난다'));
+    window.addEventListener('beforeunload', () => put('beforeunload — 새로고침/이동'));
+    document.body.appendChild(box);
+    put('진단 시작 — 아이디 칸을 눌러 글자를 치고, 하나씩 지워 보세요');
+  }
+
   (async function start() {
+    startDiag();
     if (!window.crypto || !crypto.subtle) {
       showError('이 브라우저에서는 열 수 없습니다. 최신 크롬·엣지·사파리·파이어폭스로 https 주소에 접속하세요.');
       setBusy(true, '사용할 수 없음');
