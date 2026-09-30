@@ -177,9 +177,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'p/a0xs7eBEUQGgeVTIBdwA==';
+  const SALT_B64 = 'EbTjP/f9Rf33krJC7PMGtg==';
   const ITER = 600000;
-  const BUILD = 'fc7a98802815';
+  const BUILD = 'fdce1641dffe';
   const KEY_STORE = 'sv-lock-key';
 
   const $ = (id) => document.getElementById(id);
@@ -207,8 +207,10 @@
     btn.disabled = on;
     btn.textContent = on ? label : '로그인';
     $('loginForm').setAttribute('aria-busy', on ? 'true' : 'false');
-    $('loginId').readOnly = on;
-    $('loginPw').readOnly = on;
+    // ⚠️ 예전에는 여기서 입력칸을 readOnly 로 만들었다. 휴대폰에서 readOnly 칸은
+    //    탭해도 키보드가 안 뜨고, 풀린 뒤 **다시 눌러야** 들어간다
+    //    (2026-09-30 "첫 글자는 써지지도 않고 두번눌러야 들어가네").
+    //    처리 중에 사용자가 더 쳐도 해로울 것이 없으므로 버튼만 비활성으로 둔다.
   }
 
   /* 캐시 어긋남 방지 (2026-09-18 실제 사고: 배포 직후 브라우저가 옛 로그인 화면(옛 salt)을 캐시에서 쓰고
@@ -405,6 +407,22 @@
     }
   });
 
+  /* 사용자가 화면을 이미 만졌는가.
+     폰에서 사용자가 입력칸을 탭해 키보드가 올라온 뒤에 프로그램이 focus() 를 걸면
+     모바일 브라우저가 키보드를 닫아 버린다(2026-09-30 실제 보고). 만졌으면 손대지 않는다. */
+  let userTouched = false;
+  for (const ev of ['pointerdown', 'touchstart', 'focusin', 'keydown']) {
+    document.addEventListener(ev, () => { userTouched = true; }, { once: true, passive: true });
+  }
+  /* 손가락 기기에서는 자동 포커스를 아예 하지 않는다 — 열자마자 키보드가 튀어 오르는 것도 나쁘다. */
+  const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+
+  function focusIdIfIdle() {
+    if (userTouched || COARSE) return;
+    const el = $('loginId');
+    if (el && document.activeElement !== el) el.focus();
+  }
+
   (async function start() {
     if (!window.crypto || !crypto.subtle) {
       showError('이 브라우저에서는 열 수 없습니다. 최신 크롬·엣지·사파리·파이어폭스로 https 주소에 접속하세요.');
@@ -413,7 +431,7 @@
     }
     if (await ensureFresh('start')) return;   // 옛 화면이 캐시에서 열렸으면 여기서 새로고침
     if (await tryResume()) return;
-    $('loginId').focus();
+    focusIdIfIdle();
   })();
 })();
 </script>
