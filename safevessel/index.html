@@ -79,6 +79,10 @@
     border-radius: var(--radius-sm); transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   }
   .field input.has-toggle { padding-right: 72px; }
+  /* 비밀번호 가림 — type="password" 를 쓰지 않고 글자만 가린다.
+     휴대폰 브라우저(특히 삼성 인터넷의 삼성 패스)는 type="password" 를 보면
+     autocomplete="off" 를 무시하고 자동완성 시트를 띄운다. 그 시트가 키보드를 닫는다. */
+  .field input.is-secret { -webkit-text-security: disc; text-security: disc; }
   .field input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
   .field input[aria-invalid="true"] { border-color: var(--danger); }
   .pw-toggle {
@@ -88,6 +92,22 @@
   }
   .pw-toggle:hover { background: var(--surface-sunk); }
   .pw-toggle:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 1px; }
+
+  /* 인앱 브라우저 안내 띠 */
+  .lock__inapp {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    background: #fff5e5; border: 1px solid #f0c987; color: #6b4700;
+  }
+  :root[data-theme="dark"] .lock__inapp { background: #2e2413; border-color: #6b5220; color: #ffd89b; }
+  .lock__inapp[hidden] { display: none; }
+  .lock__inapp b { display: block; font-size: 13.5px; line-height: 1.4; }
+  .lock__inapp small { display: block; font-size: 11.8px; line-height: 1.45; margin-top: 3px; opacity: .9; }
+  .lock__inapp button {
+    flex: 0 0 auto; align-self: stretch; min-width: 92px; padding: 8px 12px;
+    border: 0; border-radius: 7px; cursor: pointer;
+    background: #8a5a00; color: #fff; font: inherit; font-size: 12.5px; font-weight: 750; line-height: 1.3;
+  }
 
   .lock__error {
     display: none; margin: 0 0 16px; padding: 10px 12px; border-radius: var(--radius-sm);
@@ -133,35 +153,55 @@
     <h1 id="lockTitle">담당자 로그인</h1>
     <p class="lock__lead">권한을 받은 담당자만 이용할 수 있습니다.</p>
 
-    <!-- ⚠️ 브라우저 비밀번호 관리자를 부르지 않는다.
-         칸 이름을 아이디·비밀번호로 짓고 자동완성 힌트를 로그인용으로 주면
-         휴대폰이 **저장된 비밀번호 제안 시트**를 띄운다. 그 시트가 뜰 때마다 키보드가 내려가고
-         (빈칸일 때·첫 글자를 칠 때·다 지웠을 때 = 값이 바뀔 때마다 갱신된다),
-         제안을 건드리면 치던 글자를 덮어쓴다.
-         2026-09-30 회장님 보고: "첫 글자 누르면 키보드 바로 내려와 … 그전에 글자가 덮어써져".
-         이 화면은 비밀번호를 브라우저에 저장할 필요가 없다 — 신호를 전부 끈다. -->
-    <form id="loginForm" novalidate autocomplete="off">
+    <!-- ⚠️ 휴대폰 브라우저가 이 화면을 '로그인 폼'으로 인식하면 안 된다.
+         인식하는 순간 저장된 비밀번호·비밀번호 생성 제안 시트가 뜨고, 그 시트가 뜰 때마다
+         키보드가 내려간다(빈칸일 때·첫 글자를 칠 때·다 지웠을 때 = 값이 바뀔 때마다).
+         제안이 적용되면 치던 글자를 통째로 덮어쓴다.
+         2026-09-30 회장님 보고 — 자동완성 힌트만 끄는 것으로는 **막히지 않았다.**
+         휴대폰 브라우저는 type="password" 를 보면 힌트를 무시하고 관리자를 띄운다.
+
+         그래서 인식 재료를 전부 없앴다.
+           · <form> 을 쓰지 않는다 (폼이 없으면 '제출할 로그인 폼'이 아니다)
+           · 비밀번호 칸을 type="password" 로 두지 않는다 —
+             글자는 CSS(-webkit-text-security)로 가린다. 화면에는 똑같이 ●●● 로 보인다.
+           · name 을 주지 않는다. 자동완성·외부 관리자에도 무시하라고 표시한다.
+         (비밀번호를 브라우저에 저장할 필요가 없는 화면이다. 기억은 탭 세션이 맡는다.) -->
+    <!-- 카카오톡·페이스북 등 앱 안에 딸린 브라우저(인앱 브라우저)로 열렸을 때만 보인다.
+         인앱 브라우저는 입력칸·키보드 처리가 불안정해 글자가 안 쳐지는 일이 있다
+         (2026-09-30 실제: 카톡 링크로 열면 키보드가 계속 내려갔고, 크롬으로 열면 정상). -->
+    <div class="lock__inapp" id="inappBar" hidden>
+      <div>
+        <b>지금 카카오톡 안의 브라우저로 열렸습니다.</b>
+        <small>이 상태에서는 아이디·비밀번호가 잘 입력되지 않을 수 있습니다.</small>
+      </div>
+      <button type="button" id="inappOpen">기본 브라우저로 열기</button>
+    </div>
+
+    <div id="loginForm" role="group" aria-labelledby="lockTitle">
       <p class="lock__error" id="loginError" role="alert" aria-live="assertive"></p>
 
       <div class="field">
         <label for="loginId">아이디</label>
-        <input id="loginId" name="svaccount" type="text" autocomplete="off"
-               autocapitalize="none" autocorrect="off" spellcheck="false"
-               data-lpignore="true" data-1p-ignore data-form-type="other" required>
+        <input id="loginId" type="text" inputmode="text" enterkeyhint="next"
+               autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+               data-lpignore="true" data-1p-ignore data-form-type="other">
       </div>
 
       <div class="field">
         <label for="loginPw">비밀번호</label>
         <div class="field__row">
-          <input id="loginPw" name="svkey" type="password" class="has-toggle"
-                 autocomplete="new-password"
-                 data-lpignore="true" data-1p-ignore data-form-type="other" required>
+          <!-- type="text" 다. 가림은 .is-secret 클래스가 한다 (위 주석 참고). -->
+          <input id="loginPw" type="text" class="has-toggle is-secret" enterkeyhint="go"
+                 autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+                 aria-describedby="pwHint"
+                 data-lpignore="true" data-1p-ignore data-form-type="other">
           <button type="button" class="pw-toggle" id="pwToggle" aria-controls="loginPw" aria-pressed="false">보기</button>
         </div>
+        <span id="pwHint" class="sr-only">입력한 글자는 화면에서 가려집니다. 오른쪽 보기 단추로 확인할 수 있습니다.</span>
       </div>
 
-      <button type="submit" class="lock__btn" id="loginBtn">로그인</button>
-    </form>
+      <button type="button" class="lock__btn" id="loginBtn">로그인</button>
+    </div>
 
     <div class="lock__open">
       <a class="lock__openbtn" href="open/">
@@ -186,9 +226,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'PyMyBJkKIWHsa0xB8CsfuQ==';
+  const SALT_B64 = 'W2eU8gd+hr+c7LjRByklaw==';
   const ITER = 600000;
-  const BUILD = '0fd4bd091540';
+  const BUILD = '3a2da85ecbf5';
   const KEY_STORE = 'sv-lock-key';
 
   /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
@@ -411,17 +451,79 @@
     }
   }
 
+  /* 앱 안에 딸린 브라우저(인앱 브라우저)로 열렸는가.
+     카카오톡 인앱 브라우저는 입력칸·키보드 처리가 불안정하다 —
+     2026-09-30 실제로 카톡 링크로 열면 글자가 안 쳐지고, 같은 폰 크롬에서는 정상이었다.
+     고칠 수 있는 쪽이 아니므로 **기본 브라우저로 넘겨 준다.**
+     카카오톡은 주소에 openExternalBrowser=1 이 있으면 스스로 외부 브라우저로 연다(카카오 공식 방식). */
+  (function inappGuard() {
+    const ua = navigator.userAgent || '';
+    const isKakao = /KAKAOTALK/i.test(ua);
+    const isOtherInapp = /(FBAN|FBAV|FB_IAB|Instagram|Line\/|NAVER\(inapp|DaumApps|everytimeApp)/i.test(ua);
+    if (!isKakao && !isOtherInapp) return;
+
+    const bar = $('inappBar');
+    const btn = $('inappOpen');
+    if (!bar || !btn) return;
+    if (!isKakao) {
+      bar.querySelector('b').textContent = '지금 앱 안의 브라우저로 열렸습니다.';
+    }
+    bar.hidden = false;
+
+    btn.addEventListener('click', () => {
+      const u = new URL(location.href);
+      if (isKakao) {
+        u.searchParams.set('openExternalBrowser', '1');
+        location.href = u.toString();
+        return;
+      }
+      // 안드로이드는 크롬으로 직접 넘긴다. 실패하면 주소가 그대로 남아 사용자가 복사할 수 있다.
+      if (/Android/i.test(ua)) {
+        location.href = 'intent://' + u.host + u.pathname + u.search
+          + '#Intent;scheme=' + u.protocol.replace(':', '') + ';package=com.android.chrome;end';
+      } else {
+        window.open(u.toString(), '_blank', 'noopener');
+      }
+    });
+  })();
+
+  /* 이 브라우저가 CSS 로 글자를 가릴 수 있는가.
+     못 가리면 비밀번호가 그대로 보이게 둘 수 없으므로 type="password" 로 되돌린다
+     (그 브라우저에서는 자동완성 시트가 뜰 수 있지만, 보이는 것보다는 낫다). */
+  (function ensureMasking() {
+    const pw = $('loginPw');
+    if (!pw) return;
+    const ok = CSS && CSS.supports
+      && (CSS.supports('-webkit-text-security', 'disc') || CSS.supports('text-security', 'disc'));
+    if (!ok) {
+      pw.classList.remove('is-secret');
+      pw.type = 'password';
+      pw.setAttribute('autocomplete', 'off');
+    }
+  })();
+
   $('pwToggle').addEventListener('click', () => {
     const pw = $('loginPw');
-    const show = pw.type === 'password';
-    pw.type = show ? 'text' : 'password';
-    $('pwToggle').textContent = show ? '숨기기' : '보기';
-    $('pwToggle').setAttribute('aria-pressed', show ? 'true' : 'false');
-    pw.focus();
+    // ⚠️ type 을 바꾸지 않는다 — 휴대폰에서 type 변경은 입력칸을 다시 만들어 키보드를 닫는다.
+    const hidden = pw.type === 'password' ? true : pw.classList.contains('is-secret');
+    if (pw.type === 'password') {
+      pw.type = hidden ? 'text' : 'password';   // CSS 가림을 못 쓰는 브라우저의 폴백 경로
+    } else {
+      pw.classList.toggle('is-secret', !hidden);
+    }
+    $('pwToggle').textContent = hidden ? '숨기기' : '보기';
+    $('pwToggle').setAttribute('aria-pressed', hidden ? 'true' : 'false');
   });
 
-  $('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  /* 폼이 없으므로 '제출'은 우리가 직접 만든다 — 버튼을 누르거나 입력칸에서 Enter. */
+  $('loginBtn').addEventListener('click', () => submitLogin());
+  for (const id of ['loginId', 'loginPw']) {
+    $(id).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submitLogin(); }
+    });
+  }
+
+  async function submitLogin() {
     const idEl = $('loginId');
     const pwEl = $('loginPw');
     const id = idEl.value.trim();
@@ -432,7 +534,7 @@
       const target = !id ? idEl : pwEl;
       target.setAttribute('aria-invalid', 'true');
       showError(!id ? '아이디를 입력하세요.' : '비밀번호를 입력하세요.');
-      target.focus();
+      if (!COARSE) target.focus();   // 손가락 기기에서는 키보드가 닫힌다
       return;
     }
     showError('');
@@ -452,13 +554,13 @@
       if (err && err.bad) {
         pwEl.setAttribute('aria-invalid', 'true');
         showError('아이디 또는 비밀번호가 올바르지 않습니다.');
-        pwEl.select();
-        pwEl.focus();
+        // 손가락 기기에서는 포커스를 건드리지 않는다 — 올라와 있는 키보드가 닫힌다.
+        if (!COARSE) { pwEl.select(); pwEl.focus(); }
       } else {
         showError('화면을 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 시도하세요.');
       }
     }
-  });
+  }
 
   /* 사용자가 화면을 이미 만졌는가.
      폰에서 사용자가 입력칸을 탭해 키보드가 올라온 뒤에 프로그램이 focus() 를 걸면
