@@ -17,7 +17,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
 <title>SafeVessel — 담당자 로그인</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1.46 -2.05 39.04 39.04'  aria-label='정부상징 태극 문양'%3E %3Cg%3E %3Cpath d='M27.02 16.699a6.316 6.316 0 0 0-8.976 1.89 6.315 6.315 0 0 1-11.417-1.742v-.14a8.198 8.198 0 0 1-.327-2.513c0-5.662 5.81-11.962 14.179-11.962a15.944 15.944 0 0 1 14.723 10.111c0-.062 0-.124-.062-.194A18.037 18.037 0 0 0 .039 18.006c0 8.905 6.424 16.527 15.33 16.527a14.497 14.497 0 0 0 14.07-9.473A7.001 7.001 0 0 0 27.02 16.7Z' fill='%23003863'/%3E %3Cpath d='M35.295 12.724A15.905 15.905 0 0 0 20.44 2.232c-8.369 0-14.179 6.3-14.179 11.962-.022.85.088 1.697.327 2.513a5.344 5.344 0 0 1-.164-1.292c0-5.895 5.904-9.978 11.97-9.978a14.872 14.872 0 0 1 14.872 14.87 16.387 16.387 0 0 1-9.093 14.677 18.068 18.068 0 0 0 11.122-22.26Z' fill='%23E4032E'/%3E %3C/g%3E %3C/svg%3E"><rect width='100' height='100' rx='22' fill='%23184F95'/><text x='50' y='72' font-size='62' font-family='system-ui,sans-serif' font-weight='700' fill='white' text-anchor='middle'>S</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1.46 -2.05 39.04 39.04'  aria-label='정부상징 태극 문양'%3E %3Cg%3E %3Cpath d='M27.02 16.699a6.316 6.316 0 0 0-8.976 1.89 6.315 6.315 0 0 1-11.417-1.742v-.14a8.198 8.198 0 0 1-.327-2.513c0-5.662 5.81-11.962 14.179-11.962a15.944 15.944 0 0 1 14.723 10.111c0-.062 0-.124-.062-.194A18.037 18.037 0 0 0 .039 18.006c0 8.905 6.424 16.527 15.33 16.527a14.497 14.497 0 0 0 14.07-9.473A7.001 7.001 0 0 0 27.02 16.7Z' fill='%23003863'/%3E %3Cpath d='M35.295 12.724A15.905 15.905 0 0 0 20.44 2.232c-8.369 0-14.179 6.3-14.179 11.962-.022.85.088 1.697.327 2.513a5.344 5.344 0 0 1-.164-1.292c0-5.895 5.904-9.978 11.97-9.978a14.872 14.872 0 0 1 14.872 14.87 16.387 16.387 0 0 1-9.093 14.677 18.068 18.068 0 0 0 11.122-22.26Z' fill='%23E4032E'/%3E %3C/g%3E %3C/svg%3E">
 <style id="lockStyle">
   /* 토큰은 web/css/app.css 와 같은 값 — 로그인 전에는 앱 CSS 가 암호화돼 있어 여기 따로 둔다 */
   :root {
@@ -43,7 +43,14 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--plane); color: var(--ink); font-family: var(--sans); }
-  .lock { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
+  /* ⚠️ 100dvh 는 **키보드가 올라오면 줄어든다.** place-items:center 와 함께 쓰면
+     글자를 한 자 칠 때마다 카드가 다시 가운데로 튀고, 그때 입력칸이 포커스를 잃어
+     키보드가 내려간다(2026-09-30 회장님 보고). svh 는 키보드와 무관하게 고정이다. */
+  .lock { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+  @media (max-width: 560px) {
+    /* 폰에서는 아예 위에 붙여 둔다 — 높이가 변해도 움직일 일이 없다 */
+    .lock { align-items: start; padding-top: 32px; }
+  }
   .lock__card {
     width: 100%; max-width: 384px; background: var(--surface);
     border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg);
@@ -170,9 +177,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'BUL0S38NiTLc0r9vgEYJhw==';
+  const SALT_B64 = 'p/a0xs7eBEUQGgeVTIBdwA==';
   const ITER = 600000;
-  const BUILD = '8ae23e230ea6';
+  const BUILD = 'fc7a98802815';
   const KEY_STORE = 'sv-lock-key';
 
   const $ = (id) => document.getElementById(id);
