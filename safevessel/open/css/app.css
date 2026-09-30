@@ -249,7 +249,7 @@ display: inline-flex; align-items: center; gap: 3px;
 padding: 1px 6px; border-radius: 5px;
 font-size: 10.5px; font-weight: 650; letter-spacing: .02em;
 background: var(--surface-sunk); color: var(--ink-muted);
-border: 1px solid var(--border); cursor: help; white-space: nowrap;
+border: 1px solid var(--border); cursor: default; white-space: nowrap;
 }
 .src--kmst  { color: var(--seq-600); border-color: color-mix(in srgb, var(--seq-400) 35%, var(--border)); }
 .src--mof   { color: var(--s3);      border-color: color-mix(in srgb, var(--s3) 35%, var(--border)); }
