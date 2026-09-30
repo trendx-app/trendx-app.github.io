@@ -133,20 +133,29 @@
     <h1 id="lockTitle">담당자 로그인</h1>
     <p class="lock__lead">권한을 받은 담당자만 이용할 수 있습니다.</p>
 
-    <form id="loginForm" novalidate>
+    <!-- ⚠️ 브라우저 비밀번호 관리자를 부르지 않는다.
+         칸 이름을 아이디·비밀번호로 짓고 자동완성 힌트를 로그인용으로 주면
+         휴대폰이 **저장된 비밀번호 제안 시트**를 띄운다. 그 시트가 뜰 때마다 키보드가 내려가고
+         (빈칸일 때·첫 글자를 칠 때·다 지웠을 때 = 값이 바뀔 때마다 갱신된다),
+         제안을 건드리면 치던 글자를 덮어쓴다.
+         2026-09-30 회장님 보고: "첫 글자 누르면 키보드 바로 내려와 … 그전에 글자가 덮어써져".
+         이 화면은 비밀번호를 브라우저에 저장할 필요가 없다 — 신호를 전부 끈다. -->
+    <form id="loginForm" novalidate autocomplete="off">
       <p class="lock__error" id="loginError" role="alert" aria-live="assertive"></p>
 
       <div class="field">
         <label for="loginId">아이디</label>
-        <input id="loginId" name="username" type="text" autocomplete="username"
-               autocapitalize="none" autocorrect="off" spellcheck="false" required>
+        <input id="loginId" name="svaccount" type="text" autocomplete="off"
+               autocapitalize="none" autocorrect="off" spellcheck="false"
+               data-lpignore="true" data-1p-ignore data-form-type="other" required>
       </div>
 
       <div class="field">
         <label for="loginPw">비밀번호</label>
         <div class="field__row">
-          <input id="loginPw" name="password" type="password" class="has-toggle"
-                 autocomplete="current-password" required>
+          <input id="loginPw" name="svkey" type="password" class="has-toggle"
+                 autocomplete="new-password"
+                 data-lpignore="true" data-1p-ignore data-form-type="other" required>
           <button type="button" class="pw-toggle" id="pwToggle" aria-controls="loginPw" aria-pressed="false">보기</button>
         </div>
       </div>
@@ -177,9 +186,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = '0TA5oRUHzQZcHLdT4PiN/w==';
+  const SALT_B64 = 'PyMyBJkKIWHsa0xB8CsfuQ==';
   const ITER = 600000;
-  const BUILD = '87031d399d1d';
+  const BUILD = '0fd4bd091540';
   const KEY_STORE = 'sv-lock-key';
 
   /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
