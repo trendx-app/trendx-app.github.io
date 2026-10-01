@@ -185,3 +185,47 @@ details.evidence[open] summary { margin-bottom: var(--s-1); }
 .embed-bar[hidden] { display: none; }
 .embed-bar p { margin: 0; font-size: var(--f-14); color: var(--c-text-2); }
 .embed-bar strong { color: var(--c-primary-2); margin-right: var(--s-1); }
+
+/* 언어 전환(한국어 | English) — 머리말 오른쪽 위. 누르기 영역 44px */
+.lang-switch { display: flex; justify-content: flex-end; margin: calc(-1 * var(--s-3)) 0 var(--s-2); }
+.lang-btn {
+  min-height: var(--tap-min); min-width: var(--tap-min); padding: 0 var(--s-3); cursor: pointer;
+  border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-text-2); font-size: var(--f-14); font-weight: var(--w-medium);
+}
+.lang-btn:first-child { border-radius: var(--r-8) 0 0 var(--r-8); }
+.lang-btn:last-child { border-radius: 0 var(--r-8) var(--r-8) 0; border-left: 0; }
+.lang-btn[aria-pressed="true"] { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-on-primary); }
+
+/* 영어 화면에 섞인 한글(시설 이름·주소·원문 병기)이 낱자 단위로 끊기지 않게 — 한국어 화면에는 적용하지 않는다 */
+html[lang="en"] body { word-break: keep-all; overflow-wrap: break-word; }
+/* 체중 비교 */
+.w-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); align-items: stretch; margin-bottom: var(--s-3); }
+.w-cmp > div:not(.w-diff) { display: flex; flex-direction: column; justify-content: space-between; }
+.w-cmp > div { background: var(--c-surface-2); border-radius: var(--r-12); padding: var(--s-3); }
+.w-cmp b { display: block; font-size: var(--f-24); color: var(--c-text); font-variant-numeric: tabular-nums; }
+.w-lab { display: block; font-size: var(--f-12); color: var(--c-text-2); }
+.w-cmp .w-diff { grid-column: 1 / -1; text-align: center; font-weight: var(--w-bold); background: var(--c-primary-soft); color: var(--c-primary-2); }
+.w-advice { background: var(--c-primary-soft); border-radius: var(--r-12); padding: var(--s-3) var(--s-4); font-size: var(--f-14); line-height: var(--lh-body); }
+.w-advice small { display: block; margin-top: var(--s-2); color: var(--c-text-2); }
+/* 건강 습관 알림 */
+.rem-list { list-style: none; margin: 0 0 var(--s-4); padding: 0; }
+.rem { display: flex; align-items: flex-start; gap: var(--s-3); padding: var(--s-3) 0; border-bottom: 1px solid var(--c-border); }
+.rem:last-child { border-bottom: 0; }
+.rem-main { flex: 1; min-width: 0; }
+.rem-name { font-weight: var(--w-medium); }
+.rem-msg { font-size: var(--f-12); color: var(--c-text-2); }
+.rem.off .rem-name, .rem.off .rem-msg { color: var(--c-text-3); }
+.rem input[type="time"] { display: block; margin-top: var(--s-2); width: 10em; max-width: 100%; min-height: 44px; padding: 0 var(--s-2); border: 1px solid var(--c-border); border-radius: var(--r-8); background: var(--c-surface); color: var(--c-text); }
+.rem input[type="time"]:disabled { opacity: .45; }
+.switch { position: relative; display: inline-block; width: 52px; min-width: 52px; height: 44px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch .knob { position: absolute; top: 8px; left: 0; width: 52px; height: 28px; border-radius: var(--r-full); background: var(--c-track); transition: background var(--m-fast) var(--m-ease); }
+.switch .knob::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: var(--e-1); transition: transform var(--m-fast) var(--m-ease); }
+.switch input:checked + .knob { background: var(--c-primary); }
+.switch input:checked + .knob::after { transform: translateX(24px); }
+.switch input:focus-visible + .knob { outline: 2px solid var(--c-focus); outline-offset: 2px; }
+#rem-add:disabled { opacity: .5; cursor: not-allowed; }
+
+#rem-note { font-size: var(--f-14); color: var(--c-text-2); }
+/* 푸터 — 만든 곳의 앱 소개(스토어 링크는 누르기 쉽게 44px) */
+.foot-app a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-1); }
