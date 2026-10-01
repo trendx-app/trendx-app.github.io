@@ -103,6 +103,7 @@
     <div class="step-head"><span class="step-num" aria-hidden="true">kg</span><h2 id="h-stepw">또래 중앙 체중과 비교</h2></div>
     <div id="w-body"></div>
     <p class="src" id="w-src"></p>
+    <p class="cx-link" data-i18n="cx.link.weight">매일의 식단과 체중은 <a href="#stepcx">CaloryX 로 이어서 관리</a>할 수 있어요.</p>
   </section>
 
   <!-- AI 예상 인증 등급 -->
@@ -135,6 +136,7 @@
     <div id="map"><div class="map-fallback" id="map-fallback" data-i18n="map.preparing">지도를 준비하고 있습니다…</div></div>
     <ul class="fac-list" id="fac-list"></ul>
     <p class="src" id="fac-src"></p>
+    <p class="cx-link" data-i18n="cx.link.move">운동한 경로·고도·속도와 태운 칼로리는 <a href="#stepcx">CaloryX 로 기록</a>할 수 있어요.</p>
   </section>
 
   <!-- 건강 습관 알림 — 늘 보인다(js/reminders.js). 알림은 휴대폰 캘린더가 보낸다 -->
@@ -145,6 +147,47 @@
     <button type="button" class="btn btn-primary" id="rem-add">휴대폰 캘린더에 알림 넣기</button>
     <p class="sub" id="rem-note"></p>
     <p class="src" id="rem-saved"></p>
+  </section>
+
+  <!-- 체력 다음 — CaloryX 소개(만든 곳의 앱). 늘 보인다. 그림·영상은 화면에 들어올 때만 받는다(loading=lazy · preload=none) -->
+  <section class="step" id="stepcx" aria-labelledby="h-stepcx">
+    <div class="step-head"><img class="cx-icon" src="media/caloryx_icon.webp" width="40" height="40" alt=""><h2 id="h-stepcx" data-i18n="cx.h">체력 다음 — 식단·체중·운동은 CaloryX로</h2></div>
+    <p class="lead" data-i18n="cx.lead">이 사이트는 <strong>지금 내 체력이 또래 중 어디쯤인지</strong>를 보여 줍니다. 그다음 매일의 <strong>식단·체중·운동</strong>은 트렌드 엑스가 만든 앱 <strong>CaloryX</strong>로 기록하고 관리할 수 있어요.</p>
+    <div class="cx-feats">
+      <div class="cx-feat"><h3 data-i18n="cx.meal.h">🍱 식단</h3><ul data-i18n="cx.meal.list"><li>음식 사진 한 장으로 칼로리·단백질·탄수화물·지방 분석</li><li>한 상 차림도 반찬별로 나눠 계산, 양은 0.1인분 단위로 고침</li><li>음식 검색(바코드·프랜차이즈·편의점, 식약처 영양 데이터)</li><li>AI 영양 코치에게 "뭐 먹지?" 묻기</li></ul></div>
+      <div class="cx-feat"><h3 data-i18n="cx.move.h">🚴 운동</h3><ul data-i18n="cx.move.list"><li>산책·러닝·등산·자전거 GPS 기록</li><li>3D 지도로 경로 다시 보기, 경로 영상 저장</li><li>고도·이동 속도 그래프와 영상</li><li>내 사진에 기록을 얹은 인증샷, 태운 칼로리를 음식으로 환산</li></ul></div>
+      <div class="cx-feat"><h3 data-i18n="cx.weight.h">⚖️ 체중</h3><ul data-i18n="cx.weight.list"><li>먹은 칼로리와 소모 칼로리를 한 화면에서 매일 비교</li><li>체중 추세 차트와 나에게 맞춘 하루 목표</li><li>주간 AI 리포트·월간 결산, 연속 기록·홈 위젯</li></ul></div>
+    </div>
+    <h3 class="cx-sub" data-i18n="cx.real.h">실제 사용 화면</h3>
+    <div class="cx-media">
+      <figure><video src="media/route.mp4" data-poster="media/route_poster.jpg" controls muted loop playsinline preload="none" width="540" height="960" aria-label="CaloryX 자전거 경로 영상" data-i18n-aria="cx.route.aria"></video><figcaption data-i18n="cx.route.cap">자전거 경로 영상 — 3D 지도 위로 달린 길을 다시 그려요</figcaption></figure>
+      <figure><video src="media/elevation.mp4" data-poster="media/elevation_poster.jpg" controls muted loop playsinline preload="none" width="540" height="960" aria-label="CaloryX 고도·속도 기록 영상" data-i18n-aria="cx.elev.aria"></video><figcaption data-i18n="cx.elev.cap">고도·속도 기록 영상 — 오르막과 빨랐던 구간이 한눈에</figcaption></figure>
+      <figure><img src="media/proof.webp" loading="lazy" width="540" height="960" alt="거리 4.07km, 시간 22분 56초, 평균속도 10.7km/h, 85kcal 가 한강 사진 위에 적힌 CaloryX 인증샷" aria-label="거리 4.07km, 시간 22분 56초, 평균속도 10.7km/h, 85kcal 가 한강 사진 위에 적힌 CaloryX 인증샷" data-i18n-aria="cx.proof.alt"><figcaption data-i18n="cx.proof.cap">인증샷 — 내 사진 위에 거리·시간·속도·칼로리를 얹어요</figcaption></figure>
+      <figure><img src="media/meal.webp" loading="lazy" width="540" height="960" alt="닭가슴살 현미 볶음밥과 양배추 샐러드 도시락 480kcal, 단백질 36g, 탄수화물 62g, 지방 10g 로 분석한 CaloryX 화면" aria-label="닭가슴살 현미 볶음밥과 양배추 샐러드 도시락 480kcal, 단백질 36g, 탄수화물 62g, 지방 10g 로 분석한 CaloryX 화면" data-i18n-aria="cx.meal.alt"><figcaption data-i18n="cx.meal.cap">식단 분석 — 사진 한 장으로 칼로리와 단백질·탄수화물·지방</figcaption></figure>
+    </div>
+    <h3 class="cx-sub" data-i18n="cx.store.h">스토어 화면</h3>
+    <div class="cx-gal cx-gal-ko" lang="ko" tabindex="0" role="region" aria-label="CaloryX 앱스토어 화면 6장, 옆으로 넘겨 보세요">
+      <img src="media/store_ko_1.webp" loading="lazy" width="300" height="652" alt="오늘 먹은 칼로리를 한눈에">
+      <img src="media/store_ko_2.webp" loading="lazy" width="300" height="652" alt="사진 한 장으로 칼로리 분석">
+      <img src="media/store_ko_3.webp" loading="lazy" width="300" height="652" alt="내 운동이 3D 리플레이로">
+      <img src="media/store_ko_4.webp" loading="lazy" width="300" height="652" alt="산책·러닝·등산 GPS 기록">
+      <img src="media/store_ko_5.webp" loading="lazy" width="300" height="652" alt="AI 코치에게 식단 상담">
+      <img src="media/store_ko_6.webp" loading="lazy" width="300" height="652" alt="체중 추세로 목표까지 관리">
+    </div>
+    <div class="cx-gal cx-gal-en" lang="en" tabindex="0" role="region" aria-label="CaloryX store screenshots, 7 images — scroll sideways">
+      <img src="media/store_en_1.webp" loading="lazy" width="300" height="533" alt="Meals you can't count, counted">
+      <img src="media/store_en_2.webp" loading="lazy" width="300" height="533" alt="Your run, on a 3D map">
+      <img src="media/store_en_3.webp" loading="lazy" width="300" height="533" alt="Today's workout, ready for Reels">
+      <img src="media/store_en_4.webp" loading="lazy" width="300" height="533" alt="See today's intake at a glance">
+      <img src="media/store_en_5.webp" loading="lazy" width="300" height="533" alt="Eaten and burned, on one screen">
+      <img src="media/store_en_6.webp" loading="lazy" width="300" height="533" alt="What should I eat? Ask your AI coach">
+      <img src="media/store_en_7.webp" loading="lazy" width="300" height="533" alt="Any past day, one tap away">
+    </div>
+    <div class="cx-stores">
+      <a class="btn btn-primary cx-store" href="https://apps.apple.com/kr/app/id6791085565" rel="noopener" target="_blank" data-i18n="cx.ios">App Store에서 받기</a>
+      <a class="btn btn-primary cx-store" href="https://play.google.com/store/apps/details?id=com.caloryx.app" rel="noopener" target="_blank" data-i18n="cx.android">Google Play에서 받기</a>
+    </div>
+    <p class="src" data-i18n="cx.note">CaloryX 는 로그인 후 사용하며, 설치 후 7일은 모든 기능이 무료입니다. 그 뒤 사진 칼로리 분석·운동 영상·인증샷·주간 리포트·월간 결산은 구독 기능이고(가격은 스토어에 표시), GPS 운동 기록·체중 추세·음식 검색·AI 코치는 계속 무료입니다. CaloryX 의 칼로리·영양 정보는 AI 추정치이며 의료 정보가 아닙니다. 이 사이트에 넣은 값은 CaloryX 로 보내지 않습니다.</p>
   </section>
 
   <footer>

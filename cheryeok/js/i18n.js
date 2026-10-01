@@ -250,7 +250,31 @@
     'foot.data': 'Data: Korea Sports Promotion Foundation (KSPO) public data on the Public Data Portal (data.go.kr) — National Fitness 100 certification center test results · public sports facility details · National Fitness 100 videos. Percentiles are based on a sample of people tested at National Fitness 100 certification centers, not on the whole population.',
     'foot.map': 'Map: <a href="https://openfreemap.org" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" rel="noopener">OpenMapTiles</a> · Data from <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> · MapLibre GL JS (BSD-3)',
     'foot.contest': 'Entry in the 2026 KSPO Public Data Utilization Contest · Operated by TrendX',
-    'foot.app': 'From TrendX: <strong>CaloryX</strong> — an app to manage your meals and to save and track the calories you burn, your route, elevation and speed while hiking, walking or running, so exercise is more fun. <a href="https://play.google.com/store/apps/details?id=com.caloryx.app" rel="noopener" target="_blank">Google Play</a> · <a href="https://apps.apple.com/kr/app/id6791085565" rel="noopener" target="_blank">App Store</a>'
+    'foot.app': 'From TrendX: <strong>CaloryX</strong> — an app to manage your meals and to save and track the calories you burn, your route, elevation and speed while hiking, walking or running, so exercise is more fun. <a href="https://play.google.com/store/apps/details?id=com.caloryx.app" rel="noopener" target="_blank">Google Play</a> · <a href="https://apps.apple.com/kr/app/id6791085565" rel="noopener" target="_blank">App Store</a>',
+    // CaloryX 연계 구역(#stepcx) — 기능·요금 구분은 CaloryX 코드(FeatureGate·Monetization, Android 2.12.3) 기준 2026-10-01
+    'cx.h': 'After your fitness check — manage meals, weight and exercise with CaloryX',
+    'cx.lead': 'This site shows <strong>where your fitness stands among people your age</strong>. For the everyday part — <strong>meals, weight and exercise</strong> — you can log and manage it with <strong>CaloryX</strong>, an app made by TrendX.',
+    'cx.meal.h': '🍱 Meals',
+    'cx.meal.list': '<li>Snap one photo of your food to get calories, protein, carbs and fat</li><li>A full table is split dish by dish; adjust portions in 0.1-serving steps</li><li>Food search (barcodes, chains, convenience stores — Korean food safety nutrition data)</li><li>Ask the AI nutrition coach “What should I eat?”</li>',
+    'cx.move.h': '🚴 Exercise',
+    'cx.move.list': '<li>GPS tracking for walks, runs, hikes and bike rides</li><li>Replay your route on a 3D map and save it as a video</li><li>Elevation and speed charts and videos</li><li>Workout photos with your stats on them; calories burned shown as food</li>',
+    'cx.weight.h': '⚖️ Weight',
+    'cx.weight.list': '<li>Compare calories eaten and burned on one screen, every day</li><li>Weight trend chart and a daily goal set for you</li><li>Weekly AI report and monthly recap, streaks and home-screen widgets</li>',
+    'cx.real.h': 'Real screens from the app',
+    'cx.route.aria': 'CaloryX bike route video',
+    'cx.route.cap': 'Route video — your ride redrawn on a 3D map',
+    'cx.elev.aria': 'CaloryX elevation and speed video',
+    'cx.elev.cap': 'Elevation and speed video — climbs and fast stretches at a glance',
+    'cx.proof.alt': 'CaloryX workout photo showing 4.07 km, 22:56, average 10.7 km/h and 85 kcal over a photo of the Han River',
+    'cx.proof.cap': 'Workout photo — distance, time, speed and calories on your own photo',
+    'cx.meal.alt': 'CaloryX screen analyzing a chicken breast brown-rice fried rice and cabbage salad lunch box: 480 kcal, protein 36 g, carbs 62 g, fat 10 g',
+    'cx.meal.cap': 'Meal analysis — calories, protein, carbs and fat from one photo',
+    'cx.store.h': 'Store screenshots',
+    'cx.ios': 'Get it on the App Store',
+    'cx.android': 'Get it on Google Play',
+    'cx.note': 'CaloryX requires sign-in, and every feature is free for the first 7 days after you install it. After that, photo calorie analysis, workout videos, workout photos, the weekly report and the monthly recap need a subscription (prices are shown in the store); GPS workout tracking, weight trends, food search and the AI coach stay free. Calorie and nutrition figures in CaloryX are AI estimates, not medical information. Nothing you enter on this site is sent to CaloryX.',
+    'cx.link.weight': 'You can <a href="#stepcx">keep managing your meals and weight with CaloryX</a>.',
+    'cx.link.move': 'You can <a href="#stepcx">log your workout route, elevation, speed and calories burned with CaloryX</a>.'
   };
 
   // ────────── 데이터 속 문구의 영어판 — 코드 또는 원문(한국어)을 키로. 없으면 원문 그대로(시험이 찾아낸다).

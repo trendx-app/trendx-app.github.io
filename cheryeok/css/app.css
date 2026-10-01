@@ -231,3 +231,26 @@ html[lang="en"] body { word-break: keep-all; overflow-wrap: break-word; }
 .foot-app a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-1); }
 /* 새 칸은 어절 단위로 줄바꿈(「체 / 중」처럼 낱말 중간에서 끊기지 않게) */
 #stepw, #steprem, .foot-app { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* ────────── CaloryX 연계 구역(#stepcx) — 정보 전달용, 움직임 없음 */
+.cx-link { font-size: var(--f-14); color: var(--c-text-2); margin: var(--s-3) 0 0; }
+.cx-link a { color: var(--c-primary); font-weight: var(--w-medium); }
+#stepcx .step-head { align-items: center; }
+.cx-icon { width: 40px; height: 40px; border-radius: 10px; flex: none; }
+.cx-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin: var(--s-4) 0; }
+@media (max-width: 720px) { .cx-feats { grid-template-columns: 1fr; } }
+.cx-feat { background: var(--c-surface-2); border-radius: var(--r-12); padding: var(--s-3) var(--s-4); }
+.cx-feat h3 { font-size: var(--f-16); margin: 0 0 var(--s-2); }
+.cx-feat ul { margin: 0; padding-left: 1.1em; font-size: var(--f-14); color: var(--c-text-2); }
+.cx-feat li + li { margin-top: var(--s-1); }
+.cx-sub { font-size: var(--f-16); margin: var(--s-4) 0 var(--s-2); }
+.cx-media { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-3); }
+@media (max-width: 720px) { .cx-media { grid-template-columns: repeat(2, 1fr); } }
+.cx-media figure { margin: 0; }
+.cx-media video, .cx-media img { display: block; width: 100%; height: auto; border-radius: var(--r-12); background: var(--c-surface-2); }
+.cx-media figcaption { font-size: var(--f-12); color: var(--c-text-2); margin-top: var(--s-1); }
+.cx-gal { display: flex; gap: var(--s-2); overflow-x: auto; padding-bottom: var(--s-2); scroll-snap-type: x mandatory; }
+.cx-gal img { flex: none; width: 150px; height: auto; border-radius: var(--r-8); scroll-snap-align: start; border: 1px solid var(--c-border); }
+html[lang="en"] .cx-gal-ko, html:not([lang="en"]) .cx-gal-en { display: none; }
+.cx-stores { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-4) 0 var(--s-3); }
+.cx-store { min-height: var(--tap-min); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }

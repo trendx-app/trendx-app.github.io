@@ -12,6 +12,15 @@
   var S = { age: null, sex: null, inputs: {}, results: [], weak: [], loc: null, sidoFiles: {}, filterTypes: {}, keyword: null };
   var mapApi = null;
 
+  // ────────── CaloryX 구역 영상 대표 그림 — 화면에 가까워질 때만 붙인다(첫 화면 전송량을 늘리지 않는다). 데이터 로드와 무관하게 바로 건다.
+  (function lazyPosters() {
+    var vids = $$('video[data-poster]');
+    var put = function (v) { if (!v.getAttribute('poster')) v.setAttribute('poster', v.getAttribute('data-poster')); };
+    if (!('IntersectionObserver' in window)) { vids.forEach(put); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { put(e.target); io.unobserve(e.target); } }); }, { rootMargin: '400px 0px' });
+    vids.forEach(function (v) { io.observe(v); });
+  })();
+
   // ────────── 데이터 로드
   function loadJSON(u) { return fetch(u, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }); }
   Promise.all([loadJSON('data/meta.json'), loadJSON('data/norms.json'), loadJSON('data/exercise_map.json'), loadJSON('data/facilities/summary.json')])
