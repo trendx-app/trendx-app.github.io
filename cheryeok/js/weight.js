@@ -62,16 +62,16 @@
     },
     en: {
       title: 'Your weight vs. peers', peerLine: 'Peer median weight at your height ({h} cm)', mine: 'Your weight',
-      heavier: '{d} kg above', lighter: '{d} kg below', same: 'About the same',
-      bmiLine: 'Your BMI {b} — {c}', healthy: 'Healthy-range weight {lo}–{hi} kg',
+      heavier: '{d} kg above the peer median', lighter: '{d} kg below the peer median', same: 'About the same',
+      bmiLine: 'Your BMI {b} — {c}', healthy: 'Normal-range weight {lo}–{hi} kg',
       cat: { under: 'underweight', normal: 'normal', pre: 'pre-obese', obese: 'obese' },
-      less: 'Eat <b>about {k} kcal less</b> per day than usual and you would reach the peer median ({t} kg) in about {wk} weeks.',
-      more: 'Eat <b>about {k} kcal more</b> per day than usual and you would reach the {goal} ({t} kg) in about {wk} weeks.',
-      goalPeer: 'peer median', goalHealthy: 'healthy range',
+      less: 'If you eat <b>about {k} kcal less</b> per day than usual, you would reach the peer median ({t} kg) in about {wk} weeks.',
+      more: 'If you eat <b>about {k} kcal more</b> per day than usual, you would reach the {goal} ({t} kg) in about {wk} weeks.',
+      goalPeer: 'peer median', goalHealthy: 'normal range',
       keep: { same: 'Keep eating as you do :)', under: 'You are in the underweight range, so cutting down is not advised.',
               'peer-above-normal': 'The peer median is in the pre-obese range or above, so there is no need to eat more to match it. Keeping your current weight is fine :)' },
       tip: 'e.g. half a bowl of rice ≈ 150 kcal · 1 banana ≈ 90 kcal · 30 min brisk walk ≈ 120–150 kcal',
-      src: 'Basis: median BMI {m} of {g} participants measured at National Fitness 100 centers in Korea ({n} records) × your height². Converted from the BMI median, not height-specific raw data. Weight categories follow the Korean Society for the Study of Obesity guideline (2022). Uses 1 kg ≈ 7,700 kcal, spread over 12 weeks and capped at 500 kcal/day. Not medical advice — consult a doctor if you have a condition or are pregnant/breastfeeding.'
+      src: 'Basis: median BMI {m} of {g} participants measured at National Fitness 100 centers in Korea ({n} records) × your height². Converted from the BMI median, not height-specific raw data. Weight categories follow the Korean Society for the Study of Obesity guideline (2022). Uses 1 kg ≈ 7,700 kcal, spread over 12 weeks and capped at 500 kcal/day. Not a medical diagnosis — consult a doctor if you have a condition or are pregnant/breastfeeding.'
     }
   };
   function lang() { return /^en/i.test(document.documentElement.lang || '') ? 'en' : 'ko'; }

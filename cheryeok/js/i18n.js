@@ -142,12 +142,12 @@
     'pct.weakTag': 'Candidate to work on first',
     'pct.valLow': 'Lower value', 'pct.valHigh': 'Higher value',
     'pct.weaker': 'Weaker than peers', 'pct.stronger': 'Stronger than peers',
-    'pct.mine': 'You <b>{v}</b> · peer median {m}',
+    'pct.mine': 'Yours <b>{v}</b> · peer median {m}',
     'pct.medianTitle': 'Peer median',
     'pct.center': 'Peer median',
     'tgt.top': 'You’re already estimated at Grade 1. The goal is to keep your current level.',
     'tgt.intro': '<strong>{label} targets vs. your values</strong> — your lowest item decides the grade, so aim to pass every item in the table.',
-    'tgt.item': 'Item', 'tgt.mine': 'You', 'tgt.cut': '{label} cutoff', 'tgt.gap': 'Change needed',
+    'tgt.item': 'Item', 'tgt.mine': 'Yours', 'tgt.cut': '{label} cutoff', 'tgt.gap': 'Change needed',
     'tgt.met': 'Met',
     'tgt.less': '−{v}', 'tgt.more': '+{v}',
     'tgt.atMost': '≤ {v}', 'tgt.atLeast': '≥ {v}',
@@ -175,7 +175,7 @@
     'weak.videoLink': '{title} (Korean video{len})',
     'weak.videoLen': ', {s} s',
     'weak.tool': ' <small>· You’ll need: {tool}</small>',
-    'weak.facBtn': 'Show facilities for this',
+    'weak.facBtn': 'Show facilities for these exercises',
     'weak.src': 'Prescribed exercises: {src} ({n} records). Exercise names translated by TrendX from KSPO prescription records. Measurement videos: {vsrc} (provided by KSPO){mock}. If you have a medical condition or pain, talk to a doctor before you start exercising.',
     'mock.suffix': ' · sample data',
     'chip.all': 'All',
@@ -189,7 +189,7 @@
     'map.gestureWin': 'Use Ctrl + scroll to zoom the map',
     'map.gestureMac': 'Use ⌘ + scroll to zoom the map',
     'opt.select': 'Select',
-    'loc.sggClick': 'District center: {name}',
+    'loc.sggClick': 'City/district center: {name}',
     'loc.sgg': 'From the center of {name}',
     'loc.geo': 'From your location (near {name})',
     'loc.lead': '{label} · nearest first. Facilities without a location are not on the map.',
@@ -224,8 +224,8 @@
     'btn.demo': 'Don’t know your results? See an example',
     'step1.h': 'Tell us about yourself',
     'step1.lead': 'Age and sex are enough. Add only the test results you know.',
-    'age.label': 'Age <span class="unit">(in full years, 19+)</span>',
-    'sex.label': 'Sex to compare with',
+    'age.label': 'Age <span class="unit">(19 or older)</span>',
+    'sex.label': 'Sex (for peer comparison)',
     'sex.m': 'Male',
     'sex.f': 'Female',
     'items.legend': 'Fitness test results <span class="unit">(optional — only what you know)</span>',
@@ -255,7 +255,7 @@
     'cx.h': 'After your fitness check — manage meals, weight and exercise with CaloryX',
     'cx.lead': 'This site shows <strong>where your fitness stands among people your age</strong>. For the everyday part — <strong>meals, weight and exercise</strong> — you can log and manage it with <strong>CaloryX</strong>, an app made by TrendX.',
     'cx.meal.h': '🍱 Meals',
-    'cx.meal.list': '<li>Snap one photo of your food to get calories, protein, carbs and fat</li><li>A full table is split dish by dish; adjust portions in 0.1-serving steps</li><li>Food search (barcodes, chains, convenience stores — Korean food safety nutrition data)</li><li>Ask the AI nutrition coach “What should I eat?”</li>',
+    'cx.meal.list': '<li>Snap one photo of your food to get calories, protein, carbs and fat</li><li>A full spread is analyzed dish by dish; adjust portions in 0.1-serving steps</li><li>Food search (barcodes, chains, convenience stores — nutrition data from Korea’s Ministry of Food and Drug Safety)</li><li>Ask the AI nutrition coach “What should I eat?”</li>',
     'cx.move.h': '🚴 Exercise',
     'cx.move.list': '<li>GPS tracking for walks, runs, hikes and bike rides</li><li>Replay your route on a 3D map and save it as a video</li><li>Elevation and speed charts and videos</li><li>Workout photos with your stats on them; calories burned shown as food</li>',
     'cx.weight.h': '⚖️ Weight',
@@ -265,11 +265,12 @@
     'cx.route.cap': 'Route video — your ride redrawn on a 3D map',
     'cx.elev.aria': 'CaloryX elevation and speed video',
     'cx.elev.cap': 'Elevation and speed video — climbs and fast stretches at a glance',
-    'cx.proof.alt': 'CaloryX workout photo showing 4.07 km, 22:56, average 10.7 km/h and 85 kcal over a photo of the Han River',
+    'cx.proof.alt': 'CaloryX workout photo showing 4.07 km, 22 min 56 s, average 10.7 km/h and 85 kcal over a photo of the Han River',
     'cx.proof.cap': 'Workout photo — distance, time, speed and calories on your own photo',
     'cx.meal.alt': 'CaloryX screen analyzing a chicken breast brown-rice fried rice and cabbage salad lunch box: 480 kcal, protein 36 g, carbs 62 g, fat 10 g',
     'cx.meal.cap': 'Meal analysis — calories, protein, carbs and fat from one photo',
     'cx.store.h': 'Store screenshots',
+    'cx.galKo.aria': 'CaloryX App Store screenshots (Korean), 6 images — scroll sideways',
     'cx.ios': 'Get it on the App Store',
     'cx.android': 'Get it on Google Play',
     'cx.note': 'CaloryX requires sign-in, and every feature is free for the first 7 days after you install it. After that, photo calorie analysis, workout videos, workout photos, the weekly report and the monthly recap need a subscription (prices are shown in the store); GPS workout tracking, weight trends, food search and the AI coach stay free. Calorie and nutrition figures in CaloryX are AI estimates, not medical information. Nothing you enter on this site is sent to CaloryX.',
@@ -288,10 +289,10 @@
     f012: { label: 'Sit-and-reach', unit: 'cm' },
     f022: { label: 'Standing long jump', unit: 'cm' },
     f010: { label: 'Repeated jumps (반복점프)', unit: 'reps' },
-    f020: { label: 'Shuttle run', unit: 'laps' },   // 거리는 뺐다 — 공단 측정 영상 제목은 '15m', API 명세는 거리 없음(검토 필요)
+    f020: { label: '20 m shuttle run', unit: 'laps' },   // 성인 측정 항목 원문 「왕복오래달리기(20m)」(국민체력100 측정 항목, 2026-10-01 확인)
     f024: { label: '6-minute walk', unit: 'm' },
     f023: { label: 'Chair stand', unit: 'reps' },
-    f025: { label: '2-minute step-in-place', unit: 'steps' },
+    f025: { label: '2-minute step test (marching in place)', unit: 'steps' },
     f018: { label: 'BMI', unit: 'kg/m²' }
   };
   var HINT_EN = {
@@ -318,7 +319,7 @@
     '윗몸 일으키기': 'Sit-ups',
     '전완대고 버티기': 'Forearm plank',
     '넙다리 뒤쪽 스트레칭': 'Hamstring stretch',
-    '엉덩이 스트레칭': 'Hip and glute stretch',
+    '엉덩이 스트레칭': 'Glute stretch',
     '넙다리 안쪽 스트레칭': 'Inner-thigh stretch',
     '하지 루틴 스트레칭2': 'Lower-body stretching routine 2',
     '요가 및 필라테스 루틴프로그램': 'Yoga and Pilates routine',
@@ -341,12 +342,12 @@
     '한발 연속 뛰기': 'Single-leg hops',
     '한발 서서 균형잡기': 'Single-leg stand',
     '균형 걷기': 'Balance walk',
-    '의자 잡고 후방으로 한발 뻗어 들기': 'Rear leg raises holding a chair'
+    '의자 잡고 후방으로 한발 뻗어 들기': 'Standing back leg raises (holding a chair)'
   };
   var FTYPE_EN = {
     '1': 'Small sports ground (간이운동장)', '2': 'Other facility', '3': 'All-weather gateball court', '4': 'Soccer field',
-    '5': 'Community gym', '6': 'Tennis court', '7': 'Swimming pool', '8': 'Indoor ball-sports gym',
-    '9': 'Other (fitness center)', '10': 'Baseball field', '11': 'Futsal court', '12': 'Traditional archery range (gukgung)',
+    '5': 'Community sports center', '6': 'Tennis court', '7': 'Swimming pool', '8': 'Indoor ball-sports gymnasium',
+    '9': 'Fitness center (other sports facility)', '10': 'Baseball field', '11': 'Futsal court', '12': 'Traditional archery range (gukgung)',
     '13': 'Park golf course', '14': 'Athletics stadium', '15': 'Roller skating rink', '16': 'Golf driving range',
     '17': 'Ssireum (Korean wrestling) ring', '18': 'Outdoor climbing wall', '19': 'Golf course', '20': 'Combat sports gym',
     '21': 'Ice rink', '22': 'Shooting range', '23': 'Archery range', '24': 'Hockey field',
@@ -354,9 +355,9 @@
     '29': 'Cycling track', '30': 'Cross-country course', '31': 'Ski jump', '32': 'Biathlon range'
   };
   var SIDO_EN = {
-    '11': 'Seoul', '12': 'Jeonnam-Gwangju (전남광주)', '26': 'Busan', '27': 'Daegu', '28': 'Incheon', '29': 'Gwangju', '30': 'Daejeon',
-    '31': 'Ulsan', '36': 'Sejong', '41': 'Gyeonggi', '42': 'Gangwon', '43': 'North Chungcheong', '44': 'South Chungcheong',
-    '45': 'Jeonbuk', '46': 'South Jeolla', '47': 'North Gyeongsang', '48': 'South Gyeongsang', '50': 'Jeju', '51': 'Gangwon', '52': 'Jeonbuk'
+    '11': 'Seoul', '12': 'Jeonnam-Gwangju', '26': 'Busan', '27': 'Daegu', '28': 'Incheon', '29': 'Gwangju', '30': 'Daejeon',
+    '31': 'Ulsan', '36': 'Sejong', '41': 'Gyeonggi', '42': 'Gangwon State', '43': 'North Chungcheong', '44': 'South Chungcheong',
+    '45': 'Jeonbuk State', '46': 'South Jeolla', '47': 'North Gyeongsang', '48': 'South Gyeongsang', '50': 'Jeju', '51': 'Gangwon State', '52': 'Jeonbuk State'
   };
   var TOOL_EN = {
     '줄자': 'a tape measure', '인바디 측정기': 'a body composition analyzer (InBody)', '악력계': 'a grip dynamometer',

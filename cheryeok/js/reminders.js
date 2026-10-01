@@ -32,7 +32,7 @@
       title: 'Healthy-habit reminders',
       lead: 'Get a phone reminder at the times you choose, every day. Turn each one on or off and change its time.',
       items: {
-        morning: { name: 'Morning stretch', title: '🌅 Good morning! Time for a 10-minute stretch', body: 'Reach up high~ waking your body gently makes the whole day lighter :)' },
+        morning: { name: 'Morning stretch', title: '🌅 Good morning! Time for a 10-minute stretch', body: 'Stretch up tall! Waking your body gently makes the whole day feel easier :)' },
         water: { name: 'Lunchtime water', title: '💧 Take a sip of water :)', body: 'Gulp gulp~ staying hydrated keeps your afternoon focus sharp' },
         move: { name: 'Evening workout', title: '🏃 Shall we get moving today?', body: 'Just a 30-minute walk is plenty! Public sports facilities nearby are waiting ✨' },
         night: { name: 'Bedtime relax', title: '🌙 You did great today', body: 'Before bed, take a moment to relax with meditation and stretching :)' }
