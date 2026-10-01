@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 체력, 우리 동네 기준으로 — 국민체력100 또래 비교와 인근 공공체육시설</title>
+<meta name="description" content="나이·성별과 체력 측정값을 넣으면 국민체력100 측정 참가자 또래 중 내 위치(백분위)를 보여 주고, 약한 항목을 기를 수 있는 동네 공공체육시설을 지도에 띄웁니다. 입력값은 이 기기 밖으로 나가지 않습니다.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="내 체력, 우리 동네 기준으로">
+<meta property="og:description" content="국민체력100 측정 참가자 또래 100명 중 내 자리를 보고, 약한 항목을 기를 동네 공공체육시설을 찾습니다. 설치·가입 없음, 입력값은 기기 밖으로 나가지 않습니다.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e7c86'/%3E%3Crect x='6' y='14' width='20' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='20' cy='16.5' r='4.5' fill='%23fff' stroke='%230e7c86' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>내 체력, 우리 동네 기준으로</h1>
+    <p>나이·성별과 아는 측정값만 넣으면 <strong>국민체력100 측정 참가자 또래 중 내 자리</strong>를 보여 주고, 약한 항목을 기를 수 있는 <strong>동네 공공체육시설</strong>을 찾아 드립니다.</p>
+  </header>
+
+  <div id="banner"></div>
+
+  <div class="notice" role="note">
+    <span aria-hidden="true">ⓘ</span>
+    <div>
+      <strong>이 서비스는 체력 수준을 참고로 비교해 보는 도구이며 의료기기가 아닙니다.</strong> 질병의 진단·치료·예방을 목적으로 하지 않습니다.
+      입력한 값은 브라우저 안에서만 계산되며 <strong>이 기기 밖으로 나가지 않습니다.</strong>
+    </div>
+  </div>
+
+  <!-- 앱 연동(embed) 진입 시에만 보인다: 받은 값 요약 + 측정값 넣기 -->
+  <div class="embed-bar" id="embed-bar" role="status" hidden></div>
+
+  <div class="howto" role="note" aria-label="이렇게 써 보세요">
+    <strong>이렇게 써 보세요</strong>
+    <ol>
+      <li>나이·성별을 넣고, 아는 측정값만 넣습니다(없어도 됩니다)</li>
+      <li>"또래 중 내 자리 보기"를 누르면 항목별로 100명 중 몇 등인지, 예상 인증 등급, 먼저 기를 항목이 나옵니다</li>
+      <li>내 위치나 지역을 고르면 그 운동이 되는 가까운 공공체육시설이 지도에 뜹니다</li>
+    </ol>
+    <button type="button" class="btn btn-primary" id="btn-demo">측정값을 몰라요 — 예시로 바로 보기</button>
+  </div>
+
+  <!-- ① 입력 -->
+  <section class="step" id="step1" aria-labelledby="h-step1">
+    <div class="step-head"><span class="step-num" aria-hidden="true">1</span><h2 id="h-step1">나에 대해 알려 주세요</h2></div>
+    <p class="lead">나이와 성별만 넣어도 됩니다. 측정값은 아는 것만 넣으세요.</p>
+    <form id="form" novalidate>
+      <div class="grid">
+        <div class="field">
+          <label for="age">나이 <span class="unit">(만, 19세 이상)</span></label>
+          <input id="age" name="age" type="number" inputmode="numeric" min="19" max="120" autocomplete="off" required>
+          <div class="hint" id="age-hint"></div>
+        </div>
+        <div class="field">
+          <span class="visually-hidden" id="sex-label">측정 기준 성별</span>
+          <label for="sex-m" style="margin-bottom:0">측정 기준 성별</label>
+          <div class="seg" role="radiogroup" aria-labelledby="sex-label">
+            <label><input type="radio" name="sex" id="sex-m" value="M" required><span>남성</span></label>
+            <label><input type="radio" name="sex" id="sex-f" value="F"><span>여성</span></label>
+          </div>
+          <div class="hint" id="sex-hint"></div>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>체력 측정값 <span class="unit">(선택 — 아는 것만)</span></legend>
+        <p class="legend-sub" id="items-sub">나이를 넣으면 그 연령대에서 측정하는 항목이 나타납니다.</p>
+        <div class="grid" id="items"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>몸 정보 <span class="unit">(선택 — 상대악력·체질량지수 계산용)</span></legend>
+        <div class="grid">
+          <div class="field"><label for="height">신장 <span class="unit">cm</span></label><input id="height" type="number" inputmode="decimal" min="100" max="250" step="0.1"><div class="hint"></div></div>
+          <div class="field"><label for="weight">체중 <span class="unit">kg</span></label><input id="weight" type="number" inputmode="decimal" min="20" max="300" step="0.1"><div class="hint"></div></div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="btn-go">또래 중 내 자리 보기</button>
+        <button type="button" class="btn btn-secondary" id="btn-noinput">측정값 없이 보기</button>
+        <button type="button" class="btn btn-text" id="btn-example">예시 값 채우기</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ② 내 위치 -->
+  <section class="step" id="step2" hidden aria-labelledby="h-step2">
+    <div class="step-head"><span class="step-num" aria-hidden="true">2</span><h2 id="h-step2">또래 중 내 자리</h2></div>
+    <p class="basis" id="basis"></p>
+    <ul class="result-list" id="results"></ul>
+  </section>
+
+  <!-- AI 예상 인증 등급 -->
+  <section class="step" id="stepai" hidden aria-labelledby="h-stepai">
+    <div class="step-head"><span class="step-num" aria-hidden="true">AI</span><h2 id="h-stepai">지금 센터에 가면 받을 예상 인증 등급</h2></div>
+    <p class="lead" id="ai-lead"></p>
+    <div id="ai-grade"></div>
+    <div id="ai-targets"></div>
+    <div id="ai-whatif"></div>
+    <p class="src" id="ai-src"></p>
+  </section>
+
+  <!-- ③ 약한 항목 -->
+  <section class="step" id="step3" hidden aria-labelledby="h-step3">
+    <div class="step-head"><span class="step-num" aria-hidden="true">3</span><h2 id="h-step3">먼저 기를 항목</h2></div>
+    <div id="weak"></div>
+    <p class="src" id="weak-src"></p>
+  </section>
+
+  <!-- ④ 갈 곳 -->
+  <section class="step" id="step4" hidden aria-labelledby="h-step4">
+    <div class="step-head"><span class="step-num" aria-hidden="true">4</span><h2 id="h-step4">가까운 공공체육시설</h2></div>
+    <p class="lead" id="map-lead">내 위치를 쓰거나 지역을 고르세요. 폐업·삭제된 시설은 뺐고, 위치가 없는 시설은 지도에 없습니다.</p>
+    <div class="loc-row">
+      <button type="button" class="btn btn-secondary" id="btn-geo">내 위치 사용</button>
+      <div class="field"><label for="sel-sido">시·도</label><select id="sel-sido"><option value="">선택</option></select></div>
+      <div class="field"><label for="sel-sgg">시·군·구</label><select id="sel-sgg" disabled><option value="">선택</option></select></div>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="시설 유형 필터"></div>
+    <div id="map"><div class="map-fallback" id="map-fallback">지도를 준비하고 있습니다…</div></div>
+    <ul class="fac-list" id="fac-list"></ul>
+    <p class="src" id="fac-src"></p>
+  </section>
+
+  <footer>
+    <p id="foot-sources"></p>
+    <p>데이터: 공공데이터포털 서울올림픽기념국민체육진흥공단 공공데이터(국민체력100 체력인증센터 측정결과 · 공공체육시설 상세 정보 · 국민체력100 동영상 정보). 백분위는 국민체력100 체력인증센터 측정 참가자 표본 기준이며 국민 전체 표본이 아닙니다.</p>
+    <p>지도: <a href="https://openfreemap.org" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" rel="noopener">OpenMapTiles</a> · Data from <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> · MapLibre GL JS (BSD-3)</p>
+    <p>2026 국민체육진흥공단 공공데이터 활용 경진대회 출품작 · 운영 트렌드 엑스(TrendX)</p>
+  </footer>
+</div>
+
+<script src="js/percentile.js"></script>
+<script src="js/map.js"></script>
+<script src="js/grade.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

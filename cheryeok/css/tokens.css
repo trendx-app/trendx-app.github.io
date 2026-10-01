@@ -1,0 +1,78 @@
+/* cheryeok 디자인 토큰 — 단일 진실 원천. 컴포넌트는 이 변수만 참조한다. */
+:root {
+  /* 색 (라이트) — 심폐·신체 데이터 서비스: 조용한 바탕, 강조 1색(teal) */
+  --c-bg: #f6f7f9;
+  --c-surface: #ffffff;
+  --c-surface-2: #eef1f4;
+  --c-text: #17202a;
+  --c-text-2: #4b5563;
+  --c-text-3: #6b7280;
+  --c-border: #d9dee5;
+  --c-primary: #0e7c86;      /* 대비 4.5:1 이상 on white */
+  --c-primary-2: #0b5f67;
+  --c-on-primary: #ffffff;
+  --c-primary-soft: #d9f0f2;
+  --c-track: #e3e8ee;
+  --c-good: #1f7a3a;
+  --c-warn: #a15c00;
+  --c-danger: #b42318;
+  --c-on-warn: #ffffff;
+  --c-on-danger: #ffffff;
+  --c-info: #1d4ed8;
+  --c-focus: #1d4ed8;
+
+  /* 간격 4/8 그리드 */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+
+  /* 타이포 */
+  --f-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --f-12: 12px; --f-14: 14px; --f-16: 16px; --f-18: 18px; --f-20: 20px; --f-24: 24px; --f-30: 30px; --f-36: 36px;
+  --lh-tight: 1.25; --lh-body: 1.55;
+  --w-regular: 400; --w-medium: 500; --w-bold: 700;
+
+  /* 곡률 */
+  --r-4: 4px; --r-8: 8px; --r-12: 12px; --r-16: 16px; --r-full: 999px;
+
+  /* 그림자 단계 */
+  --e-0: none;
+  --e-1: 0 1px 2px rgba(23, 32, 42, .06);
+  --e-2: 0 4px 12px rgba(23, 32, 42, .08);
+
+  /* 모션 — 절제 등급 */
+  --m-fast: 150ms; --m-base: 250ms; --m-slow: 350ms;
+  --m-ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* 터치 */
+  --tap-min: 44px;
+  --content-max: 720px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #0f1418;
+    --c-surface: #171d23;
+    --c-surface-2: #1f272f;
+    --c-text: #eef2f6;
+    --c-text-2: #c3cbd5;
+    --c-text-3: #98a2ae;
+    --c-border: #2c3641;
+    --c-primary: #5fd0d9;
+    --c-primary-2: #8be0e7;
+    --c-on-primary: #08262a;
+    --c-primary-soft: #113b40;
+    --c-track: #2a343e;
+    --c-good: #5fcf80;
+    --c-warn: #f2b76b;
+    --c-danger: #ff8a80;
+    --c-on-warn: #1a1200;      /* 대비: 다크 warn 위 흰 글자는 1.8:1 이라 어두운 글자로 */
+    --c-on-danger: #2a0400;
+    --c-info: #8ab4ff;
+    --c-focus: #8ab4ff;
+    --e-1: 0 1px 2px rgba(0, 0, 0, .4);
+    --e-2: 0 4px 12px rgba(0, 0, 0, .5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --m-fast: 0ms; --m-base: 0ms; --m-slow: 0ms; }
+}
