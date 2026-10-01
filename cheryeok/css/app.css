@@ -229,3 +229,5 @@ html[lang="en"] body { word-break: keep-all; overflow-wrap: break-word; }
 #rem-note { font-size: var(--f-14); color: var(--c-text-2); }
 /* 푸터 — 만든 곳의 앱 소개(스토어 링크는 누르기 쉽게 44px) */
 .foot-app a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-1); }
+/* 새 칸은 어절 단위로 줄바꿈(「체 / 중」처럼 낱말 중간에서 끊기지 않게) */
+#stepw, #steprem, .foot-app { word-break: keep-all; overflow-wrap: anywhere; }
