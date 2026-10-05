@@ -41,7 +41,7 @@ a{color:var(--brand)}
   <header>
     <div class="logo">🏠</div>
     <h1>집운 개인정보처리방침</h1>
-    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 9월 24일(3-1항 광고 식별자 — iOS 추적 허용 시 IDFA·Android 광고 ID 를 Meta 에 전달, 5항·영문 요약 갱신)</p>
+    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 10월 5일(1·2·5·6항 — 손금 보기의 손 사진 전송·기기 보관·삭제, 영문 요약 갱신)</p>
   </header>
 
   <p>집운(Jibwoon, 이하 “앱”)은 이용자의 개인정보를 소중히 여기며, 필요한 최소한의 정보만 다룹니다.
@@ -49,25 +49,31 @@ a{color:var(--brand)}
 
   <h2>1. 수집·이용하는 정보</h2>
   <table>
-    <tr><th>항목</th><td>생년월일, 태어난 시간(선택), 성별, 이용자가 등록한 가족·친구의 이름(별명)과 생년월일</td></tr>
+    <tr><th>항목</th><td>생년월일, 태어난 시간(선택), 성별, 이용자가 등록한 가족·친구의 이름(별명)과 생년월일, 손금 보기를 쓸 때 고른 손 사진과 그 결과</td></tr>
     <tr><th>이용 목적</th><td>사주 오행 분석, 본명괘·길방 계산, 오늘의 운세 및 인테리어 추천 제공</td></tr>
     <tr><th>보관 위치</th><td><strong>이용자 기기 내부 저장소에만</strong> 보관합니다. 개발사 서버로 전송·수집하지 않습니다.</td></tr>
     <tr><th>보관 기간</th><td>이용자가 앱에서 삭제하거나 앱을 삭제하면 즉시 함께 삭제됩니다.</td></tr>
   </table>
 
   <h2>2. AI 기능 이용 시</h2>
-  <p>다음 세 기능은 Google의 <strong>Gemini API</strong>로 글을 만듭니다. 이용자가 <strong>그 기능을 쓸 때에 한해</strong> 아래 정보가 전송됩니다.</p>
+  <p>다음 네 기능은 Google의 <strong>Gemini API</strong>로 글을 만듭니다. 이용자가 <strong>그 기능을 쓸 때에 한해</strong> 아래 정보가 전송됩니다.</p>
   <ul>
     <li><strong>AI 터 분석</strong> — 이용자가 입력한 주소</li>
     <li><strong>운세 풀이</strong>(결과를 열 때 문장을 다듬음) — 그 풀이의 제목과 문장</li>
     <li><strong>지비에게 물어보기</strong> — 이용자가 쓴 질문</li>
+    <li><strong>손금 보기</strong> — 이용자가 찍거나 고른 <strong>손바닥 사진 1장</strong>, 고른 손(왼손·오른손)과 관심사, 문장의 높임·성 표현을 맞추기 위한 성별.
+        사진은 보내기 전에 앱에서 크기를 줄이고 <strong>사진 속 위치(GPS)·촬영 정보 등 메타데이터를 지운 뒤</strong> 전송합니다.
+        다른 사람의 손을 찍을 때는 먼저 그 사람의 동의를 받아 주세요.</li>
   </ul>
-  <p>세 기능 모두 위 내용과 함께 <strong>사주 요약</strong>(생년월일로 계산한 사주 네 기둥, 일간, 오행 비율, 필요한 오행, 본명괘·길방, 오늘의 일진)이 함께 전송됩니다.
+  <p>네 기능 모두 위 내용과 함께 <strong>사주 요약</strong>(생년월일로 계산한 사주 네 기둥 또는 일간, 오행 비율, 필요한 오행, 본명괘·길방, 오늘의 일진 중 그 기능에 필요한 것)이 함께 전송됩니다.
      <strong>생년월일 원본·이름·연락처</strong>처럼 이용자를 식별할 수 있는 정보는 보내지 않습니다.</p>
   <ul>
-    <li>전송 경로: 앱 → 개발사의 중계 함수(Supabase Edge Function) → Google Gemini API. 중계 함수는 내용을 <strong>기록·저장하지 않습니다.</strong></li>
+    <li>전송 경로: 앱 → 개발사의 중계 함수(Supabase Edge Function) → Google Gemini API. 중계 함수는 내용(손 사진 포함)을 <strong>기록·저장하지 않습니다.</strong>
+        손금 보기는 하루 이용량 상한을 지키기 위해 <strong>날짜별 호출 횟수</strong>만 서버에 셉니다(사진·기기·IP 정보 없음).</li>
+    <li>Google 은 Gemini API 이용 약관에 따라 오남용 감시 등을 위해 요청을 한시적으로 보관할 수 있습니다 — <a href="https://ai.google.dev/gemini-api/terms">Gemini API 추가 서비스 약관</a></li>
     <li>처리 위탁: Google LLC (Gemini API) — <a href="https://policies.google.com/privacy">Google 개인정보처리방침</a></li>
-    <li>이 세 기능을 쓰지 않으면 이 항목의 정보는 외부로 전송되지 않습니다.</li>
+    <li>이 네 기능을 쓰지 않으면 이 항목의 정보는 외부로 전송되지 않습니다.</li>
+    <li>손금 결과와 그 사진은 <strong>이용자 기기에만</strong> 사람·손별 최근 1건이 저장되며, 결과 화면의 «이 손금 지우기», 프로필 재설정, 앱 삭제로 지워집니다. 기기 백업·기기 간 이전에는 포함되지 않습니다.</li>
   </ul>
 
   <h2>3. 광고</h2>
@@ -127,19 +133,20 @@ a{color:var(--brand)}
   <h2>5. 제3자 제공</h2>
   <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음뿐입니다.</p>
   <ul>
-    <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함</li>
+    <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담·손금 보기) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함(손금 보기는 손 사진 포함)</li>
     <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 앱 이용 이벤트 및 기기 정보, 그리고 광고 식별자(iOS 는 추적 허용 시에만). Meta 는 이를 다른 앱·사이트의 데이터와 결합해 광고 성과를 측정할 수 있습니다(App Store 기준 «추적»에 해당)</li>
     <li>3-4항의 <strong>무료 이용 기간 확인</strong>(Supabase 서버) — 변환된 기기 값과 최초 등록 시각</li>
     <li>3-5항의 <strong>앱 이용 통계</strong>(Google Analytics for Firebase) — 앱 이용 기록과 앱 인스턴스 ID</li>
   </ul>
   <p>생년월일 원본·성별·가족 및 친구 정보·체크리스트·연속 기록 등 앱에 입력한 내용은
      <strong>외부로 전송되지 않으며</strong> 이용자의 기기 안에만 저장됩니다.
-     (2항의 AI 기능을 쓸 때 보내는 것은 생년월일로 계산한 사주 요약뿐입니다.)</p>
+     (2항의 AI 기능을 쓸 때 보내는 것은 생년월일로 계산한 사주 요약과 그 기능에 필요한 입력 — 주소·질문·손 사진 — 뿐입니다.)</p>
 
   <h2>6. 이용자의 권리</h2>
   <ul>
     <li>설정 화면의 ‘프로필 재설정’으로 저장된 정보를 언제든 삭제할 수 있습니다.</li>
-    <li>등록한 가족·친구 정보는 목록에서 개별 삭제할 수 있습니다.</li>
+    <li>등록한 가족·친구 정보는 목록에서 개별 삭제할 수 있습니다(그 사람의 손금 결과·사진도 함께 삭제).</li>
+    <li>손금 결과와 사진은 결과 화면의 «이 손금 지우기»로 언제든 삭제할 수 있습니다.</li>
     <li>앱을 삭제하면 기기에 저장된 모든 정보가 함께 삭제됩니다.</li>
   </ul>
 
@@ -159,10 +166,10 @@ a{color:var(--brand)}
   <details class="en">
     <summary>English summary</summary>
     <div>
-      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-09-24)</p>
+      <p><strong>Jibwoon Privacy Policy</strong> (effective 2026-08-29, last updated 2026-10-05)</p>
       <ul>
         <li>No account is required. Your birth date, birth time, gender, and the family/friend entries you add are stored <strong>only on your device</strong> and are never sent to our servers.</li>
-        <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result) and Ask Jibi (your question). Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them.</li>
+        <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result), Ask Jibi (your question) and Palm Reading (one palm photo you take or pick, the hand and topic you chose, and your gender so the text uses the right grammatical forms; the app shrinks the photo and strips its metadata — including GPS location — before sending, and the palm result and photo are kept only on your device, excluded from backups and device transfer, and can be deleted with “Delete this reading”). Please ask before photographing someone else’s hand. Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them (for Palm Reading it only counts the number of calls per day, with no photo, device or IP data). Google may retain requests for a limited time under the <a href="https://ai.google.dev/gemini-api/terms">Gemini API Additional Terms</a>, for example for abuse monitoring.</li>
         <li><strong>No ads</strong> from version 1.8.0 (September 2026). Earlier versions (1.7.x and below) showed Google AdMob rewarded ads only when you chose “Watch ad”; updating removes the ad SDK.</li>
         <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. From version 1.8.5 the advertising identifier is also shared with Meta for ad measurement: on iOS only after you tap “Allow” in the one-time tracking prompt (you can change it any time in Settings › Privacy › Tracking; every feature works the same either way), on Android the advertising ID (resettable in Settings › Google › Ads). Meta may combine it with data from other apps and sites, which Apple classifies as tracking. Versions 1.8.4 and below did not collect it. Nothing you enter in the app is sent.</li>
         <li><strong>Subscriptions and lifetime purchase</strong> are sold only through App Store / Google Play billing. Payment details are handled by the store; we never receive them.</li>
