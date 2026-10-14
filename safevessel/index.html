@@ -226,9 +226,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'llYzKGDbD+BmG2avp67YRQ==';
+  const SALT_B64 = 'unbvPm0Lv7VSfbcvrSGOTA==';
   const ITER = 600000;
-  const BUILD = 'e8c9557b0490';
+  const BUILD = 'b758246b492a';
   const KEY_STORE = 'sv-lock-key';
 
   /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
@@ -335,10 +335,21 @@
       base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
   }
 
+  /* SVL1 = 암호문 그대로 · SVL2 = 암호문 안이 gzip (큰 자료 — 실명 선박 31,790척 명부 등). */
   async function openSealed(buf) {
     const u8 = new Uint8Array(buf);
-    if (u8.length < 32 || String.fromCharCode(u8[0], u8[1], u8[2], u8[3]) !== 'SVL1') throw new Error('형식이 맞지 않습니다');
-    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8.subarray(4, 16) }, KEY, u8.subarray(16));
+    const magic = u8.length >= 32 ? String.fromCharCode(u8[0], u8[1], u8[2], u8[3]) : '';
+    if (magic !== 'SVL1' && magic !== 'SVL2') throw new Error('형식이 맞지 않습니다');
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8.subarray(4, 16) }, KEY, u8.subarray(16));
+    if (magic === 'SVL1') return plain;
+    if (typeof DecompressionStream === 'undefined') {
+      const err = new Error('이 브라우저는 압축 자료를 풀 수 없습니다 — Chrome/Edge 80 이상, Safari 16.4 이상으로 열어 주십시오.');
+      err.unsupported = true;
+      throw err;
+    }
+    const ds = new DecompressionStream('gzip');
+    const stream = new Blob([plain]).stream().pipeThrough(ds);
+    return new Response(stream).arrayBuffer();
   }
 
   async function loadBundle() {
@@ -352,7 +363,8 @@
 
   /* 앱은 fetch('data/이름.json') 으로 자료를 부른다 — 암호문(.enc)을 받아 풀어서 같은 모양으로 돌려준다. */
   function installFetch() {
-    const re = /(^|\/)data\/([A-Za-z0-9_-]+)\.json(?:[?#].*)?$/;
+    // 하위 폴더(data/named_detail/46890-0.json)도 같은 규칙 — 실명 선박 상세 조각(2026-10-14)
+    const re = /(^|\/)data\/([A-Za-z0-9_\-\/]+)\.json(?:[?#].*)?$/;
     window.fetch = async function (input, init) {
       const url = typeof input === 'string' ? input : (input && input.url) || '';
       const m = url.match(re);
