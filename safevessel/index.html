@@ -16,6 +16,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
 <title>SafeVessel — 담당자 로그인</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1.46 -2.05 39.04 39.04'  aria-label='정부상징 태극 문양'%3E %3Cg%3E %3Cpath d='M27.02 16.699a6.316 6.316 0 0 0-8.976 1.89 6.315 6.315 0 0 1-11.417-1.742v-.14a8.198 8.198 0 0 1-.327-2.513c0-5.662 5.81-11.962 14.179-11.962a15.944 15.944 0 0 1 14.723 10.111c0-.062 0-.124-.062-.194A18.037 18.037 0 0 0 .039 18.006c0 8.905 6.424 16.527 15.33 16.527a14.497 14.497 0 0 0 14.07-9.473A7.001 7.001 0 0 0 27.02 16.7Z' fill='%23003863'/%3E %3Cpath d='M35.295 12.724A15.905 15.905 0 0 0 20.44 2.232c-8.369 0-14.179 6.3-14.179 11.962-.022.85.088 1.697.327 2.513a5.344 5.344 0 0 1-.164-1.292c0-5.895 5.904-9.978 11.97-9.978a14.872 14.872 0 0 1 14.872 14.87 16.387 16.387 0 0 1-9.093 14.677 18.068 18.068 0 0 0 11.122-22.26Z' fill='%23E4032E'/%3E %3C/g%3E %3C/svg%3E">
 <style id="lockStyle">
@@ -211,7 +212,7 @@
     </div>
 
     <div class="lock__open">
-      <a class="lock__openbtn" href="open/">
+      <a class="lock__openbtn" href="/safevessel/open">
         <span aria-hidden="true">🌊</span>
         <span>
           <b>로그인 없이 해상위험정보 보기</b>
@@ -233,9 +234,12 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = 'E8zIA78XM9Twx6iYnnTsuA==';
+  const SALT_B64 = 'KDxO6P91Lv5cp5gASLtQXw==';
   const ITER = 600000;
-  const BUILD = 'c7c5e99c019e';
+  const BUILD = '935b7dd5a71f';
+  /* 사이트 기준 경로(빌드가 넣는다, 예 '/safevessel'). 회사 사이트(trendx-company.vercel.app)는 끝 슬래시를 떼어
+     /safevessel/ 이 /safevessel 로 열리므로 상대경로 자산이 전부 깨진다 → 자산 주소는 전부 여기서 시작한다(2026-10-14). */
+  const SITE_BASE = '/safevessel';
   const KEY_STORE = 'sv-lock-key';
 
   /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
@@ -297,7 +301,7 @@
   async function ensureFresh(reason) {
     let server = null;
     try {
-      const r = await nativeFetch('build.json?t=' + Date.now(), { cache: 'no-store' });
+      const r = await nativeFetch(SITE_BASE + '/build.json?t=' + Date.now(), { cache: 'no-store' });
       if (r.ok) server = (await r.json()).build || null;
     } catch (e) { return false; }          // 오프라인·차단 — 판단 보류, 지금 화면으로 진행
     if (!server || server === build) return false;
@@ -360,7 +364,7 @@
   }
 
   async function loadBundle() {
-    const res = await nativeFetch('app.bundle.enc?b=' + build, { cache: 'no-cache' });
+    const res = await nativeFetch(SITE_BASE + '/app.bundle.enc?b=' + build, { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     let plain;
@@ -376,7 +380,8 @@
       const url = typeof input === 'string' ? input : (input && input.url) || '';
       const m = url.match(re);
       if (!m) return nativeFetch(input, init);
-      const encUrl = url.replace(re, (all, pre, name) => pre + 'data/' + name + '.enc');
+      // 앱의 상대 주소('data/x.json')를 사이트 기준 절대 주소로 — 문서 주소가 /safevessel(슬래시 없음)이어도 맞게
+      const encUrl = url.replace(re, (all, pre, name) => SITE_BASE + '/data/' + name + '.enc');
       const res = await nativeFetch(encUrl + '?b=' + build, { cache: 'no-cache' });
       if (!res.ok) return new Response('', { status: res.status, statusText: res.statusText });
       const plain = await openSealed(await res.arrayBuffer());
@@ -410,7 +415,7 @@
       const w = window.open('', '_blank');
       try {
         if (w) w.document.write('<p style="font-family:system-ui;padding:24px">사용 설명서를 여는 중…</p>');
-        const res = await nativeFetch('manual/manual.enc?b=' + build, { cache: 'no-cache' });
+        const res = await nativeFetch(SITE_BASE + '/manual/manual.enc?b=' + build, { cache: 'no-cache' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const plain = await openSealed(await res.arrayBuffer());
         const url = URL.createObjectURL(new Blob([plain], { type: 'application/pdf' }));

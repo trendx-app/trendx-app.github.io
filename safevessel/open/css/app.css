@@ -763,3 +763,28 @@ transition: transform var(--dur) var(--ease);
 .foldcard[open] > summary::after { transform: rotate(180deg); }
 .foldcard > summary:hover { background: var(--surface-2); }
 .foldcard > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.al-item { padding: 12px 0; border-top: 1px solid var(--border); }
+.al-item:first-of-type { border-top: 0; padding-top: 0; }
+.al-card { display: block; width: 100%; max-width: 420px; height: auto; border-radius: 10px; border: 1px solid var(--border); }
+.al-text { white-space: pre-wrap; font: 12.5px/1.6 var(--sans); margin: 8px 0 0; color: var(--ink-2); }
+.kk-phone { max-width: 400px; margin: 0 auto; border: 1px solid var(--border-strong); border-radius: 22px; overflow: hidden;
+background: #abc1d1; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+.kk-top { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #fee500; color: #1a1a1a; font-weight: 700; }
+.kk-top__back { font-size: 22px; line-height: 1; }
+.kk-top__title { flex: 1; font-size: 15px; }
+.kk-top__badge { font-size: 11px; font-weight: 700; background: #1a1a1a; color: #fee500; border-radius: 6px; padding: 2px 6px; }
+.kk-chat { padding: 12px 12px 16px; display: grid; gap: 12px; }
+.kk-date { justify-self: center; font-size: 11.5px; color: #fff; background: rgba(0,0,0,.25); border-radius: 999px; padding: 3px 10px; }
+.kk-msg { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: start; }
+.kk-avatar { width: 36px; height: 36px; border-radius: 14px; background: #184f95; color: #fff; display: grid; place-items: center; font-weight: 800; }
+.kk-name { font-size: 12.5px; color: #1a1a1a; margin: 0 0 4px 2px; }
+.kk-tag { display: inline-block; font-size: 10.5px; background: #fff; color: #555; border: 1px solid rgba(0,0,0,.15); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+.kk-tag--brand { background: #fff4c2; border-color: #e9c84a; color: #6b4700; }
+.kk-bubble { background: #fff; color: #1a1a1a; border-radius: 4px 14px 14px 14px; padding: 10px 12px; max-width: 300px; box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+.kk-text { white-space: pre-wrap; font: 13px/1.55 var(--sans); margin: 0; }
+.kk-foot { margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,.12); }
+.kk-bubble--card { padding: 0; overflow: hidden; }
+.kk-img { display: block; width: 100%; height: auto; }
+.kk-cardtext { padding: 10px 12px; font-size: 13px; font-weight: 700; }
+.kk-btn { margin: 0 10px 10px; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 700; border-radius: 8px; background: #f2f3f5; color: #1a1a1a; }
+:root[data-theme="dark"] .kk-bubble, :root[data-theme="dark"] .kk-tag, :root[data-theme="dark"] .kk-btn { color: #1a1a1a; }
