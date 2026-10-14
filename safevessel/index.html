@@ -127,14 +127,21 @@
   @media (prefers-reduced-motion: reduce) { .lock__btn, .field input { transition: none; } .lock__btn:active { transform: none; } }
 
   .lock__open { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line, #e5e5e5); }
+/* ⚠️ 글자색을 inherit 로 두면 다크 모드에서 흰 글자가 밝은 배경(#f4f8fd) 위에 찍혀 안 보인다
+   (2026-10-14 회장님 지적). 배경과 글자색을 **항상 짝으로** 정한다. */
 .lock__openbtn { display: flex; align-items: center; gap: 10px; text-decoration: none;
   padding: 12px 14px; border-radius: 10px; border: 1px solid #cfd8e3; background: #f4f8fd;
-  color: inherit; transition: background .15s, border-color .15s; }
+  color: #0b1a2e; transition: background .15s, border-color .15s; }
 .lock__openbtn:hover { background: #e8f1fb; border-color: #9fbfe0; }
-.lock__openbtn b { display: block; font-size: 14px; }
-.lock__openbtn small { display: block; font-size: 11.5px; color: #5b6675; margin-top: 2px; }
+.lock__openbtn b { display: block; font-size: 14px; color: #0b1a2e; }
+.lock__openbtn small { display: block; font-size: 11.5px; color: #4a5565; margin-top: 2px; }
 .lock__openbtn > span:nth-child(1) { font-size: 20px; }
-.lock__arrow { margin-left: auto; font-size: 20px; color: #7a8796; }
+.lock__arrow { margin-left: auto; font-size: 20px; color: #5b6878; }
+:root[data-theme="dark"] .lock__openbtn { background: #1b2a3d; border-color: #35506e; color: #f2f6fb; }
+:root[data-theme="dark"] .lock__openbtn:hover { background: #22364e; border-color: #4a6a8e; }
+:root[data-theme="dark"] .lock__openbtn b { color: #f2f6fb; }
+:root[data-theme="dark"] .lock__openbtn small { color: #b8c6d6; }
+:root[data-theme="dark"] .lock__arrow { color: #b8c6d6; }
 .lock__foot { margin: 20px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); text-align: center; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
@@ -226,9 +233,9 @@
   'use strict';
 
   /* 빌드가 채운다 (tools/lock/build_locked.mjs). salt·반복횟수는 비밀이 아니다. */
-  const SALT_B64 = '9AvtZzIweQIIf4ciC1JxBw==';
+  const SALT_B64 = 'DabNKd3f2BVVKEjZpZlLYw==';
   const ITER = 600000;
-  const BUILD = '61ac78f93920';
+  const BUILD = '33e87cfadaff';
   const KEY_STORE = 'sv-lock-key';
 
   /* 위 세 값은 **빌드마다 바뀐다**(매일 자동 갱신). 브라우저가 옛 화면을 캐시에서 주면
