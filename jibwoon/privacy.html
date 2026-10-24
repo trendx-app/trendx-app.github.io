@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://trendx-company.vercel.app/jibwoon/privacy.html">
 <title>집운 — 개인정보처리방침</title>
 <meta name="description" content="집운(Jibwoon) 앱의 개인정보처리방침. 생년월일 등 입력 정보는 기기에만 저장됩니다.">
 <style>
@@ -41,7 +42,7 @@ a{color:var(--brand)}
   <header>
     <div class="logo">🏠</div>
     <h1>집운 개인정보처리방침</h1>
-    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 10월 9일(3-6·6항 — 유럽경제지역·영국·스위스 이용자의 측정 동의, 영문 요약 갱신)</p>
+    <p class="updated">시행일: 2026년 8월 29일 · 최종 개정: 2026년 10월 24일(3-1·3-5·3-6·6항 — 1.18.0부터 유럽경제지역·스위스는 이용 통계만 묻고, 유럽경제지역·영국·스위스에서는 Meta SDK 를 사용하지 않음, 영문 요약 갱신)</p>
   </header>
 
   <p>집운(Jibwoon, 이하 “앱”)은 이용자의 개인정보를 소중히 여기며, 필요한 최소한의 정보만 다룹니다.
@@ -90,6 +91,7 @@ a{color:var(--brand)}
         iOS 에서는 앱이 <strong>«추적 허용»을 한 번 묻고, 허용한 경우에만</strong> IDFA 를 씁니다(허용하지 않아도 모든 기능을 그대로 쓸 수 있고, 설정 › 개인정보 보호 › 추적에서 언제든 바꿀 수 있습니다).
         Android 에서는 광고 ID 를 쓰며, 설정 › Google › 광고에서 광고 ID 를 재설정하거나 삭제할 수 있습니다. 1.8.4 이하에서는 광고 식별자를 수집하지 않았습니다.</li>
     <li>목적: 광고를 통한 앱 설치 여부 확인(기여 측정)</li>
+    <li><strong>유럽경제지역(EEA)·영국·스위스에서는 Meta SDK 를 사용하지 않으며 이 정보를 전송하지 않습니다(앱 1.18.0 이상).</strong> 지역을 판단할 수 없을 때도 사용하지 않습니다.</li>
     <li>사주·생년월일·가족 정보 등 앱에 입력한 내용은 <strong>전송되지 않습니다.</strong></li>
   </ul>
 
@@ -123,18 +125,19 @@ a{color:var(--brand)}
     <li><strong>광고 식별자는 수집하지 않으며</strong>, 광고 개인화에 쓰지 않습니다.</li>
     <li>생년월일·이름·주소·질문 등 <strong>앱에 입력한 내용은 보내지 않습니다.</strong></li>
     <li>보관 기간: 14개월</li>
+    <li>설정 › 개인정보 설정 › <strong>«앱 이용 통계 보내기»</strong>를 끄면 수집하지 않습니다(어느 나라에서든). 유럽경제지역(EEA)·스위스에서는 처음 실행할 때 동의를 묻고, 동의한 경우에만 수집합니다(3-6).</li>
   </ul>
 
-  <h2>3-6. 유럽경제지역·영국·스위스 이용자의 동의</h2>
-  <p>유럽경제지역(EU 회원국·아이슬란드·리히텐슈타인·노르웨이)·영국·스위스에서는 <strong>1.16.0부터</strong> 앱을 처음 열 때
-     위 3-1(Meta 앱 설치 성과 측정)과 3-5(Google 앱 이용 통계)에 대한 동의를 <strong>목적별로 따로</strong> 묻습니다
-     («사용 통계(Google)»·«광고 측정(Meta)» — 처음에는 둘 다 꺼져 있고, «모두 허용»·«허용 안 함»·«선택한 대로 저장» 중에서 고릅니다).</p>
+  <h2>3-6. 유럽경제지역·영국·스위스 이용자</h2>
+  <p><strong>1.18.0부터</strong> 다음과 같이 바뀌었습니다(1.16.0~1.17.x 는 «사용 통계»·«광고 측정»을 목적별로 따로 물었습니다).</p>
   <ul>
-    <li>«사용 통계»를 허용하기 전이나 허용하지 않으면 Google Analytics(Firebase)를 실행하지 않습니다.</li>
-    <li>«광고 측정»을 허용하기 전이나 허용하지 않으면 Meta SDK 를 실행하지 않고, 광고 식별자를 쓰지 않으며, iOS «추적 허용» 창도 띄우지 않습니다.</li>
-    <li>허용하지 않아도 모든 기능을 똑같이 쓸 수 있고, <strong>설정 › 개인정보 설정</strong>에서 목적별로 언제든 바꾸거나 철회할 수 있습니다.</li>
-    <li>지역은 기기의 지역 설정·통신사 국가(Android)·App Store 국가(iOS)로 판단하며, 이 판단은 기기 안에서만 이뤄집니다.</li>
-    <li>처리 근거: 이용자의 동의(GDPR 제6조 1항 a호, UK GDPR 동일, 스위스 FADP).</li>
+    <li><strong>유럽경제지역(EU 회원국·아이슬란드·리히텐슈타인·노르웨이)·스위스</strong>: 앱을 처음 열 때 3-5(Google 앱 이용 통계)에 대한 동의를 한 번 묻습니다(«허용»·«허용 안 함»).
+        허용하기 전이나 허용하지 않으면 Google Analytics(Firebase)를 실행하지 않습니다. 1.17.x 이하에서 이미 고른 답은 그대로 이어집니다.</li>
+    <li><strong>유럽경제지역·영국·스위스</strong>: 3-1(Meta 앱 설치 성과 측정) SDK 를 <strong>실행하지 않습니다</strong> — 광고 식별자를 쓰지 않고, iOS «추적 허용» 창도 띄우지 않습니다. 이전 버전에서 «광고 측정»을 허용했어도 마찬가지입니다.</li>
+    <li><strong>영국</strong>의 앱 이용 통계는 다른 나라와 같습니다(처음부터 켜져 있고, 설정에서 언제든 끌 수 있습니다).</li>
+    <li>허용하지 않아도 모든 기능을 똑같이 쓸 수 있고, <strong>설정 › 개인정보 설정 › «앱 이용 통계 보내기»</strong>에서 언제든 바꾸거나 철회할 수 있습니다. 고른 값과 시각은 기기에만 저장합니다.</li>
+    <li>지역은 기기의 지역 설정·통신사 국가·시간대(Android)와 기기 지역·App Store 국가·시간대(iOS)로 판단하며, 이 판단은 기기 안에서만 이뤄집니다.</li>
+    <li>처리 근거: 이용자의 동의(GDPR 제6조 1항 a호, 스위스 FADP).</li>
   </ul>
 
   <h2>4. 제휴 링크(쿠팡 파트너스)</h2>
@@ -146,7 +149,7 @@ a{color:var(--brand)}
   <p>앱은 이용자의 개인정보를 제3자에게 <strong>판매하지 않습니다.</strong> 외부로 나가는 정보는 다음뿐입니다.</p>
   <ul>
     <li>2항의 <strong>AI 기능</strong>(터 분석·운세 풀이·지비 상담·손금 보기) 위탁(Google Gemini) — 이용자가 그 기능을 쓸 때만, 사주 요약 포함(손금 보기는 손 사진 포함)</li>
-    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta) — 앱 이용 이벤트 및 기기 정보, 그리고 광고 식별자(iOS 는 추적 허용 시에만). Meta 는 이를 다른 앱·사이트의 데이터와 결합해 광고 성과를 측정할 수 있습니다(App Store 기준 «추적»에 해당)</li>
+    <li>3-1항의 <strong>설치 성과 측정</strong>(Meta, 유럽경제지역·영국·스위스 제외) — 앱 이용 이벤트 및 기기 정보, 그리고 광고 식별자(iOS 는 추적 허용 시에만). Meta 는 이를 다른 앱·사이트의 데이터와 결합해 광고 성과를 측정할 수 있습니다(App Store 기준 «추적»에 해당)</li>
     <li>3-4항의 <strong>무료 이용 기간 확인</strong>(Supabase 서버) — 변환된 기기 값과 최초 등록 시각</li>
     <li>3-5항의 <strong>앱 이용 통계</strong>(Google Analytics for Firebase) — 앱 이용 기록과 앱 인스턴스 ID</li>
   </ul>
@@ -160,7 +163,7 @@ a{color:var(--brand)}
     <li>등록한 가족·친구 정보는 목록에서 개별 삭제할 수 있습니다(그 사람의 손금 결과·사진도 함께 삭제).</li>
     <li>손금 결과와 사진은 결과 화면의 «이 손금 지우기»로 언제든 삭제할 수 있습니다.</li>
     <li>앱을 삭제하면 기기에 저장된 모든 정보가 함께 삭제됩니다.</li>
-    <li>유럽경제지역·영국·스위스 이용자는 측정 동의를 설정에서 언제든 철회할 수 있으며, 개인정보 열람·정정·삭제·처리 제한·이의 제기 권리와
+    <li>앱 이용 통계는 설정에서 언제든 끌 수 있습니다. 유럽경제지역·영국·스위스 이용자는 개인정보 열람·정정·삭제·처리 제한·이의 제기 권리와
         감독기관에 민원을 낼 권리가 있습니다. 아래 문의처로 요청해 주세요.</li>
   </ul>
 
@@ -185,8 +188,8 @@ a{color:var(--brand)}
         <li>No account is required. Your birth date, birth time, gender, and the family/friend entries you add are stored <strong>only on your device</strong> and are never sent to our servers.</li>
         <li><strong>AI features</strong> use Google’s Gemini API, only when you use them: AI Site Reading (the address you type), reading polish (the reading’s title and lines, when you open a result), Ask Jibi (your question) and Palm Reading (one palm photo you take or pick, the hand and topic you chose, and your gender so the text uses the right grammatical forms; the app shrinks the photo and strips its metadata — including GPS location — before sending, and the palm result and photo are kept only on your device, excluded from backups and device transfer, and can be deleted with “Delete this reading”). Please ask before photographing someone else’s hand. Each request also carries a chart summary computed from your birth date (four pillars, day master, element ratios, Kua and lucky directions, today’s pillar). Your raw birth date, name and contact details are never sent. Requests pass through our relay function (Supabase Edge Function), which does not log or store them (for Palm Reading it only counts the number of calls per day, with no photo, device or IP data). Google may retain requests for a limited time under the <a href="https://ai.google.dev/gemini-api/terms">Gemini API Additional Terms</a>, for example for abuse monitoring.</li>
         <li><strong>No ads</strong> from version 1.8.0 (September 2026). Earlier versions (1.7.x and below) showed Google AdMob rewarded ads only when you chose “Watch ad”; updating removes the ad SDK.</li>
-        <li><strong>Install measurement:</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. From version 1.8.5 the advertising identifier is also shared with Meta for ad measurement: on iOS only after you tap “Allow” in the one-time tracking prompt (you can change it any time in Settings › Privacy › Tracking; every feature works the same either way), on Android the advertising ID (resettable in Settings › Google › Ads). Meta may combine it with data from other apps and sites, which Apple classifies as tracking. Versions 1.8.4 and below did not collect it. Nothing you enter in the app is sent.</li>
-        <li><strong>EEA, UK and Switzerland (from version 1.16.0):</strong> the app asks for your consent the first time you open it, separately for each purpose — “Usage statistics (Google)” and “Ad measurement (Meta)”; both start switched off and you choose “Allow all”, “Don’t allow” or “Save my choices”. Without usage-statistics consent Google Analytics (Firebase) is not started; without ad-measurement consent the Meta SDK is not started, no advertising identifier is used and the iOS tracking prompt is not shown. Every feature works the same either way, and you can change or withdraw each choice anytime in Settings › Privacy settings. Legal basis: consent (GDPR Art. 6(1)(a), UK GDPR, Swiss FADP). You also have the rights of access, rectification, erasure, restriction, objection and to lodge a complaint with a supervisory authority — contact us below.</li>
+        <li><strong>Install measurement (outside the EEA, the UK and Switzerland):</strong> the Meta (Facebook) SDK measures app installs and launches from our ads, using app events, device information and IP address. From version 1.8.5 the advertising identifier is also shared with Meta for ad measurement: on iOS only after you tap “Allow” in the one-time tracking prompt (you can change it any time in Settings › Privacy › Tracking; every feature works the same either way), on Android the advertising ID (resettable in Settings › Google › Ads). Meta may combine it with data from other apps and sites, which Apple classifies as tracking. Versions 1.8.4 and below did not collect it. Nothing you enter in the app is sent.</li>
+        <li><strong>EEA, UK and Switzerland (from version 1.18.0):</strong> in the EEA and Switzerland we ask first and collect usage statistics (Google Analytics for Firebase) only if you agree — “Allow” or “Don’t allow”; until you allow, Google Analytics is not started, and an answer you gave in version 1.16–1.17 carries over. In the EEA, the UK and Switzerland the Meta SDK is not used at all (no install measurement, no advertising identifier, no iOS tracking prompt), even if you allowed “Ad measurement” in an earlier version; it is also not used when the region cannot be determined. In the UK, usage statistics work as in other countries (on by default). Anywhere, you can turn usage statistics off in Settings › Privacy settings › Send app usage statistics; every feature works the same either way. Legal basis for the EEA and Switzerland: consent (GDPR Art. 6(1)(a), Swiss FADP). You also have the rights of access, rectification, erasure, restriction, objection and to lodge a complaint with a supervisory authority — contact us below.</li>
         <li><strong>Subscriptions and lifetime purchase</strong> are sold only through App Store / Google Play billing. Payment details are handled by the store; we never receive them.</li>
         <li><strong>Free-trial check:</strong> to stop the 7-day free period from repeating after reinstalling, we store a one-way hashed device value (SHA-256 of the Android per-app ID, or of a random value the app keeps on the iPhone, with an app-specific salt) and its first registration time on our server (Supabase). It contains nothing you entered.</li>
         <li><strong>Usage statistics:</strong> Google Analytics for Firebase records screen views, feature use and errors, a random app-instance ID, device/app information, approximate location derived from IP (country/city level) and in-app purchase events, to improve the app. No advertising ID is collected and nothing you enter (birth date, names, addresses, questions) is sent. Retention: 14 months.</li>
@@ -200,7 +203,7 @@ a{color:var(--brand)}
   </details>
 
   <footer>
-    <p>집운 · <a href="./">앱 소개</a> · 문의 <a href="mailto:dys0707y@gmail.com">dys0707y@gmail.com</a></p>
+    <p>집운 · <a href="https://trendx-app.github.io/jibwoon/">앱 소개</a> · 문의 <a href="mailto:dys0707y@gmail.com">dys0707y@gmail.com</a></p>
   </footer>
 
 </div>
